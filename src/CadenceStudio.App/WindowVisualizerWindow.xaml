@@ -1,0 +1,218 @@
+<Window x:Class="CadenceStudio.App.WindowVisualizerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        Title="Cadence Studio — Window Visualizer"
+        Width="1180" Height="720" MinWidth="640" MinHeight="420"
+        WindowStyle="None" AllowsTransparency="False" ResizeMode="CanResize"
+        Background="{DynamicResource WindowBrush}" ShowInTaskbar="True" KeyDown="Window_KeyDown"
+        MouseMove="Window_MouseMove">
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome CaptionHeight="34" ResizeBorderThickness="6" CornerRadius="0" GlassFrameThickness="0" UseAeroCaptionButtons="False"/>
+    </shell:WindowChrome.WindowChrome>
+
+    <Grid x:Name="VisualizerRoot" ClipToBounds="True" Opacity="1">
+        <Grid.Background>
+            <RadialGradientBrush Center="0.5,0.47" GradientOrigin="0.5,0.47" RadiusX="0.78" RadiusY="0.92">
+                <GradientStop Color="{DynamicResource VisualizerAtmosphereColor}" Offset="0"/>
+                <GradientStop Color="{DynamicResource SurfaceRaisedColor}" Offset="0.43"/>
+                <GradientStop Color="{DynamicResource WindowColor}" Offset="1"/>
+            </RadialGradientBrush>
+        </Grid.Background>
+
+        <!-- cinematic atmospheric color fields -->
+        <Ellipse Width="920" Height="540" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.28">
+            <Ellipse.Fill><RadialGradientBrush><GradientStop Color="{DynamicResource VisualizerAtmosphereColor}" Offset="0"/><GradientStop Color="{DynamicResource AccentSoftColor}" Offset="0.48"/><GradientStop Color="#00000000" Offset="1"/></RadialGradientBrush></Ellipse.Fill>
+            <Ellipse.Effect><BlurEffect Radius="70"/></Ellipse.Effect>
+        </Ellipse>
+        <Ellipse x:Name="AtmosphereHaloA" Width="1120" Height="420" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.18">
+            <Ellipse.Fill><RadialGradientBrush><GradientStop Color="{DynamicResource VisualizerBand1Color}" Offset="0"/><GradientStop Color="#00101018" Offset="1"/></RadialGradientBrush></Ellipse.Fill>
+            <Ellipse.Effect><BlurEffect Radius="95"/></Ellipse.Effect>
+        </Ellipse>
+        <Ellipse x:Name="AtmosphereHaloB" Width="760" Height="760" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.16">
+            <Ellipse.Fill><RadialGradientBrush><GradientStop Color="{DynamicResource VisualizerBand6Color}" Offset="0"/><GradientStop Color="#00000000" Offset="1"/></RadialGradientBrush></Ellipse.Fill>
+            <Ellipse.Effect><BlurEffect Radius="82"/></Ellipse.Effect>
+        </Ellipse>
+        <Canvas IsHitTestVisible="False" Opacity="0.72">
+            <Ellipse x:Name="ParticleA" Width="5" Height="5" Fill="{DynamicResource VisualizerBand6Brush}" Canvas.Left="110" Canvas.Top="128"/>
+            <Ellipse x:Name="ParticleB" Width="3" Height="3" Fill="{DynamicResource VisualizerCoreBrush}" Canvas.Right="145" Canvas.Top="172"/>
+            <Ellipse x:Name="ParticleC" Width="4" Height="4" Fill="{DynamicResource VisualizerBand5Brush}" Canvas.Left="245" Canvas.Bottom="150"/>
+            <Ellipse x:Name="ParticleD" Width="3" Height="3" Fill="{DynamicResource VisualizerBand3Brush}" Canvas.Right="260" Canvas.Bottom="132"/>
+            <Ellipse x:Name="ParticleE" Width="2" Height="2" Fill="White" Canvas.Left="50" Canvas.Top="290"/>
+            <Ellipse x:Name="ParticleF" Width="2" Height="2" Fill="White" Canvas.Right="68" Canvas.Top="248"/>
+        </Canvas>
+        <Ellipse x:Name="OrbitOuter" Width="730" Height="730" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{DynamicResource VisualizerBand1Brush}" StrokeThickness="2" RenderTransformOrigin="0.5,0.5"><Ellipse.RenderTransform><RotateTransform/></Ellipse.RenderTransform></Ellipse>
+        <Ellipse x:Name="OrbitMiddle" Width="600" Height="600" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{DynamicResource BorderBrush}" StrokeThickness="1" StrokeDashArray="2,7" RenderTransformOrigin="0.5,0.5"><Ellipse.RenderTransform><RotateTransform/></Ellipse.RenderTransform></Ellipse>
+        <Ellipse x:Name="OrbitInner" Width="470" Height="470" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{DynamicResource VisualizerBand5Brush}" StrokeThickness="1.5" StrokeDashArray="5,3" RenderTransformOrigin="0.5,0.5"><Ellipse.RenderTransform><RotateTransform/></Ellipse.RenderTransform></Ellipse>
+        <Ellipse x:Name="CelestialDottedRing" Width="350" Height="350" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#55E6B65D" StrokeThickness="2" StrokeDashArray="1,4"/>
+
+        <!-- orbital nodes -->
+        <Ellipse Width="12" Height="12" Fill="{DynamicResource VisualizerCoreBrush}" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,82,0,0"><Ellipse.Effect><DropShadowEffect Color="{DynamicResource VisualizerCoreColor}" BlurRadius="18" ShadowDepth="0"/></Ellipse.Effect></Ellipse>
+        <Ellipse Width="8" Height="8" Fill="{DynamicResource VisualizerBand6Brush}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="180,0,0,0"/>
+        <Ellipse Width="8" Height="8" Fill="{DynamicResource VisualizerBand6Brush}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,180,0"/>
+
+        <!-- alternate preset layers: each preset has its own geometry and atmosphere -->
+        <Grid x:Name="AuroraCascadeLayer" Visibility="Collapsed" IsHitTestVisible="False">
+            <Ellipse Width="980" Height="520" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.42">
+                <Ellipse.Fill><RadialGradientBrush><GradientStop Color="{DynamicResource VisualizerBand3Color}" Offset="0"/><GradientStop Color="{DynamicResource VisualizerBand5Color}" Offset="0.48"/><GradientStop Color="#00000000" Offset="1"/></RadialGradientBrush></Ellipse.Fill>
+                <Ellipse.Effect><BlurEffect Radius="85"/></Ellipse.Effect>
+            </Ellipse>
+            <Canvas ClipToBounds="True">
+                <Path x:Name="AuroraRibbonA" Data="M 0,170 C 220,40 420,290 650,120 C 860,-20 1040,210 1280,65" Stroke="{DynamicResource VisualizerBand3Brush}" StrokeThickness="46" Opacity="0.38" Fill="Transparent"><Path.Effect><BlurEffect Radius="26"/></Path.Effect></Path>
+                <Path x:Name="AuroraRibbonB" Data="M 0,280 C 210,410 430,95 690,260 C 920,410 1090,115 1320,310" Stroke="{DynamicResource VisualizerBand5Brush}" StrokeThickness="34" Opacity="0.34" Fill="Transparent"><Path.Effect><BlurEffect Radius="22"/></Path.Effect></Path>
+                <Path x:Name="AuroraRibbonC" Data="M 0,350 C 250,190 430,470 710,300 C 930,160 1100,380 1320,210" Stroke="{DynamicResource VisualizerBand6Brush}" StrokeThickness="18" Opacity="0.30" Fill="Transparent"><Path.Effect><BlurEffect Radius="16"/></Path.Effect></Path>
+            </Canvas>
+        </Grid>
+
+        <Grid x:Name="GlassHorizonLayer" Visibility="Collapsed" IsHitTestVisible="False" Opacity="0.66">
+            <Viewbox Stretch="Uniform" StretchDirection="Both" Margin="155,92,155,126" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Grid Width="760" Height="430" RenderTransformOrigin="0.5,0.5">
+                    <Grid.RenderTransform><RotateTransform x:Name="GlassHorizonRotation"/></Grid.RenderTransform>
+                    <Ellipse Width="650" Height="350" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="#08000000" Stroke="{DynamicResource VisualizerBand5Brush}" StrokeThickness="1" Opacity="0.50"/>
+                    <Canvas Width="700" Height="390" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Polygon x:Name="GlassShardA" Points="120,330 245,82 330,325" Stroke="{DynamicResource VisualizerBand6Brush}" StrokeThickness="1.6">
+                            <Polygon.Fill><LinearGradientBrush StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#0EFFFFFF" Offset="0"/><GradientStop Color="{DynamicResource VisualizerBand6Color}" Offset="0.55"/><GradientStop Color="#02000000" Offset="1"/></LinearGradientBrush></Polygon.Fill>
+                        </Polygon>
+                        <Polygon x:Name="GlassShardB" Points="270,345 385,105 480,345" Stroke="{DynamicResource VisualizerBand4Brush}" StrokeThickness="1.5">
+                            <Polygon.Fill><LinearGradientBrush StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#12FFFFFF" Offset="0"/><GradientStop Color="{DynamicResource VisualizerBand4Color}" Offset="0.58"/><GradientStop Color="#02000000" Offset="1"/></LinearGradientBrush></Polygon.Fill>
+                        </Polygon>
+                        <Polygon x:Name="GlassShardC" Points="445,330 555,70 635,330" Stroke="{DynamicResource VisualizerBand5Brush}" StrokeThickness="1.6">
+                            <Polygon.Fill><LinearGradientBrush StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#0CFFFFFF" Offset="0"/><GradientStop Color="{DynamicResource VisualizerBand5Color}" Offset="0.60"/><GradientStop Color="#02000000" Offset="1"/></LinearGradientBrush></Polygon.Fill>
+                        </Polygon>
+                        <Line X1="105" Y1="338" X2="645" Y2="338" Stroke="{DynamicResource VisualizerCoreBrush}" StrokeThickness="2" Opacity="0.72"/>
+                        <Line X1="190" Y1="118" X2="570" Y2="315" Stroke="#32FFFFFF" StrokeThickness="1"/>
+                        <Line X1="300" Y1="310" X2="575" Y2="100" Stroke="#24FFFFFF" StrokeThickness="1"/>
+                    </Canvas>
+                </Grid>
+            </Viewbox>
+        </Grid>
+
+        <Grid x:Name="InfiniteWindowsLayer" Visibility="Collapsed" IsHitTestVisible="False" RenderTransformOrigin="0.5,0.5">
+            <Grid.RenderTransform><ScaleTransform ScaleX="1" ScaleY="1"/></Grid.RenderTransform>
+            <Border Width="860" Height="520" HorizontalAlignment="Center" VerticalAlignment="Center" BorderBrush="{DynamicResource VisualizerBand1Brush}" BorderThickness="2" Opacity="0.28"/>
+            <Border Width="700" Height="420" HorizontalAlignment="Center" VerticalAlignment="Center" BorderBrush="{DynamicResource VisualizerBand2Brush}" BorderThickness="2" Opacity="0.38"/>
+            <Border Width="540" Height="320" HorizontalAlignment="Center" VerticalAlignment="Center" BorderBrush="{DynamicResource VisualizerBand4Brush}" BorderThickness="2" Opacity="0.52"/>
+            <Border Width="380" Height="220" HorizontalAlignment="Center" VerticalAlignment="Center" BorderBrush="{DynamicResource VisualizerBand5Brush}" BorderThickness="3" Opacity="0.68"/>
+            <Border Width="220" Height="120" HorizontalAlignment="Center" VerticalAlignment="Center" BorderBrush="{DynamicResource VisualizerCoreBrush}" BorderThickness="4" Opacity="0.92"><Border.Effect><DropShadowEffect Color="{DynamicResource VisualizerCoreColor}" BlurRadius="34" ShadowDepth="0"/></Border.Effect></Border>
+        </Grid>
+
+        <!-- spectrum stage -->
+        <Grid x:Name="SpectrumStage" Margin="58,88,58,112" RenderTransformOrigin="0.5,0.5"><Grid.RenderTransform><ScaleTransform ScaleX="1" ScaleY="1"/></Grid.RenderTransform>
+            <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+            <ItemsControl Grid.Row="0" ItemsSource="{Binding VisualizerBars}" VerticalAlignment="Bottom" Height="230" Opacity="0.34" IsHitTestVisible="False">
+                <ItemsControl.Effect><BlurEffect Radius="11"/></ItemsControl.Effect>
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Rows="1"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate><DataTemplate><Border Height="{Binding ExpandedHeight}" Margin="1,0" VerticalAlignment="Bottom" Background="{Binding ExpandedFill}" CornerRadius="5"/></DataTemplate></ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <ItemsControl Grid.Row="0" ItemsSource="{Binding VisualizerBars}" VerticalAlignment="Bottom" Height="230">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Rows="1"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Height="{Binding ExpandedHeight}" Margin="2,0" VerticalAlignment="Bottom" Background="{Binding ExpandedFill}" CornerRadius="3,3,1,1">
+                            <Border.Effect><DropShadowEffect Color="#AAFFFFFF" BlurRadius="12" ShadowDepth="0" Opacity="0.32"/></Border.Effect>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <Border Grid.Row="1" Height="2" Background="{DynamicResource VisualizerCoreBrush}" CornerRadius="1"><Border.Effect><DropShadowEffect Color="{DynamicResource VisualizerCoreColor}" BlurRadius="18" ShadowDepth="0"/></Border.Effect></Border>
+            <ItemsControl Grid.Row="2" ItemsSource="{Binding VisualizerBars}" VerticalAlignment="Top" Height="170" Opacity="0.42" RenderTransformOrigin="0.5,0.5">
+                <ItemsControl.RenderTransform><ScaleTransform ScaleY="-0.68"/></ItemsControl.RenderTransform>
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Rows="1"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate><Border Height="{Binding ExpandedHeight}" Margin="2,0" VerticalAlignment="Top" Background="{Binding ExpandedFill}" CornerRadius="1,1,3,3"><Border.Effect><BlurEffect Radius="2"/></Border.Effect></Border></DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+
+        <!-- central energy core -->
+        <Grid x:Name="CoreShell" Width="230" Height="230" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5"><Grid.RenderTransform><TransformGroup><ScaleTransform/><RotateTransform/></TransformGroup></Grid.RenderTransform>
+            <Ellipse Stroke="#90F5D58C" StrokeThickness="2" Margin="4"/>
+            <Ellipse Stroke="#60B7B9FF" StrokeThickness="1" Margin="30" StrokeDashArray="3,4"/>
+            <Polygon x:Name="CoreHex" Points="115,38 180,76 180,152 115,190 50,152 50,76" Stroke="{DynamicResource VisualizerCoreBrush}" StrokeThickness="2.2" Fill="#142A2637"/>
+            <Polygon x:Name="CoreDiamond" Points="115,54 163,114 115,174 67,114" Stroke="{DynamicResource VisualizerBand6Brush}" StrokeThickness="1.4" Fill="#102E3760"/>
+            <Line X1="50" Y1="76" X2="180" Y2="152" Stroke="#70FFFFFF"/>
+            <Line X1="180" Y1="76" X2="50" Y2="152" Stroke="#70FFFFFF"/>
+            <Ellipse x:Name="CoreGlow" Width="24" Height="24" Fill="{DynamicResource VisualizerBand6Brush}" HorizontalAlignment="Center" VerticalAlignment="Center"><Ellipse.Effect><DropShadowEffect Color="{DynamicResource VisualizerCoreColor}" BlurRadius="34" ShadowDepth="0" Opacity="1"/></Ellipse.Effect></Ellipse>
+        </Grid>
+
+        <!-- reflective platform -->
+        <Ellipse x:Name="ReflectionPlatform" Width="520" Height="90" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,68" Stroke="#70F5C96C" StrokeThickness="2" Fill="#0EFFFFFF"/>
+        <Ellipse x:Name="ReflectionInner" Width="390" Height="58" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,82" Stroke="#50FFFFFF" StrokeThickness="1"/>
+
+        <!-- top chrome -->
+        <Grid VerticalAlignment="Top" Height="48" Background="#9005070B" shell:WindowChrome.IsHitTestVisibleInChrome="False">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="18,0,0,0">
+                <TextBlock Text="CADENCE STUDIO" Foreground="#CDE7E7EA" FontWeight="SemiBold" FontSize="13"/>
+                <TextBlock Text=" — WINDOW VISUALIZER" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold" FontSize="13"/>
+                <TextBlock Text="  •  " Foreground="#AFC8CAD2" FontSize="11" VerticalAlignment="Center"/><TextBlock Text="{Binding WindowVisualizerPresetLabel}" Foreground="#AFC8CAD2" FontSize="11" VerticalAlignment="Center"/>
+                <TextBlock x:Name="PresetCreditText" Text="  •  Inspired by TMWrath" Foreground="#8FA6A8B2" FontSize="10" VerticalAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,0,8,0" VerticalAlignment="Center">
+                <ComboBox x:Name="PresetSelector" Width="172" Height="30" Margin="0,0,10,0" Style="{StaticResource PremiumComboBoxStyle}" SelectionChanged="PresetSelector_SelectionChanged" shell:WindowChrome.IsHitTestVisibleInChrome="True">
+                    <ComboBoxItem Content="Celestial Resonance" Tag="CelestialResonance"/>
+                    <ComboBoxItem Content="Aurora Cascade" Tag="AuroraCascade"/>
+                    <ComboBoxItem Content="Glass Horizon" Tag="GlassHorizon"/>
+                    <ComboBoxItem Content="Infinite Windows" Tag="InfiniteWindows"/>
+                </ComboBox>
+                <Button Content="PIN" Click="Pin_Click" Width="50" Height="28" Margin="2,0,5,0" Background="{DynamicResource PremiumButtonBrush}" BorderBrush="{DynamicResource AccentBrush}" Foreground="{DynamicResource TextPrimaryBrush}" shell:WindowChrome.IsHitTestVisibleInChrome="True"/>
+                <Button Content="▣" Click="Fullscreen_Click" Width="38" Height="28" Margin="2,0,5,0" Background="{DynamicResource PremiumButtonBrush}" BorderBrush="{DynamicResource AccentBrush}" Foreground="White" FontSize="14" shell:WindowChrome.IsHitTestVisibleInChrome="True"/>
+                <Button Content="✕" Click="Close_Click" Width="38" Height="28" Margin="2,0,5,0" Background="{DynamicResource PremiumButtonBrush}" BorderBrush="{DynamicResource AccentBrush}" Foreground="White" shell:WindowChrome.IsHitTestVisibleInChrome="True"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- bottom hover controls -->
+        <Border x:Name="ControlsPanel" VerticalAlignment="Bottom" Margin="18,18,18,14" Padding="10,9" CornerRadius="13" Background="{DynamicResource PremiumMenuBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1" Opacity="0">
+            <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="52" Height="52" CornerRadius="8" Margin="0,0,10,0" BorderBrush="#66F0C36B" BorderThickness="1">
+                        <Border.Background><ImageBrush ImageSource="{Binding NowPlayingArtwork, Converter={StaticResource AlbumArtConverter}}" Stretch="UniformToFill"/></Border.Background>
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="{Binding NowPlayingTitle}" Foreground="White" FontSize="16" FontWeight="Bold" TextTrimming="CharacterEllipsis" MaxWidth="310"/>
+                        <TextBlock Text="{Binding NowPlayingArtist}" Foreground="#CCF0C36B" FontSize="13"/>
+                        <TextBlock Text="{Binding NowPlayingAlbum}" Foreground="#AFC8CAD2" FontSize="12" FontStyle="Italic"/>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Style="{StaticResource TransportButtonStyle}" Content="◀" Command="{Binding PreviousCommand}" Margin="6"/>
+                    <Button Style="{StaticResource PlayButtonStyle}" Command="{Binding TogglePlaybackCommand}" Margin="8">
+                        <Grid Width="30" Height="30">
+                            <Path Data="M 7,4 L 25,15 L 7,26 Z" Fill="{DynamicResource AccentTextBrush}">
+                                <Path.Style>
+                                    <Style TargetType="Path">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers><DataTrigger Binding="{Binding IsPlaybackPlaying}" Value="True"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers>
+                                    </Style>
+                                </Path.Style>
+                            </Path>
+                            <Grid>
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers><DataTrigger Binding="{Binding IsPlaybackPlaying}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers>
+                                    </Style>
+                                </Grid.Style>
+                                <Rectangle Width="7" Height="24" Fill="{DynamicResource AccentTextBrush}" HorizontalAlignment="Left"/>
+                                <Rectangle Width="7" Height="24" Fill="{DynamicResource AccentTextBrush}" HorizontalAlignment="Right"/>
+                            </Grid>
+                        </Grid>
+                    </Button>
+                    <Button Style="{StaticResource TransportButtonStyle}" Content="▶" Command="{Binding NextCommand}" Margin="6"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <TextBlock Text="FULL RANGE • 20 Hz — 20 kHz" Foreground="#AFC8CAD2" FontSize="11" HorizontalAlignment="Right"/>
+                    <TextBlock Text="{Binding WindowVisualizerQualityLabel}" Foreground="{DynamicResource AccentBrush}" FontSize="11" HorizontalAlignment="Right" Margin="0,5,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+
+        <Border x:Name="IdleBadge" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,106" Padding="12,5" CornerRadius="11" Background="#9905080D" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Opacity="0.78" IsHitTestVisible="False">
+            <TextBlock Text="PAUSED • AMBIENT IDLE" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" FontWeight="SemiBold"/>
+            <Border.Style><Style TargetType="Border"><Setter Property="Visibility" Value="Visible"/><Style.Triggers><DataTrigger Binding="{Binding IsPlaybackPlaying}" Value="True"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></Border.Style>
+        </Border>
+        <Border BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1" Opacity="0.62" IsHitTestVisible="False"/>
+    </Grid>
+</Window>

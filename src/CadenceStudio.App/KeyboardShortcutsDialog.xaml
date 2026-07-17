@@ -1,0 +1,125 @@
+<Window x:Class="CadenceStudio.App.KeyboardShortcutsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        Title="Keyboard Shortcuts"
+        Width="820" Height="690"
+        MinWidth="700" MinHeight="580"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="None"
+        ResizeMode="CanResize"
+        Background="{DynamicResource WindowBrush}"
+        FontFamily="{DynamicResource AppBodyFontFamily}"
+        FontSize="{DynamicResource AppBodyFontSize}"
+        FontWeight="Medium"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        BorderThickness="0"
+        SnapsToDevicePixels="True"
+        UseLayoutRounding="True"
+        ShowInTaskbar="False"
+        PreviewKeyDown="Dialog_PreviewKeyDown">
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome CaptionHeight="48"
+                            ResizeBorderThickness="6"
+                            CornerRadius="18"
+                            GlassFrameThickness="0"
+                            UseAeroCaptionButtons="False" />
+    </shell:WindowChrome.WindowChrome>
+
+    <Window.Resources>
+        <Style x:Key="ShortcutKeyStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="7" />
+            <Setter Property="Padding" Value="8,4" />
+            <Setter Property="MinWidth" Value="66" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="TextElement.FontFamily" Value="{DynamicResource AppTechnicalFontFamily}" />
+            <Setter Property="TextElement.FontWeight" Value="SemiBold" />
+        </Style>
+        <Style x:Key="ShortcutRowStyle" TargetType="Grid">
+            <Setter Property="Margin" Value="0,5" />
+        </Style>
+    </Window.Resources>
+
+    <Border Style="{StaticResource PremiumDialogChromeStyle}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="48" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0" Background="{DynamicResource WindowBrush}" BorderBrush="{DynamicResource BorderSoftBrush}" BorderThickness="0,0,0,1"
+                    CornerRadius="18,18,0,0" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid>
+                    <TextBlock Text="Keyboard Shortcuts" Style="{StaticResource SecondaryDialogTitleStyle}" Margin="18,0" />
+                    <Button HorizontalAlignment="Right" shell:WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource CloseWindowButtonStyle}" Content="×" Click="Close_Click" />
+                </Grid>
+            </Border>
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="28">
+                <StackPanel>
+                    <TextBlock Text="Fast control without leaving the music" FontFamily="{DynamicResource AppDisplayFontFamily}" FontSize="{DynamicResource AppDialogHeroFontSize}" FontWeight="Bold" />
+                    <TextBlock Text="Shortcuts work globally unless focus is inside a text field or an interactive list/control. Press Esc to close this reference."
+                               Style="{StaticResource CaptionStyle}" TextWrapping="Wrap" Margin="0,6,0,20" />
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="18" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <Border Style="{StaticResource SecondaryWorkspaceCardStyle}" Padding="18">
+                                <StackPanel>
+                                    <TextBlock Text="Playback" Style="{StaticResource PanelTitleStyle}" Margin="0,0,0,8" />
+                                    <Grid Style="{StaticResource ShortcutRowStyle}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Play / Pause"/><Border Grid.Column="1" Style="{StaticResource ShortcutKeyStyle}"><TextBlock Text="Space" HorizontalAlignment="Center"/></Border></Grid>
+                                    <Grid Style="{StaticResource ShortcutRowStyle}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Previous track"/><Border Grid.Column="1" Style="{StaticResource ShortcutKeyStyle}"><TextBlock Text="Ctrl + ←" HorizontalAlignment="Center"/></Border></Grid>
+                                    <Grid Style="{StaticResource ShortcutRowStyle}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Next track"/><Border Grid.Column="1" Style="{StaticResource ShortcutKeyStyle}"><TextBlock Text="Ctrl + →" HorizontalAlignment="Center"/></Border></Grid>
+                                    <Grid Style="{StaticResource ShortcutRowStyle}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Seek backward / forward"/><Border Grid.Column="1" Style="{StaticResource ShortcutKeyStyle}"><TextBlock Text="← / →" HorizontalAlignment="Center"/></Border></Grid>
+                                    <Grid Style="{StaticResource ShortcutRowStyle}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Volume down / up"/><Border Grid.Column="1" Style="{StaticResource ShortcutKeyStyle}"><TextBlock Text="↓ / ↑" HorizontalAlignment="Center"/></Border></Grid>
+                                    <Grid Style="{StaticResource ShortcutRowStyle}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Mute"/><Border Grid.Column="1" Style="{StaticResource ShortcutKeyStyle}"><TextBlock Text="M" HorizontalAlignment="Center"/></Border></Grid>
+                                    <Grid Style="{StaticResource ShortcutRowStyle}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Shuffle"/><Border Grid.Column="1" Style="{StaticResource ShortcutKeyStyle}"><TextBlock Text="S" HorizontalAlignment="Center"/></Border></Grid>
+                                    <Grid Style="{StaticResource ShortcutRowStyle}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Cycle repeat"/><Border Grid.Column="1" Style="{StaticResource ShortcutKeyStyle}"><TextBlock Text="R" HorizontalAlignment="Center"/></Border></Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource SecondaryWorkspaceCardStyle}" Padding="18" Margin="0,18,0,0">
+                                <StackPanel>
+                                    <TextBlock Text="Files and playlists" Style="{StaticResource PanelTitleStyle}" Margin="0,0,0,8" />
+                                    <Grid Style="{StaticResource ShortcutRowStyle}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Open music"/><Border Grid.Column="1" Style="{StaticResource ShortcutKeyStyle}"><TextBlock Text="Ctrl + O" HorizontalAlignment="Center"/></Border></Grid>
+                                    <Grid Style="{StaticResource ShortcutRowStyle}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Save queue as playlist"/><Border Grid.Column="1" Style="{StaticResource ShortcutKeyStyle}"><TextBlock Text="Ctrl + S" HorizontalAlignment="Center"/></Border></Grid>
+                                    <Grid Style="{StaticResource ShortcutRowStyle}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Export selected playlist"/><Border Grid.Column="1" Style="{StaticResource ShortcutKeyStyle}"><TextBlock Text="Ctrl + Shift + S" HorizontalAlignment="Center"/></Border></Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <Border Style="{StaticResource SecondaryWorkspaceCardStyle}" Padding="18">
+                                <StackPanel>
+                                    <TextBlock Text="Navigation" Style="{StaticResource PanelTitleStyle}" Margin="0,0,0,8" />
+                                    <Grid Style="{StaticResource ShortcutRowStyle}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Library"/><Border Grid.Column="1" Style="{StaticResource ShortcutKeyStyle}"><TextBlock Text="Ctrl + L" HorizontalAlignment="Center"/></Border></Grid>
+                                    <Grid Style="{StaticResource ShortcutRowStyle}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Playlists"/><Border Grid.Column="1" Style="{StaticResource ShortcutKeyStyle}"><TextBlock Text="Ctrl + P" HorizontalAlignment="Center"/></Border></Grid>
+                                    <Grid Style="{StaticResource ShortcutRowStyle}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Queue"/><Border Grid.Column="1" Style="{StaticResource ShortcutKeyStyle}"><TextBlock Text="Ctrl + Q" HorizontalAlignment="Center"/></Border></Grid>
+                                    <Grid Style="{StaticResource ShortcutRowStyle}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Settings"/><Border Grid.Column="1" Style="{StaticResource ShortcutKeyStyle}"><TextBlock Text="Ctrl + ," HorizontalAlignment="Center"/></Border></Grid>
+                                    <Grid Style="{StaticResource ShortcutRowStyle}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Focus current search"/><Border Grid.Column="1" Style="{StaticResource ShortcutKeyStyle}"><TextBlock Text="Ctrl + F" HorizontalAlignment="Center"/></Border></Grid>
+                                    <Grid Style="{StaticResource ShortcutRowStyle}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Compact / Expanded"/><Border Grid.Column="1" Style="{StaticResource ShortcutKeyStyle}"><TextBlock Text="Ctrl + E" HorizontalAlignment="Center"/></Border></Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource SecondaryWorkspaceCardStyle}" Padding="18" Margin="0,18,0,0">
+                                <StackPanel>
+                                    <TextBlock Text="Help" Style="{StaticResource PanelTitleStyle}" Margin="0,0,0,8" />
+                                    <Grid Style="{StaticResource ShortcutRowStyle}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Shortcut reference"/><Border Grid.Column="1" Style="{StaticResource ShortcutKeyStyle}"><TextBlock Text="Ctrl + /" HorizontalAlignment="Center"/></Border></Grid>
+                                    <Grid Style="{StaticResource ShortcutRowStyle}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Shortcut reference"/><Border Grid.Column="1" Style="{StaticResource ShortcutKeyStyle}"><TextBlock Text="F1" HorizontalAlignment="Center"/></Border></Grid>
+                                    <Grid Style="{StaticResource ShortcutRowStyle}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Close dialog / clear focus"/><Border Grid.Column="1" Style="{StaticResource ShortcutKeyStyle}"><TextBlock Text="Esc" HorizontalAlignment="Center"/></Border></Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Border>
+</Window>

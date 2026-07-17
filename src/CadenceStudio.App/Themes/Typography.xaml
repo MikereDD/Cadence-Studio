@@ -1,0 +1,25 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Runtime-selectable typography defaults. TypographyManager replaces these
+         resources when the user changes profile or text scale. No Light/Thin weights
+         are used anywhere in the Cadence Studio typography system. -->
+    <FontFamily x:Key="AppBodyFontFamily">Segoe UI Variable Text, Segoe UI</FontFamily>
+    <FontFamily x:Key="AppDisplayFontFamily">Segoe UI Variable Display, Segoe UI</FontFamily>
+    <FontFamily x:Key="AppTechnicalFontFamily">Cascadia Mono, Consolas</FontFamily>
+
+    <sys:Double x:Key="AppSmallFontSize">11</sys:Double>
+    <sys:Double x:Key="AppCaptionFontSize">12</sys:Double>
+    <sys:Double x:Key="AppBodyFontSize">13</sys:Double>
+    <sys:Double x:Key="AppControlFontSize">12</sys:Double>
+    <sys:Double x:Key="AppNavigationFontSize">14</sys:Double>
+    <sys:Double x:Key="AppPanelTitleFontSize">18</sys:Double>
+    <sys:Double x:Key="AppPageTitleFontSize">30</sys:Double>
+    <sys:Double x:Key="AppCompactTrackTitleFontSize">22</sys:Double>
+    <sys:Double x:Key="AppExpandedTrackTitleFontSize">34</sys:Double>
+    <sys:Double x:Key="AppQueueTitleFontSize">14</sys:Double>
+    <sys:Double x:Key="AppLyricsFontSize">15</sys:Double>
+    <sys:Double x:Key="AppLyricsLineHeight">27</sys:Double>
+    <sys:Double x:Key="AppDialogHeroFontSize">28</sys:Double>
+</ResourceDictionary>
