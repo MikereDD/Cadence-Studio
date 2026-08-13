@@ -1,6 +1,6 @@
 # SDK compatibility
 
-Cadence Studio v1.0-dev.10.9 targets .NET 8 for Windows and WPF.
+Cadence Studio v1.0 targets .NET 8 for Windows and WPF.
 
 Validated target configuration:
 

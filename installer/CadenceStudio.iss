@@ -1,5 +1,5 @@
 #ifndef MyAppVersion
-  #define MyAppVersion "1.0-dev"
+  #define MyAppVersion "1.0"
 #endif
 #ifndef PublishDir
   #error PublishDir must be supplied by New-Installer.ps1
@@ -12,7 +12,7 @@
 #endif
 
 #define MyAppName "Cadence Studio"
-#define MyAppPublisher "Mike Redd"
+#define MyAppPublisher "Typezer∅"
 #define MyAppExeName "CadenceStudio.exe"
 
 [Setup]

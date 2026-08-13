@@ -102,7 +102,7 @@
                         </Border>
                     </Grid>
 
-                    <TextBlock Text="It Works On My Machine • Mike Redd" Style="{StaticResource CaptionStyle}" HorizontalAlignment="Center" Margin="0,24,0,6" />
+                    <TextBlock Text="Typezer∅ Studio" Style="{StaticResource CaptionStyle}" HorizontalAlignment="Center" Margin="0,24,0,6" />
                 </StackPanel>
             </ScrollViewer>
         </Grid>

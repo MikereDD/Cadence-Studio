@@ -37,7 +37,7 @@ public sealed partial class MusicEnrichmentService : ITrackEnrichmentService
             Timeout = TimeSpan.FromSeconds(15)
         };
         _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(
-            "CadenceStudio/1.0-dev.10.9.2 (https://github.com/MikereDD/It-Works-On-My-Machine)");
+            "CadenceStudio/1.0 (https://github.com/MikereDD/Cadence-Studio)");
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
     }
 

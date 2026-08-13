@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  <a href="release/"><strong>Release files</strong></a>
+  <a href="https://github.com/MikereDD/Cadence-Studio/releases"><strong>GitHub Releases</strong></a>
   ·
   <a href="RELEASE-NOTES.md">Release notes</a>
   ·
@@ -94,7 +94,7 @@ Cadence Studio is separate from **Cadence Classic**, the original PowerShell/Win
 
 ### Download a release
 
-Prebuilt installers and portable packages are kept in the repository’s [**release directory**](release/).
+Prebuilt installers and portable packages are published through [**GitHub Releases**](https://github.com/MikereDD/Cadence-Studio/releases). Release binaries are intentionally kept out of the source repository.
 
 ### Windows installer
 
@@ -184,7 +184,7 @@ Stable v1.0 is a quality gate, not a schedule target. The application reached st
 
 ## Documentation
 
-- [Release files](release/)
+- [GitHub Releases](https://github.com/MikereDD/Cadence-Studio/releases)
 - [v1.0 Validation Plan](RC-TEST-PLAN.md)
 - [Testing Notes](TESTING.md)
 - [Architecture](ARCHITECTURE.md)

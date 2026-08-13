@@ -4,6 +4,10 @@ All notable Cadence Studio changes are recorded here in reverse chronological or
 
 ## v1.0 — Stable release
 
+- Adopted the final Cadence Studio application icon across the executable, installer, About UI, and README branding.
+- Prepared the standalone public repository for GitHub Releases by removing tracked release binaries and ignoring generated `release/` and `artifacts/` output.
+- Updated public project metadata and enrichment user-agent references for the standalone Cadence Studio repository.
+
 - Promoted the validated v1.0 release candidate to the first stable Cadence Studio release.
 - Replaced release-candidate interface badges with **Stable Release**.
 - Finalized product versioning, README presentation, release notes, installer metadata, and packaging output for v1.0.

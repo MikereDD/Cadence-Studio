@@ -2,6 +2,7 @@
 [Bb]in/
 [Oo]bj/
 artifacts/
+release/
 
 # Visual Studio
 .vs/

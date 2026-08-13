@@ -56,3 +56,8 @@ User data remains under:
 ```
 
 Uninstalling Cadence Studio removes the application and shortcuts while intentionally preserving that user-data directory.
+
+## Final release presentation
+
+The public v1.0 repository uses the final Cadence Studio application icon across the app, installer, and README. Release binaries are distributed through GitHub Releases rather than stored in source control.
+

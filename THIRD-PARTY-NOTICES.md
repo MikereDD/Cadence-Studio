@@ -1,6 +1,6 @@
 # Third-party notices
 
-Cadence Studio v1.0-dev.10.9 references or accesses:
+Cadence Studio v1.0 references or accesses:
 
 - **NAudio 2.3.0** by Mark Heath and contributors, distributed under the MIT License.
 - **TagLibSharp 2.3.0**, distributed under the LGPL-2.1 license as identified by its NuGet package metadata.

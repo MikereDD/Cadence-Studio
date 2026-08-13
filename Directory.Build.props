@@ -7,9 +7,9 @@
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
-    <Authors>Mike Redd</Authors>
-    <Company>It Works On My Machine</Company>
+    <Authors>Typezer∅</Authors>
+    <Company>Typezer∅ Studio</Company>
     <Product>Cadence Studio</Product>
-    <Copyright>Copyright © Mike Redd</Copyright>
+    <Copyright>Copyright © Typezer∅</Copyright>
   </PropertyGroup>
 </Project>
