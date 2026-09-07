@@ -3,8 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         Title="About Cadence Studio"
-        Width="760" Height="680"
-        MinWidth="680" MinHeight="600"
+        Width="760" Height="760"
+        MinWidth="680" MinHeight="620"
         WindowStartupLocation="CenterOwner"
         WindowStyle="None"
         ResizeMode="CanResize"
@@ -56,7 +56,7 @@
                             <TextBlock Text="{Binding VersionText}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="13" Margin="0,4,0,0" />
                             <Border Background="{DynamicResource SurfaceRaisedBrush}" BorderBrush="{DynamicResource BorderSoftBrush}" BorderThickness="1"
                                     CornerRadius="10" Padding="10,5" HorizontalAlignment="Left" Margin="0,12,0,0">
-                                <TextBlock Text="STABLE RELEASE" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}" />
+                                <TextBlock x:Name="ReleaseStageText" Text="DEVELOPMENT BUILD" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}" />
                             </Border>
                         </StackPanel>
                     </Grid>
@@ -69,6 +69,50 @@
                             <TextBlock Margin="0,10,0,0" Style="{StaticResource CaptionStyle}" TextWrapping="Wrap"
                                        Text="Cadence Studio is a separate application that preserves Cadence Classic while providing its own modern architecture, visual system, and release path." />
                         </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource SecondaryWorkspaceCardStyle}" Margin="0,18,0,0" Padding="18">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Updates" Style="{StaticResource PanelTitleStyle}" />
+                                    <TextBlock x:Name="UpdatePolicyText"
+                                               Text="Development channel • manifest schema 2 • updater protocol 2"
+                                               Style="{StaticResource CaptionStyle}"
+                                               TextWrapping="Wrap"
+                                               Margin="0,6,16,0" />
+                                </StackPanel>
+                                <Button x:Name="UpdateCheckButton"
+                                        Grid.Column="1"
+                                        Style="{StaticResource AccentPillButtonStyle}"
+                                        Content="Check for updates"
+                                        Click="CheckForUpdates_Click"
+                                        VerticalAlignment="Top" />
+                            </Grid>
+
+                            <TextBlock Grid.Row="1"
+                                       Text="v1.1-dev.3 performs discovery, strict manifest validation, channel/architecture checks, numeric version comparison, and updater-protocol compatibility only. It does not download, stage, verify payload signatures, replace files, or roll back yet."
+                                       Style="{StaticResource CaptionStyle}"
+                                       TextWrapping="Wrap"
+                                       LineHeight="19"
+                                       Margin="0,13,0,0" />
+
+                            <TextBlock x:Name="UpdateStatusText"
+                                       Grid.Row="2"
+                                       Text="Not checked yet."
+                                       TextWrapping="Wrap"
+                                       Margin="0,13,0,0" />
+                        </Grid>
                     </Border>
 
                     <Grid Margin="0,18,0,0">

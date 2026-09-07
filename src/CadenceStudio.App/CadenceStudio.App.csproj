@@ -10,7 +10,7 @@
     <RootNamespace>CadenceStudio.App</RootNamespace>
     <AssemblyVersion>1.1.0.0</AssemblyVersion>
     <FileVersion>1.1.0.0</FileVersion>
-    <InformationalVersion>1.1-dev.2</InformationalVersion>
+    <InformationalVersion>1.1-dev.3</InformationalVersion>
     <Description>Modern WPF desktop music player inspired by Cadence.</Description>
   </PropertyGroup>
 

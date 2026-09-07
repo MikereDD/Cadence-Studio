@@ -1,16 +1,32 @@
-# Cadence Studio v1.1-dev.2 — Development Build
+# Cadence Studio v1.1-dev.3 — Development Build
 
-The second v1.1 development increment adds Windows-level playback integration on top of the background-player foundation. Hardware media keys can control Cadence Studio while its window is visible, minimized, or hidden in the tray, and a new optional **Start Cadence with Windows** preference provides per-user automatic launch without administrator access.
+The third v1.1 development increment establishes the read-only updater discovery foundation. Cadence Studio can now perform a user-initiated check against a pinned, approved HTTPS manifest endpoint and strictly validate release identity, channel, architecture, manifest schema, numeric version ordering, source metadata, payload metadata, detached-signature metadata, rollback policy, and updater-protocol compatibility before declaring an update eligible.
 
-## Added in dev.2
+## Added in dev.3
 
-- Global Previous, Play/Pause, Stop, and Next media-key handling.
-- Media-key registration remains nonfatal when another application already owns an individual key.
-- Optional Start with Windows registration, disabled by default.
-- Startup registration automatically targets the currently running Cadence Studio executable.
-- Persisted Windows-startup preference in settings schema 12.
+- Canonical Typezer∅ release-manifest revision 2 data model.
+- Strict rejection of unknown JSON properties.
+- Cadence-specific manifest validation for:
+  - `appId`, product name, Windows platform, architecture, and channel;
+  - Stable/development version grammar and numeric multi-part comparison;
+  - source repository, exact `v<version>` tag, and full commit identifier;
+  - canonical updater payload filename;
+  - exact asset size/hash metadata;
+  - detached-signature metadata and pinned-key fingerprint metadata shape;
+  - Windows rollback policy retaining one known-good version;
+  - updater protocol compatibility and direct-update minimum version.
+- Approved development manifest endpoint pinned to the Cadence Studio GitHub repository over HTTPS.
+- 256 KiB manifest size ceiling and bounded network timeout.
+- A manual **Check for updates** control in About.
+- Clear dev.3 boundary: discovery and compatibility checks only.
 
-The tray lifecycle, themed tray menu, second-launch restoration, and background playback behavior from v1.1-dev.1 are retained.
+## Intentionally not implemented yet
+
+v1.1-dev.3 does **not** download release payloads, create staging transactions, verify actual downloaded hashes/signatures, launch a separate updater, replace installed files, perform startup-health confirmation, or roll back. Those operations belong to the later updater increments.
+
+Until a development manifest is published at the approved endpoint, the expected runtime result is a clean **No development update manifest is published...** message rather than a failure or crash.
+
+The tray lifecycle, media keys, and optional Start with Windows behavior from dev.1 and dev.2 are retained.
 
 This is a development build and is not the stable v1.0 release.
 
@@ -78,4 +94,3 @@ Uninstalling Cadence Studio removes the application and shortcuts while intentio
 ## Final release presentation
 
 The public v1.0 repository uses the final Cadence Studio application icon across the app, installer, and README. Release binaries are distributed through GitHub Releases rather than stored in source control.
-

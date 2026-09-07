@@ -1,10 +1,12 @@
 using System.Diagnostics;
 using System.IO;
-using System.Windows.Input;
 using System.Windows;
+using System.Windows.Input;
 using CadenceStudio.App.Support;
 using CadenceStudio.App.ViewModels;
+using CadenceStudio.Core;
 using CadenceStudio.Infrastructure;
+using CadenceStudio.Infrastructure.Services;
 
 namespace CadenceStudio.App;
 
@@ -12,6 +14,8 @@ public partial class AboutDialog : Window
 {
     private readonly MainWindowViewModel _viewModel;
     private readonly AppPaths _paths;
+    private readonly UpdateDiscoveryService _updateDiscoveryService = new();
+    private CancellationTokenSource? _updateCheckCancellation;
 
     public AboutDialog(MainWindowViewModel viewModel)
     {
@@ -19,6 +23,26 @@ public partial class AboutDialog : Window
         _paths = new AppPaths();
         InitializeComponent();
         DataContext = viewModel;
+
+        ReleaseStageText.Text = string.Equals(
+            ProductInfo.UpdateChannel,
+            "development",
+            StringComparison.Ordinal)
+            ? "DEVELOPMENT BUILD"
+            : "STABLE RELEASE";
+
+        UpdatePolicyText.Text =
+            $"{Capitalize(ProductInfo.UpdateChannel)} channel • " +
+            $"manifest schema {ProductInfo.ReleaseManifestSchemaVersion} • " +
+            $"updater protocol {ProductInfo.UpdaterProtocolVersion}";
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        _updateCheckCancellation?.Cancel();
+        _updateCheckCancellation?.Dispose();
+        _updateCheckCancellation = null;
+        base.OnClosed(e);
     }
 
     private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -33,6 +57,42 @@ public partial class AboutDialog : Window
     private void OpenLogs_Click(object sender, RoutedEventArgs e) => OpenPath(_paths.Logs);
     private void OpenCache_Click(object sender, RoutedEventArgs e) => OpenPath(_paths.Cache);
     private void OpenData_Click(object sender, RoutedEventArgs e) => OpenPath(_paths.Root);
+
+    private async void CheckForUpdates_Click(object sender, RoutedEventArgs e)
+    {
+        _updateCheckCancellation?.Cancel();
+        _updateCheckCancellation?.Dispose();
+        _updateCheckCancellation = new CancellationTokenSource();
+
+        UpdateCheckButton.IsEnabled = false;
+        UpdateStatusText.Text =
+            $"Checking the approved {ProductInfo.UpdateChannel} manifest endpoint...";
+
+        try
+        {
+            var result = await _updateDiscoveryService.CheckForUpdatesAsync(
+                _updateCheckCancellation.Token);
+
+            if (IsLoaded)
+            {
+                UpdateStatusText.Text = result.Message;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            if (IsLoaded)
+            {
+                UpdateStatusText.Text = "Update check canceled.";
+            }
+        }
+        finally
+        {
+            if (IsLoaded)
+            {
+                UpdateCheckButton.IsEnabled = true;
+            }
+        }
+    }
 
     private void CopyDiagnostics_Click(object sender, RoutedEventArgs e)
     {
@@ -72,4 +132,9 @@ public partial class AboutDialog : Window
             DiagnosticsStatusText.Text = $"Could not open path: {exception.Message}";
         }
     }
+
+    private static string Capitalize(string value) =>
+        string.IsNullOrEmpty(value)
+            ? value
+            : char.ToUpperInvariant(value[0]) + value[1..];
 }

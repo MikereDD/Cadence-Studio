@@ -1,6 +1,16 @@
 # Changelog
 
 All notable Cadence Studio changes are recorded here in reverse chronological order. Repeated micro-build entries from the development cycle have been consolidated under their final milestone versions for clarity.
+## v1.1-dev.3 — Updater discovery foundation
+
+- Added the Typezer∅ release-manifest revision 2 model and strict manifest validation.
+- Added canonical numeric Stable and Development version comparison, including multi-part development versions.
+- Added validation for Cadence Studio application identity, Windows platform, architecture, release channel, source metadata, updater protocol compatibility, and Windows rollback policy.
+- Added canonical release-asset and detached-signature metadata validation.
+- Added a pinned approved HTTPS manifest endpoint with a bounded request timeout and 256 KiB manifest-size limit.
+- Added a user-initiated **Check for updates** control to the About dialog.
+- Added safe handling for an unpublished development manifest without treating the missing manifest as an application failure.
+- Kept dev.3 discovery-only: payload download, staging, signature verification, replacement, health confirmation, and rollback remain reserved for later updater increments.
 
 ## v1.1-dev.2 — Global media keys and Windows startup
 
@@ -303,3 +313,4 @@ All notable Cadence Studio changes are recorded here in reverse chronological or
 ## v1.0-dev.7 — Equalizer and audio processing
 
 - Added the real-time 10-band equalizer, preamp, presets, custom profile, and headroom protection.
+
