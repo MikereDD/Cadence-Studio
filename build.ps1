@@ -15,6 +15,23 @@ $solution = Join-Path $root 'CadenceStudio.sln'
 $appProject = Join-Path $root 'src\CadenceStudio.App\CadenceStudio.App.csproj'
 $appOutput = Join-Path $root "src\CadenceStudio.App\bin\$Configuration\net8.0-windows"
 $executable = Join-Path $appOutput 'CadenceStudio.exe'
+$versionFile = Join-Path $root 'VERSION'
+
+if (-not (Test-Path -LiteralPath $versionFile)) {
+    throw "VERSION file was not found: $versionFile"
+}
+
+$version = (Get-Content -LiteralPath $versionFile -Raw).Trim()
+if ([string]::IsNullOrWhiteSpace($version)) {
+    throw 'VERSION file is empty.'
+}
+
+$displayVersion = if ($version.StartsWith('v', [StringComparison]::OrdinalIgnoreCase)) {
+    $version
+}
+else {
+    "v$version"
+}
 
 if (-not (Get-Command dotnet -ErrorAction SilentlyContinue)) {
     throw '.NET SDK was not found. Install the .NET 8 SDK and try again.'
@@ -34,7 +51,7 @@ if (-not $net8Sdk) {
         '(none found)'
     }
 
-    throw "Cadence Studio v1.0 requires a .NET 8 SDK.`nInstalled SDKs:`n$installedText"
+    throw "Cadence Studio $displayVersion requires a .NET 8 SDK.`nInstalled SDKs:`n$installedText"
 }
 
 $sdkVersionOutput = @(& dotnet --version 2>&1)
@@ -43,7 +60,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 $sdkVersion = $sdkVersionOutput | Select-Object -First 1
 
-Write-Host 'Cadence Studio v1.0' -ForegroundColor Cyan
+Write-Host "Cadence Studio $displayVersion" -ForegroundColor Cyan
 Write-Host "SDK: $sdkVersion" -ForegroundColor DarkGray
 
 if (-not $NoRestore) {
