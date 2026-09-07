@@ -1,6 +1,16 @@
-# Cadence Studio v1.1-dev.1 — Development Build
+# Cadence Studio v1.1-dev.2 — Development Build
 
-The first v1.1 development increment turns Cadence Studio into a true background-capable desktop player. Close-to-tray is enabled by default, minimize-to-tray remains optional, the tray exposes core playback actions, and a second Cadence launch now restores the running instance.
+The second v1.1 development increment adds Windows-level playback integration on top of the background-player foundation. Hardware media keys can control Cadence Studio while its window is visible, minimized, or hidden in the tray, and a new optional **Start Cadence with Windows** preference provides per-user automatic launch without administrator access.
+
+## Added in dev.2
+
+- Global Previous, Play/Pause, Stop, and Next media-key handling.
+- Media-key registration remains nonfatal when another application already owns an individual key.
+- Optional Start with Windows registration, disabled by default.
+- Startup registration automatically targets the currently running Cadence Studio executable.
+- Persisted Windows-startup preference in settings schema 12.
+
+The tray lifecycle, themed tray menu, second-launch restoration, and background playback behavior from v1.1-dev.1 are retained.
 
 This is a development build and is not the stable v1.0 release.
 

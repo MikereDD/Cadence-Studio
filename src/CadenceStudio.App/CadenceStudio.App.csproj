@@ -10,14 +10,19 @@
     <RootNamespace>CadenceStudio.App</RootNamespace>
     <AssemblyVersion>1.1.0.0</AssemblyVersion>
     <FileVersion>1.1.0.0</FileVersion>
-    <InformationalVersion>1.1-dev.1</InformationalVersion>
+    <InformationalVersion>1.1-dev.2</InformationalVersion>
     <Description>Modern WPF desktop music player inspired by Cadence.</Description>
   </PropertyGroup>
 
-  <!-- Keep NotifyIcon available without importing WinForms/Drawing into every WPF file. -->
   <ItemGroup>
-    <Using Remove="System.Windows.Forms" />
+    <!--
+      Keep WinForms available for NotifyIcon without importing its implicit
+      global namespaces into the WPF compilation. This prevents collisions
+      with WPF types such as Application, Color, Brush, KeyEventArgs,
+      MouseEventArgs, and DragEventArgs.
+    -->
     <Using Remove="System.Drawing" />
+    <Using Remove="System.Windows.Forms" />
   </ItemGroup>
 
   <ItemGroup>

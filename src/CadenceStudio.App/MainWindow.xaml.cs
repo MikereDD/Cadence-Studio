@@ -18,7 +18,17 @@ namespace CadenceStudio.App;
 public partial class MainWindow : Window
 {
     private const int WmGetMinMaxInfo = 0x0024;
+    private const int WmHotKey = 0x0312;
     private const uint MonitorDefaultToNearest = 0x00000002;
+    private const uint ModNoRepeat = 0x4000;
+    private const uint VkMediaNextTrack = 0xB0;
+    private const uint VkMediaPreviousTrack = 0xB1;
+    private const uint VkMediaStop = 0xB2;
+    private const uint VkMediaPlayPause = 0xB3;
+    private const int MediaHotKeyPrevious = 0xCA01;
+    private const int MediaHotKeyPlayPause = 0xCA02;
+    private const int MediaHotKeyStop = 0xCA03;
+    private const int MediaHotKeyNext = 0xCA04;
     private const double RestoredLibraryPanelWidth = 350;
     private const double MaximizedLibraryPanelWidth = 480;
     private const double RestoredEnrichmentPanelWidth = 232;
@@ -31,7 +41,9 @@ public partial class MainWindow : Window
     private const double MaximizedExpandedEnrichmentWidth = 430;
 
     private readonly MainWindowViewModel _viewModel;
+    private readonly HashSet<int> _registeredMediaHotKeyIds = [];
     private HwndSource? _windowSource;
+    private IntPtr _windowHandle;
     private System.Windows.Point _queueDragStart;
     private Track? _queueDragTrack;
     private bool _queueDragBlocked;
@@ -73,9 +85,10 @@ public partial class MainWindow : Window
     {
         base.OnSourceInitialized(e);
 
-        var handle = new WindowInteropHelper(this).Handle;
-        _windowSource = HwndSource.FromHwnd(handle);
+        _windowHandle = new WindowInteropHelper(this).Handle;
+        _windowSource = HwndSource.FromHwnd(_windowHandle);
         _windowSource?.AddHook(WindowProcedure);
+        RegisterMediaHotKeys();
     }
 
     protected override void OnClosing(CancelEventArgs e)
@@ -140,8 +153,10 @@ public partial class MainWindow : Window
     protected override void OnClosed(EventArgs e)
     {
         _viewModel.PropertyChanged -= ViewModel_PropertyChanged;
+        UnregisterMediaHotKeys();
         _windowSource?.RemoveHook(WindowProcedure);
         _windowSource = null;
+        _windowHandle = IntPtr.Zero;
         base.OnClosed(e);
     }
 
@@ -887,21 +902,94 @@ public partial class MainWindow : Window
     private void ToggleMaximize() =>
         WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
 
-    private static IntPtr WindowProcedure(
+    private IntPtr WindowProcedure(
         IntPtr windowHandle,
         int message,
         IntPtr wParam,
         IntPtr lParam,
         ref bool handled)
     {
-        if (message != WmGetMinMaxInfo)
+        if (message == WmHotKey)
         {
+            handled = HandleMediaHotKey(wParam.ToInt32());
             return IntPtr.Zero;
         }
 
-        ApplyMonitorWorkArea(windowHandle, lParam);
-        handled = true;
+        if (message == WmGetMinMaxInfo)
+        {
+            ApplyMonitorWorkArea(windowHandle, lParam);
+            handled = true;
+        }
+
         return IntPtr.Zero;
+    }
+
+    private void RegisterMediaHotKeys()
+    {
+        if (_windowHandle == IntPtr.Zero)
+        {
+            return;
+        }
+
+        TryRegisterMediaHotKey(MediaHotKeyPrevious, VkMediaPreviousTrack);
+        TryRegisterMediaHotKey(MediaHotKeyPlayPause, VkMediaPlayPause);
+        TryRegisterMediaHotKey(MediaHotKeyStop, VkMediaStop);
+        TryRegisterMediaHotKey(MediaHotKeyNext, VkMediaNextTrack);
+    }
+
+    private void TryRegisterMediaHotKey(int id, uint virtualKey)
+    {
+        // Registration can legitimately fail when another application has already
+        // claimed a particular media key. Leave that key untouched rather than
+        // treating the conflict as an application failure.
+        if (RegisterHotKey(_windowHandle, id, ModNoRepeat, virtualKey))
+        {
+            _registeredMediaHotKeyIds.Add(id);
+        }
+    }
+
+    private void UnregisterMediaHotKeys()
+    {
+        if (_windowHandle == IntPtr.Zero)
+        {
+            _registeredMediaHotKeyIds.Clear();
+            return;
+        }
+
+        foreach (var id in _registeredMediaHotKeyIds)
+        {
+            UnregisterHotKey(_windowHandle, id);
+        }
+
+        _registeredMediaHotKeyIds.Clear();
+    }
+
+    private bool HandleMediaHotKey(int id)
+    {
+        if (!_registeredMediaHotKeyIds.Contains(id))
+        {
+            return false;
+        }
+
+        switch (id)
+        {
+            case MediaHotKeyPrevious:
+                ExecuteCommand(_viewModel.PreviousCommand);
+                break;
+            case MediaHotKeyPlayPause:
+                ExecuteCommand(_viewModel.TogglePlaybackCommand);
+                break;
+            case MediaHotKeyStop:
+                ExecuteCommand(_viewModel.StopPlaybackCommand);
+                break;
+            case MediaHotKeyNext:
+                ExecuteCommand(_viewModel.NextCommand);
+                break;
+            default:
+                return false;
+        }
+
+        return true;
     }
 
     private static void ApplyMonitorWorkArea(IntPtr windowHandle, IntPtr minMaxInfoPointer)
@@ -999,6 +1087,14 @@ public partial class MainWindow : Window
 
         e.Handled = true;
     }
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool RegisterHotKey(IntPtr windowHandle, int id, uint modifiers, uint virtualKey);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool UnregisterHotKey(IntPtr windowHandle, int id);
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]

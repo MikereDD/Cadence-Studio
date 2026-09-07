@@ -2,6 +2,15 @@
 
 All notable Cadence Studio changes are recorded here in reverse chronological order. Repeated micro-build entries from the development cycle have been consolidated under their final milestone versions for clarity.
 
+## v1.1-dev.2 — Global media keys and Windows startup
+
+- Added global Previous, Play/Pause, Stop, and Next hardware-media-key handling while Cadence Studio is visible, minimized, or hidden in the system tray.
+- Media-key registration is nonfatal per key: if another application already owns a specific key, Cadence Studio leaves that key alone.
+- Added an optional **Start Cadence with Windows** preference, disabled by default.
+- Added per-user Windows startup registration under the current user's standard Run key with no administrator requirement.
+- Startup registration is synchronized to the currently running Cadence Studio executable so installed-path updates can refresh the launch target.
+- Bumped the persisted settings schema to version 12 for the new Windows-startup preference.
+
 ## v1.1-dev.1 — Background player lifecycle
 
 - Added a persistent Windows system-tray presence using the Cadence Studio application icon.

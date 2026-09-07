@@ -4,7 +4,7 @@ namespace CadenceStudio.Core.Models;
 
 public sealed class AppSettings
 {
-    public int SchemaVersion { get; set; } = 11;
+    public int SchemaVersion { get; set; } = 12;
     public double Volume { get; set; } = 0.72;
     public bool IsMuted { get; set; }
     public bool ShuffleEnabled { get; set; }
@@ -17,6 +17,7 @@ public sealed class AppSettings
     public bool IsNowPlayingExpanded { get; set; }
     public bool CloseToTray { get; set; } = true;
     public bool MinimizeToTray { get; set; }
+    public bool StartWithWindows { get; set; }
     public EqualizerSettings Equalizer { get; set; } = new();
     public VisualizerSettings Visualizer { get; set; } = new();
     public VisualizerExperienceSettings VisualizerExperience { get; set; } = new();
@@ -37,7 +38,7 @@ public sealed class AppSettings
 
     public void Normalize()
     {
-        SchemaVersion = Math.Max(11, SchemaVersion);
+        SchemaVersion = Math.Max(12, SchemaVersion);
         Volume = Math.Clamp(Volume, 0, 1);
         SelectedSection = string.IsNullOrWhiteSpace(SelectedSection) ? "Library" : SelectedSection;
         SelectedNowPlayingTab = SelectedNowPlayingTab is "Details" or "Lyrics" or "Bio"

@@ -81,6 +81,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
         InitializeEqualizerState(settings.Equalizer);
         InitializeVisualizerState(settings.Visualizer);
         InitializeAppearanceState(settings.Theme, settings.Typography, settings.TextSize, settings.ReduceMotion, settings.IsNowPlayingExpanded, settings.CloseToTray, settings.MinimizeToTray);
+        InitializeSystemIntegrationState(settings.StartWithWindows);
         InitializeEnrichmentState(settings.SelectedNowPlayingTab);
 
         _activeSection = NormalizeSection(settings.SelectedSection);
@@ -131,6 +132,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
         InitializeEqualizerCommands();
         InitializeVisualizerCommands();
         InitializeAppearanceCommands();
+        InitializeSystemIntegrationCommands();
         InitializeEnrichmentCommands();
         InitializeQueueArtworkCommands();
 
