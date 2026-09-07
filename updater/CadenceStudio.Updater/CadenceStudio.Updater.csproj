@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <AssemblyName>CadenceStudio.Updater</AssemblyName>
+    <InformationalVersion>1.1-dev.4</InformationalVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/CadenceStudio.Core/CadenceStudio.Core.csproj" />
+  </ItemGroup>
+</Project>

@@ -2,7 +2,11 @@
 
 Cadence Studio follows the Typezer∅ Release Standards repository as the canonical updater contract.
 
-## v1.1-dev.3 scope
+## v1.1-dev.4 extension
+
+The discovery behavior below is preserved. See [UPDATER-TRANSACTIONS.md](UPDATER-TRANSACTIONS.md) for the separate dry-run updater, transaction/staging contract, limitations and exact build/runtime tests.
+
+## v1.1-dev.3 scope (historical discovery baseline)
 
 This increment implements **discovery and eligibility only**.
 

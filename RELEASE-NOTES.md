@@ -1,5 +1,16 @@
 # Cadence Studio v1.1-dev.3 — Development Build
 
+## v1.1-dev.4 — Separate updater and staging transactions
+
+- Added a separate CadenceStudio.Updater executable with a dry-run-only command contract.
+- Added randomized local-app-data staging, strict transaction/path validation, process identity checks and already-exited handling.
+- Added transaction state logging, exclusive active leases and conservative abandoned-staging cleanup.
+- Added the About-dialog test handoff, including an explicitly synthetic offline test when no update is eligible.
+- Included updater build/publish wiring and 37 automated regression checks.
+- Preserved discovery behavior. No payload download, signature verification, installed-file replacement or rollback is enabled.
+- See docs/UPDATER-TRANSACTIONS.md for exact build/runtime tests and validation limits.
+
+
 The third v1.1 development increment establishes the read-only updater discovery foundation. Cadence Studio can now perform a user-initiated check against a pinned, approved HTTPS manifest endpoint and strictly validate release identity, channel, architecture, manifest schema, numeric version ordering, source metadata, payload metadata, detached-signature metadata, rollback policy, and updater-protocol compatibility before declaring an update eligible.
 
 ## Added in dev.3

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <!-- A standalone fixture installation; never copied into the real app output. -->
+    <AssemblyName>CadenceStudio</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/CadenceStudio.Core/CadenceStudio.Core.csproj" />
+    <ProjectReference Include="../../updater/CadenceStudio.Updater/CadenceStudio.Updater.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+  <Target Name="CopyUpdaterFixture" AfterTargets="Build">
+    <ItemGroup><UpdaterFiles Include="../../updater/CadenceStudio.Updater/bin/$(Configuration)/$(TargetFramework)/*" /></ItemGroup>
+    <Copy SourceFiles="@(UpdaterFiles)" DestinationFolder="$(TargetDir)updater" />
+  </Target>
+</Project>

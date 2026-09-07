@@ -49,6 +49,14 @@ Write-Host "Runtime: $Runtime | Deployment: $Deployment" -ForegroundColor DarkGr
 & dotnet @args | Out-Host
 if ($LASTEXITCODE -ne 0) { throw 'dotnet publish failed.' }
 
+# Publish the separate updater with the same architecture and deployment model.
+$updaterProject = Join-Path $root 'updater\CadenceStudio.Updater\CadenceStudio.Updater.csproj'
+$updaterArgs = @('publish', $updaterProject, '-c', $Configuration, '-r', $Runtime,
+    '--self-contained', $selfContained.ToString().ToLowerInvariant(), '-o', (Join-Path $output 'updater'),
+    '-p:PublishSingleFile=false', '-p:DebugType=None', '-p:DebugSymbols=false')
+if ($NoRestore) { $updaterArgs += '--no-restore' }
+& dotnet @updaterArgs | Out-Host
+if ($LASTEXITCODE -ne 0) { throw 'Updater publish failed.' }
 Copy-Item (Join-Path $root 'README.md') $output -Force
 Copy-Item (Join-Path $root 'RELEASE-NOTES.md') $output -Force
 Copy-Item (Join-Path $root 'THIRD-PARTY-NOTICES.md') $output -Force

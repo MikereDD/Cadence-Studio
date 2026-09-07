@@ -16,6 +16,7 @@ public partial class AboutDialog : Window
     private readonly AppPaths _paths;
     private readonly UpdateDiscoveryService _updateDiscoveryService = new();
     private CancellationTokenSource? _updateCheckCancellation;
+    private CadenceStudio.Core.Updates.UpdateCheckResult? _eligibleUpdate;
 
     public AboutDialog(MainWindowViewModel viewModel)
     {
@@ -65,6 +66,8 @@ public partial class AboutDialog : Window
         _updateCheckCancellation = new CancellationTokenSource();
 
         UpdateCheckButton.IsEnabled = false;
+        DryRunButton.IsEnabled = false;
+        _eligibleUpdate = null;
         UpdateStatusText.Text =
             $"Checking the approved {ProductInfo.UpdateChannel} manifest endpoint...";
 
@@ -76,6 +79,7 @@ public partial class AboutDialog : Window
             if (IsLoaded)
             {
                 UpdateStatusText.Text = result.Message;
+                _eligibleUpdate = result;
             }
         }
         catch (OperationCanceledException)
@@ -90,10 +94,30 @@ public partial class AboutDialog : Window
             if (IsLoaded)
             {
                 UpdateCheckButton.IsEnabled = true;
+                DryRunButton.IsEnabled = true;
             }
         }
     }
 
+    private async void DryRun_Click(object sender, RoutedEventArgs e)
+    {
+        DryRunButton.IsEnabled = false;
+        UpdateCheckButton.IsEnabled = false;
+        try
+        {
+            UpdateStatusText.Text = "Testing updater handoff...";
+            UpdateStatusText.Text = await Services.UpdateDryRunService.RunAsync(_eligibleUpdate);
+        }
+        catch (Exception exception)
+        {
+            UpdateStatusText.Text = $"Dry run failed: {exception.Message}";
+        }
+        finally
+        {
+            DryRunButton.IsEnabled = true;
+            UpdateCheckButton.IsEnabled = true;
+        }
+    }
     private void CopyDiagnostics_Click(object sender, RoutedEventArgs e)
     {
         try

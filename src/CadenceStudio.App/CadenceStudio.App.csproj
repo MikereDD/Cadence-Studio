@@ -10,7 +10,7 @@
     <RootNamespace>CadenceStudio.App</RootNamespace>
     <AssemblyVersion>1.1.0.0</AssemblyVersion>
     <FileVersion>1.1.0.0</FileVersion>
-    <InformationalVersion>1.1-dev.3</InformationalVersion>
+    <InformationalVersion>1.1-dev.4</InformationalVersion>
     <Description>Modern WPF desktop music player inspired by Cadence.</Description>
   </PropertyGroup>
 
@@ -38,4 +38,13 @@
     <Content Include="..\..\THIRD-PARTY-NOTICES.md" Link="THIRD-PARTY-NOTICES.md" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="../../updater/CadenceStudio.Updater/CadenceStudio.Updater.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+  <Target Name="CopyDryRunUpdater" AfterTargets="Build">
+    <ItemGroup>
+      <DryRunUpdaterFiles Include="../../updater/CadenceStudio.Updater/bin/$(Configuration)/$(TargetFramework)/$(RuntimeIdentifier)/*" Exclude="../../updater/CadenceStudio.Updater/bin/$(Configuration)/$(TargetFramework)/$(RuntimeIdentifier)/*.pdb" />
+    </ItemGroup>
+    <Copy SourceFiles="@(DryRunUpdaterFiles)" DestinationFolder="$(TargetDir)updater" />
+  </Target>
 </Project>

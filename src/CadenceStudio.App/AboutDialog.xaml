@@ -101,17 +101,17 @@
                             </Grid>
 
                             <TextBlock Grid.Row="1"
-                                       Text="v1.1-dev.3 performs discovery, strict manifest validation, channel/architecture checks, numeric version comparison, and updater-protocol compatibility only. It does not download, stage, verify payload signatures, replace files, or roll back yet."
+                                       Text="Test the separate updater safely. Cadence stays open and no update is installed. Without an eligible update, this runs a clearly labeled synthetic test."
                                        Style="{StaticResource CaptionStyle}"
                                        TextWrapping="Wrap"
                                        LineHeight="19"
                                        Margin="0,13,0,0" />
 
-                            <TextBlock x:Name="UpdateStatusText"
+                            <StackPanel Grid.Row="2"><Button x:Name="DryRunButton" Content="Test updater (no installation)" Click="DryRun_Click" Style="{StaticResource PillButtonStyle}" HorizontalAlignment="Left" Margin="0,12,0,0" /><TextBlock x:Name="UpdateStatusText"
                                        Grid.Row="2"
                                        Text="Not checked yet."
                                        TextWrapping="Wrap"
-                                       Margin="0,13,0,0" />
+                                       Margin="0,13,0,0" /></StackPanel>
                         </Grid>
                     </Border>
 
