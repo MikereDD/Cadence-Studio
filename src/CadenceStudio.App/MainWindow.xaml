@@ -2072,6 +2072,49 @@
                                     </Grid>
                                 </Border>
 
+                                <Border Background="{DynamicResource SurfaceRaisedBrush}" BorderBrush="{DynamicResource BorderSoftBrush}"
+                                        BorderThickness="1" CornerRadius="12" Padding="15" Margin="0,-10,0,22">
+                                    <StackPanel>
+                                        <TextBlock Text="Background player" FontWeight="SemiBold" FontSize="15" />
+                                        <TextBlock Text="Choose how Cadence Studio behaves when the main window is closed or minimized."
+                                                   Style="{StaticResource CaptionStyle}" TextWrapping="Wrap" Margin="0,5,0,14" />
+
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <TextBlock Text="Close to system tray" FontWeight="SemiBold" />
+                                                <TextBlock Text="{Binding CloseToTrayDescription}" Style="{StaticResource CaptionStyle}"
+                                                           TextWrapping="Wrap" Margin="0,4,16,0" />
+                                            </StackPanel>
+                                            <ToggleButton Grid.Column="1" Style="{StaticResource ChipToggleStyle}"
+                                                          IsChecked="{Binding CloseToTray, Mode=OneWay}"
+                                                          Command="{Binding ToggleCloseToTrayCommand}"
+                                                          Content="{Binding CloseToTrayLabel}" VerticalAlignment="Center" />
+                                        </Grid>
+
+                                        <Border Height="1" Background="{DynamicResource BorderSoftBrush}" Margin="0,14" />
+
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <TextBlock Text="Minimize to system tray" FontWeight="SemiBold" />
+                                                <TextBlock Text="{Binding MinimizeToTrayDescription}" Style="{StaticResource CaptionStyle}"
+                                                           TextWrapping="Wrap" Margin="0,4,16,0" />
+                                            </StackPanel>
+                                            <ToggleButton Grid.Column="1" Style="{StaticResource ChipToggleStyle}"
+                                                          IsChecked="{Binding MinimizeToTray, Mode=OneWay}"
+                                                          Command="{Binding ToggleMinimizeToTrayCommand}"
+                                                          Content="{Binding MinimizeToTrayLabel}" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
 
                                 <Grid Margin="0,-8,0,22">
                                     <Grid.ColumnDefinitions>

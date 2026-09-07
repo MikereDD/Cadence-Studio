@@ -80,8 +80,29 @@ public partial class MainWindow : Window
 
     protected override void OnClosing(CancelEventArgs e)
     {
-        // Persist the normal restore bounds even when Cadence Studio is currently
-        // maximized or minimized, then stop NAudio before the window disappears.
+        CaptureWindowPlacement();
+
+        if (Application.Current is App app && !app.IsExiting)
+        {
+            if (_viewModel.CloseToTray)
+            {
+                e.Cancel = true;
+                HideToTray();
+                return;
+            }
+
+            // Explicit-shutdown mode keeps Cadence alive after its main window closes,
+            // so route a real close through the application shutdown path.
+            e.Cancel = true;
+            app.RequestExit();
+            return;
+        }
+
+        base.OnClosing(e);
+    }
+
+    private void CaptureWindowPlacement()
+    {
         var bounds = WindowState == WindowState.Normal
             ? new Rect(Left, Top, ActualWidth, ActualHeight)
             : RestoreBounds;
@@ -92,8 +113,28 @@ public partial class MainWindow : Window
             bounds.Width,
             bounds.Height,
             _lastNonMinimizedWindowState == WindowState.Maximized);
-        _viewModel.Shutdown();
-        base.OnClosing(e);
+    }
+
+    public void HideToTray()
+    {
+        if (WindowState != WindowState.Minimized)
+        {
+            _lastNonMinimizedWindowState = WindowState;
+        }
+
+        Hide();
+    }
+
+    public void RestoreFromTray()
+    {
+        Show();
+        WindowState = _lastNonMinimizedWindowState == WindowState.Maximized
+            ? WindowState.Maximized
+            : WindowState.Normal;
+        Activate();
+        Topmost = true;
+        Topmost = false;
+        Focus();
     }
 
     protected override void OnClosed(EventArgs e)
@@ -213,6 +254,12 @@ public partial class MainWindow : Window
 
     private void MainWindow_StateChanged(object? sender, EventArgs e)
     {
+        if (WindowState == WindowState.Minimized && _viewModel.MinimizeToTray)
+        {
+            _ = Dispatcher.BeginInvoke(new Action(HideToTray));
+            return;
+        }
+
         if (WindowState != WindowState.Minimized)
         {
             _lastNonMinimizedWindowState = WindowState;

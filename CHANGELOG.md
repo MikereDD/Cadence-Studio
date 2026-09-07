@@ -2,6 +2,16 @@
 
 All notable Cadence Studio changes are recorded here in reverse chronological order. Repeated micro-build entries from the development cycle have been consolidated under their final milestone versions for clarity.
 
+## v1.1-dev.1 — Background player lifecycle
+
+- Added a persistent Windows system-tray presence using the Cadence Studio application icon.
+- Closing the main window now sends Cadence Studio to the tray by default while playback continues.
+- Added optional minimize-to-tray behavior and persistent background-player preferences.
+- Added tray playback controls for Previous, Play/Pause, and Next, plus explicit Open and Exit actions.
+- Added current-track tray tooltip text.
+- Improved single-instance behavior so launching Cadence Studio again restores the existing window instead of showing an already-running dialog.
+- Moved WPF shutdown control to an explicit application lifecycle so tray/background playback can remain alive safely.
+
 ## v1.0 — Stable release
 
 - Adopted the final Cadence Studio application icon across the executable, installer, About UI, and README branding.

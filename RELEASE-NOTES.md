@@ -1,3 +1,11 @@
+# Cadence Studio v1.1-dev.1 — Development Build
+
+The first v1.1 development increment turns Cadence Studio into a true background-capable desktop player. Close-to-tray is enabled by default, minimize-to-tray remains optional, the tray exposes core playback actions, and a second Cadence launch now restores the running instance.
+
+This is a development build and is not the stable v1.0 release.
+
+---
+
 # Cadence Studio v1.0 — Stable Release
 
 Cadence Studio v1.0 is the first stable release of the modern Windows music player. It preserves the direct, local workflow of Cadence Classic while delivering a separate C#, WPF, XAML, and MVVM application with premium presentation, reliable playback, deep library tools, and a complete release pipeline.

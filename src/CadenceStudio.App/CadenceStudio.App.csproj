@@ -3,15 +3,22 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <ApplicationIcon>Assets\cadence-studio.ico</ApplicationIcon>
     <AssemblyName>CadenceStudio</AssemblyName>
     <RootNamespace>CadenceStudio.App</RootNamespace>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
-    <InformationalVersion>1.0</InformationalVersion>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
+    <InformationalVersion>1.1-dev.1</InformationalVersion>
     <Description>Modern WPF desktop music player inspired by Cadence.</Description>
   </PropertyGroup>
+
+  <!-- Keep NotifyIcon available without importing WinForms/Drawing into every WPF file. -->
+  <ItemGroup>
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CadenceStudio.Core\CadenceStudio.Core.csproj" />

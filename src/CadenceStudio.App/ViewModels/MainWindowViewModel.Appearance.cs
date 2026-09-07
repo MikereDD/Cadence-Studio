@@ -11,12 +11,16 @@ public sealed partial class MainWindowViewModel
     private TextScale _currentTextSize;
     private bool _reduceMotion;
     private bool _isNowPlayingExpanded;
+    private bool _closeToTray;
+    private bool _minimizeToTray;
 
     public RelayCommand<string> ApplyThemeCommand { get; private set; } = null!;
     public RelayCommand<string> ApplyTypographyCommand { get; private set; } = null!;
     public RelayCommand<string> ApplyTextSizeCommand { get; private set; } = null!;
     public RelayCommand ToggleReducedMotionCommand { get; private set; } = null!;
     public RelayCommand ToggleNowPlayingModeCommand { get; private set; } = null!;
+    public RelayCommand ToggleCloseToTrayCommand { get; private set; } = null!;
+    public RelayCommand ToggleMinimizeToTrayCommand { get; private set; } = null!;
 
     public AppTheme CurrentTheme
     {
@@ -162,18 +166,58 @@ public sealed partial class MainWindowViewModel
         ? "Nonessential hover scaling is disabled while responsive feedback remains."
         : "Crisp hover and press feedback is enabled for the Eye Candy interface.";
 
+    public bool CloseToTray
+    {
+        get => _closeToTray;
+        private set
+        {
+            if (SetProperty(ref _closeToTray, value))
+            {
+                OnPropertyChanged(nameof(CloseToTrayLabel));
+                OnPropertyChanged(nameof(CloseToTrayDescription));
+            }
+        }
+    }
+
+    public bool MinimizeToTray
+    {
+        get => _minimizeToTray;
+        private set
+        {
+            if (SetProperty(ref _minimizeToTray, value))
+            {
+                OnPropertyChanged(nameof(MinimizeToTrayLabel));
+                OnPropertyChanged(nameof(MinimizeToTrayDescription));
+            }
+        }
+    }
+
+    public string CloseToTrayLabel => CloseToTray ? "Close to tray on" : "Close to tray off";
+    public string CloseToTrayDescription => CloseToTray
+        ? "Closing the main window keeps playback alive in the notification area."
+        : "Closing the main window exits Cadence Studio completely.";
+
+    public string MinimizeToTrayLabel => MinimizeToTray ? "Minimize to tray on" : "Minimize to tray off";
+    public string MinimizeToTrayDescription => MinimizeToTray
+        ? "Minimizing hides Cadence Studio from the taskbar while playback continues."
+        : "Minimizing keeps Cadence Studio visible on the Windows taskbar.";
+
     private void InitializeAppearanceState(
         AppTheme theme,
         TypographyProfile typography,
         TextScale textSize,
         bool reduceMotion,
-        bool isNowPlayingExpanded)
+        bool isNowPlayingExpanded,
+        bool closeToTray,
+        bool minimizeToTray)
     {
         _currentTheme = Enum.IsDefined(theme) ? theme : AppTheme.DarkMonochrome;
         _currentTypography = Enum.IsDefined(typography) ? typography : TypographyProfile.Cadence;
         _currentTextSize = Enum.IsDefined(textSize) ? textSize : TextScale.Standard;
         _reduceMotion = reduceMotion;
         _isNowPlayingExpanded = isNowPlayingExpanded;
+        _closeToTray = closeToTray;
+        _minimizeToTray = minimizeToTray;
     }
 
     private void InitializeAppearanceCommands()
@@ -252,6 +296,25 @@ public sealed partial class MainWindowViewModel
             StatusText = IsNowPlayingExpanded
                 ? "Expanded Now Playing focus enabled."
                 : "Compact Library workspace restored.";
+        });
+
+
+        ToggleCloseToTrayCommand = new RelayCommand(() =>
+        {
+            CloseToTray = !CloseToTray;
+            _settings.CloseToTray = CloseToTray;
+            StatusText = CloseToTray
+                ? "Closing Cadence Studio will now send it to the system tray."
+                : "Closing Cadence Studio will now exit the application.";
+        });
+
+        ToggleMinimizeToTrayCommand = new RelayCommand(() =>
+        {
+            MinimizeToTray = !MinimizeToTray;
+            _settings.MinimizeToTray = MinimizeToTray;
+            StatusText = MinimizeToTray
+                ? "Minimizing Cadence Studio will now send it to the system tray."
+                : "Minimizing Cadence Studio will remain on the taskbar.";
         });
     }
 

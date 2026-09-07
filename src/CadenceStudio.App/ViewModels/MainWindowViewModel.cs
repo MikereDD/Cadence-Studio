@@ -80,7 +80,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
         InitializeQueueAndPlaylistState();
         InitializeEqualizerState(settings.Equalizer);
         InitializeVisualizerState(settings.Visualizer);
-        InitializeAppearanceState(settings.Theme, settings.Typography, settings.TextSize, settings.ReduceMotion, settings.IsNowPlayingExpanded);
+        InitializeAppearanceState(settings.Theme, settings.Typography, settings.TextSize, settings.ReduceMotion, settings.IsNowPlayingExpanded, settings.CloseToTray, settings.MinimizeToTray);
         InitializeEnrichmentState(settings.SelectedNowPlayingTab);
 
         _activeSection = NormalizeSection(settings.SelectedSection);
