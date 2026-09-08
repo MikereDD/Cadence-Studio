@@ -17,4 +17,5 @@ public sealed record UpdateCheckResult(
     string Message,
     string? CandidateVersion = null,
     bool Mandatory = false,
-    string? ReleaseNotesUrl = null);
+    string? ReleaseNotesUrl = null,
+    ReleaseManifest? Manifest = null);

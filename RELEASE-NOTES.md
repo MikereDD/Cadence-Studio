@@ -1,3 +1,9 @@
+## v1.1-dev.5
+
+The update transaction foundation now supports verified downloads, independent updater verification, safe extraction, one prior-version backup, bounded replacement, final hashes, validated restart and rollback of failed replacement.
+
+Production updates fail closed until the release public key is provisioned. See `docs/UPDATER-DEV5.md` for build, tests, key setup and runtime steps. No startup-health handshake is implemented in this increment.
+
 # Cadence Studio v1.1-dev.3 — Development Build
 
 ## v1.1-dev.4 — Separate updater and staging transactions

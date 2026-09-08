@@ -73,5 +73,9 @@ $manifest = [ordered]@{
 }
 $manifest | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $output 'release-manifest.json') -Encoding utf8
 
+# This identity is covered by the detached ZIP signature and prevents version relabeling.
+$identity = [ordered]@{ appId = 'cadence-studio'; version = $version; architecture = $Runtime; channel = 'development' }
+[IO.File]::WriteAllText((Join-Path $output 'cadence-update.json'), ($identity | ConvertTo-Json -Compress), [Text.UTF8Encoding]::new($false))
+
 Write-Host "Publish complete: $output" -ForegroundColor Green
 $output

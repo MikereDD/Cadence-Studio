@@ -26,10 +26,14 @@ void Reject(Action action, string name)
 }
 int Run(string executable, params string[] arguments)
 {
-    var start = new ProcessStartInfo(executable) { UseShellExecute = false, CreateNoWindow = true };
+    var start = new ProcessStartInfo(executable) { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true };
     foreach (var arg in arguments) start.ArgumentList.Add(arg);
     using var p = Process.Start(start)!;
-    if (!p.WaitForExit(20000)) throw new Exception("Fixture timed out.");
+    var stdout = p.StandardOutput.ReadToEndAsync();
+    var stderr = p.StandardError.ReadToEndAsync();
+    if (!p.WaitForExit(180000)) throw new Exception("Fixture timed out.");
+    Console.Write(stdout.GetAwaiter().GetResult());
+    Console.Error.Write(stderr.GetAwaiter().GetResult());
     return p.ExitCode;
 }
 var t = UpdateTransactionStore.Prepare(install, ProductInfo.InformationalVersion, true);
@@ -71,7 +75,7 @@ using (var released = new FileStream(Path.Combine(failure.StagingRoot, "active.l
     Check(true, "failure releases lock");
 Check(!File.Exists(t.PayloadPath) && !Directory.Exists(t.BackupPath), "no payload or backup created");
 Check(Run(updater) == 2, "missing required arguments");
-Check(Run(updater, "--install", "--transaction", file) == 2, "install mode unavailable");
+Check(Run(updater, "--install", "--transaction", file) == 2, "install requires verified release transaction");
 Check(Run(updater, "--dry-run", "--transaction", file, "--dry-run") == 2, "extra argument rejected");
 Reject(() => Validate(t with { TransactionId = "../escape" }), "invalid transaction ID");
 Reject(() => Validate(t with { FormatVersion = 0 }), "old local format");
@@ -132,7 +136,7 @@ var psi = new ProcessStartInfo("powershell.exe") { UseShellExecute = false, Crea
 psi.ArgumentList.Add("-NoProfile"); psi.ArgumentList.Add("-Command");
 psi.ArgumentList.Add("New-Item -ItemType Junction -Path '" + junction.Replace("'", "''") +
     "' -Target '" + install.Replace("'", "''") + "' -ErrorAction Stop | Out-Null");
-using (var p = Process.Start(psi)!) { Check(p.WaitForExit(20000) && p.ExitCode == 0, "junction fixture created"); }
+using (var p = Process.Start(psi)!) { Check(p.WaitForExit(180000) && p.ExitCode == 0, "junction fixture created"); }
 Reject(() => Validate(t), "reparse-point extraction rejected");
 UpdateTransactionStore.CleanupAbandoned();
 Check(File.Exists(file), "junction staging retained by cleanup");
@@ -147,5 +151,7 @@ foreach (var dir in new[] { t.StagingRoot, exitedStaging, lifecycle.StagingRoot,
 }
 UpdateTransactionStore.CleanupAbandoned();
 Check(!Directory.Exists(t.StagingRoot) && !Directory.Exists(exitedStaging), "expired flat staging cleanup");
-Console.WriteLine($"{passed} tests passed.");
+Console.WriteLine($"{passed} dev.4 regression tests passed.");
+Check(Run(Path.Combine(install, "signed-tests", "CadenceStudio.exe"), "--suite") == 0, "signed dev.5 integration suite");
+Console.WriteLine($"{passed} top-level checks passed.");
 return 0;

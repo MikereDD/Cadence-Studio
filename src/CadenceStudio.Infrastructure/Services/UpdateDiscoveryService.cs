@@ -142,10 +142,10 @@ public sealed class UpdateDiscoveryService
 
             return new UpdateCheckResult(
                 UpdateCheckState.UpdateAvailable,
-                $"Update v{manifest.Version} is available. Manifest discovery and compatibility validation passed; download and installation are intentionally disabled in v1.1-dev.3.",
+                $"Update v{manifest.Version} is available. Manifest discovery and compatibility validation passed. Installation requires a provisioned release trust anchor.",
                 manifest.Version,
                 manifest.Mandatory,
-                manifest.ReleaseNotesUrl);
+                manifest.ReleaseNotesUrl, manifest);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {

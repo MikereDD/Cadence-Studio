@@ -12,6 +12,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "updater", "updater", "{EF6E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CadenceStudio.Updater", "updater\CadenceStudio.Updater\CadenceStudio.Updater.csproj", "{B3C336EF-6D8D-45BA-B4DE-B17F8AD485E5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{AE810139-20B9-48B1-A28F-FFA98141298D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SigningFixture.Core", "tests\SigningFixture.Core\SigningFixture.Core.csproj", "{C591E27B-9442-49FB-BC2B-2A493D1C82BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CadenceStudio.Updater.Tests", "tests\CadenceStudio.Updater.Tests\CadenceStudio.Updater.Tests.csproj", "{35EABF9F-5D88-458E-A1D7-80762BCFBB02}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CadenceStudio.SignedInstall.Tests", "tests\CadenceStudio.SignedInstall.Tests\CadenceStudio.SignedInstall.Tests.csproj", "{4CE9F6D7-F507-4C18-B651-AE71089AA368}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SigningFixture.Updater", "tests\SigningFixture.Updater\SigningFixture.Updater.csproj", "{ED0256D7-D425-4B2C-84E2-A234DEEB205B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,11 +44,31 @@ Global
 		{B3C336EF-6D8D-45BA-B4DE-B17F8AD485E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B3C336EF-6D8D-45BA-B4DE-B17F8AD485E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B3C336EF-6D8D-45BA-B4DE-B17F8AD485E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C591E27B-9442-49FB-BC2B-2A493D1C82BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C591E27B-9442-49FB-BC2B-2A493D1C82BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C591E27B-9442-49FB-BC2B-2A493D1C82BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C591E27B-9442-49FB-BC2B-2A493D1C82BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35EABF9F-5D88-458E-A1D7-80762BCFBB02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35EABF9F-5D88-458E-A1D7-80762BCFBB02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35EABF9F-5D88-458E-A1D7-80762BCFBB02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35EABF9F-5D88-458E-A1D7-80762BCFBB02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CE9F6D7-F507-4C18-B651-AE71089AA368}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CE9F6D7-F507-4C18-B651-AE71089AA368}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CE9F6D7-F507-4C18-B651-AE71089AA368}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CE9F6D7-F507-4C18-B651-AE71089AA368}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED0256D7-D425-4B2C-84E2-A234DEEB205B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED0256D7-D425-4B2C-84E2-A234DEEB205B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED0256D7-D425-4B2C-84E2-A234DEEB205B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED0256D7-D425-4B2C-84E2-A234DEEB205B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{B3C336EF-6D8D-45BA-B4DE-B17F8AD485E5} = {EF6E5893-2E3B-4286-B48B-854DE5E30877}
+		{C591E27B-9442-49FB-BC2B-2A493D1C82BB} = {AE810139-20B9-48B1-A28F-FFA98141298D}
+		{35EABF9F-5D88-458E-A1D7-80762BCFBB02} = {AE810139-20B9-48B1-A28F-FFA98141298D}
+		{4CE9F6D7-F507-4C18-B651-AE71089AA368} = {AE810139-20B9-48B1-A28F-FFA98141298D}
+		{ED0256D7-D425-4B2C-84E2-A234DEEB205B} = {AE810139-20B9-48B1-A28F-FFA98141298D}
 	EndGlobalSection
 EndGlobal

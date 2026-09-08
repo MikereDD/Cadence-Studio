@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk">
+<PropertyGroup><TargetFramework>net8.0</TargetFramework><AssemblyName>CadenceStudio.SigningFixture.Core</AssemblyName><EnableDefaultCompileItems>false</EnableDefaultCompileItems></PropertyGroup>
+<ItemGroup><Compile Include="../../src/CadenceStudio.Core/**/*.cs" Exclude="../../src/CadenceStudio.Core/obj/**;../../src/CadenceStudio.Core/bin/**;../../src/CadenceStudio.Core/Updates/ReleaseTrustAnchor.cs" /><Compile Include="ReleaseTrustAnchor.cs" /></ItemGroup>
+</Project>

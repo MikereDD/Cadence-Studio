@@ -13,7 +13,7 @@ public static class UpdateTransactionStore
         Converters = { new JsonStringEnumConverter<UpdateTransactionState>(allowIntegerValues: false) }
     };
 
-    public static UpdateTransaction Prepare(string installRoot, string targetVersion, bool syntheticTest)
+    public static UpdateTransaction Prepare(string installRoot, string targetVersion, bool syntheticTest, ReleaseManifest? manifest = null)
     {
         using var process = Process.GetCurrentProcess();
         if (!UpdateTransactionPaths.Same(process.MainModule!.FileName!, Path.Combine(installRoot, "CadenceStudio.exe")))
@@ -22,14 +22,14 @@ public static class UpdateTransactionStore
         var staging = Path.Combine(UpdateTransactionPaths.UpdatesRoot, id);
         var t = new UpdateTransaction
         {
-            FormatVersion = 1, AppId = ProductInfo.AppId, TransactionId = id,
+            Manifest = manifest, FormatVersion = 1, AppId = ProductInfo.AppId, TransactionId = id,
             CurrentVersion = ProductInfo.InformationalVersion, TargetVersion = targetVersion,
             SyntheticTest = syntheticTest, InstallRoot = installRoot,
             InstalledExecutable = Path.Combine(installRoot, "CadenceStudio.exe"),
             RestartExecutable = Path.Combine(installRoot, "CadenceStudio.exe"), StagingRoot = staging,
-            PayloadPath = Path.Combine(staging, "payload", "payload.zip"),
-            SignaturePath = Path.Combine(staging, "payload", "payload.zip.sig"),
-            ExtractionPath = Path.Combine(staging, "extracted"), BackupPath = Path.Combine(staging, "previous"),
+            PayloadPath = Path.Combine(staging, "payload", manifest is null ? "payload.zip" : UpdateMaterials.Select(manifest).FileName),
+            SignaturePath = Path.Combine(staging, "payload", manifest is null ? "payload.zip.sig" : UpdateMaterials.Select(manifest).Signature.FileName),
+            ExtractionPath = Path.Combine(staging, "extracted"), BackupPath = manifest is null ? Path.Combine(staging, "previous") : Path.Combine(installRoot, ".cadence-previous"),
             ProcessId = process.Id, ProcessStartUtcTicks = process.StartTime.ToUniversalTime().Ticks,
             CreatedUtc = DateTimeOffset.UtcNow, State = UpdateTransactionState.Prepared
         };
@@ -41,8 +41,11 @@ public static class UpdateTransactionStore
         Directory.CreateDirectory(staging);
         UpdateTransactionPaths.Validate(t, file, installRoot);
         using (var stream = new FileStream(file, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+        {
             JsonSerializer.Serialize(stream, t, Json);
-        Log(t, UpdateTransactionState.Prepared, "Dry-run only; payload and signature are unverified and absent.");
+            stream.Flush(true);
+        }
+        Log(t, UpdateTransactionState.Prepared, manifest is null ? "Dry-run only; payload and signature are unverified and absent." : "Release transaction prepared; materials unverified.");
         return t;
     }
 
@@ -54,18 +57,31 @@ public static class UpdateTransactionStore
         using var stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read);
         if (stream.Length > 32768) throw new InvalidDataException("Transaction exceeds 32 KiB.");
         using var document = JsonDocument.Parse(stream, new JsonDocumentOptions { MaxDepth = 8 });
-        var names = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var property in document.RootElement.EnumerateObject())
-            if (!names.Add(property.Name)) throw new InvalidDataException("Duplicate transaction property.");
+        RejectDuplicates(document.RootElement);
         var t = document.Deserialize<UpdateTransaction>(Json) ?? throw new InvalidDataException("Missing transaction.");
         UpdateTransactionPaths.Validate(t, file, knownInstallRoot, requirePrepared);
         return t;
     }
 
+    private static void RejectDuplicates(JsonElement value)
+    {
+        if (value.ValueKind == JsonValueKind.Object)
+        {
+            var names = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var property in value.EnumerateObject())
+            {
+                if (!names.Add(property.Name)) throw new InvalidDataException("Duplicate transaction property.");
+                RejectDuplicates(property.Value);
+            }
+        }
+        else if (value.ValueKind == JsonValueKind.Array)
+            foreach (var item in value.EnumerateArray()) RejectDuplicates(item);
+    }
+
     // Caller owns active.lock throughout the transition, including failure recording.
     public static UpdateTransaction Transition(UpdateTransaction t, UpdateTransactionState state, string message)
     {
-        var next = t with { State = state };
+        var next = t with { State = state, Reason = message };
         var file = Path.Combine(t.StagingRoot, "transaction.json");
         UpdateTransactionPaths.Validate(next, file, t.InstallRoot, requirePrepared: false);
         var temporary = Path.Combine(t.StagingRoot, $"transaction-{Guid.NewGuid():N}.tmp");
@@ -99,6 +115,8 @@ public static class UpdateTransactionStore
         if (stream.Length > 65536) throw new InvalidDataException("Transaction log limit reached.");
         using var writer = new StreamWriter(stream);
         writer.WriteLine($"{DateTimeOffset.UtcNow:O} {t.TransactionId} {t.CurrentVersion} -> {t.TargetVersion} {state}: {message}");
+        writer.Flush();
+        stream.Flush(true);
     }
 
     // Intentionally flat cleanup: unexpected files or ANY directories are retained.

@@ -68,6 +68,7 @@ public partial class AboutDialog : Window
         UpdateCheckButton.IsEnabled = false;
         DryRunButton.IsEnabled = false;
         _eligibleUpdate = null;
+        InstallButton.IsEnabled = false;
         UpdateStatusText.Text =
             $"Checking the approved {ProductInfo.UpdateChannel} manifest endpoint...";
 
@@ -80,6 +81,7 @@ public partial class AboutDialog : Window
             {
                 UpdateStatusText.Text = result.Message;
                 _eligibleUpdate = result;
+                InstallButton.IsEnabled = result.State == CadenceStudio.Core.Updates.UpdateCheckState.UpdateAvailable;
             }
         }
         catch (OperationCanceledException)
@@ -97,6 +99,20 @@ public partial class AboutDialog : Window
                 DryRunButton.IsEnabled = true;
             }
         }
+    }
+
+    private async void Install_Click(object sender, RoutedEventArgs e)
+    {
+        InstallButton.IsEnabled = false;
+        DryRunButton.IsEnabled = false;
+        UpdateCheckButton.IsEnabled = false;
+        try
+        {
+            UpdateStatusText.Text = "Downloading and verifying update...";
+            await Services.UpdateInstallService.InstallAsync(_eligibleUpdate!);
+        }
+        catch (Exception exception) { UpdateStatusText.Text = "Update rejected: " + exception.Message; }
+        finally { DryRunButton.IsEnabled = true; UpdateCheckButton.IsEnabled = true; }
     }
 
     private async void DryRun_Click(object sender, RoutedEventArgs e)

@@ -1,11 +1,13 @@
 namespace CadenceStudio.Core.Updates;
 
-public enum UpdateTransactionState { Prepared, Validated, ProcessRunning, ProcessClosed, DryRunCompleted, Failed }
+public enum UpdateTransactionState { Prepared, Validated, ProcessRunning, ProcessClosed, DryRunCompleted, Failed, Downloading, MaterialsVerified, Extracted, BackupReady, Replacing, InstalledVerified, Restarted, RollingBack, RolledBack, RollbackFailed }
 
 // This local format is deliberately separate from the release-manifest protocol.
-// No state in this foundation authorizes installation or represents verified bytes.
+// Installation materials are independently verified at each process boundary.
 public sealed record UpdateTransaction
 {
+    public ReleaseManifest? Manifest { get; init; }
+    public string? Reason { get; init; }
     public required int FormatVersion { get; init; }
     public required string AppId { get; init; }
     public required string TransactionId { get; init; }

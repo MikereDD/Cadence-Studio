@@ -13,4 +13,14 @@
     <ItemGroup><UpdaterFiles Include="../../updater/CadenceStudio.Updater/bin/$(Configuration)/$(TargetFramework)/*" /></ItemGroup>
     <Copy SourceFiles="@(UpdaterFiles)" DestinationFolder="$(TargetDir)updater" />
   </Target>
+  <Target Name="CopySignedHarness" AfterTargets="Build">
+    <!-- Build the second standalone CadenceStudio fixture explicitly instead of adding it
+         as a ProjectReference. Both harnesses intentionally use AssemblyName=CadenceStudio;
+         keeping them out of the same reference graph preserves the dev.4 Core dependency. -->
+    <MSBuild Projects="../CadenceStudio.SignedInstall.Tests/CadenceStudio.SignedInstall.Tests.csproj"
+             Targets="Build"
+             Properties="Configuration=$(Configuration)" />
+    <ItemGroup><SignedHarnessFiles Include="../CadenceStudio.SignedInstall.Tests/bin/$(Configuration)/$(TargetFramework)/**/*" /></ItemGroup>
+    <Copy SourceFiles="@(SignedHarnessFiles)" DestinationFiles="@(SignedHarnessFiles->'$(TargetDir)signed-tests/%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
 </Project>

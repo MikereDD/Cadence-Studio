@@ -72,10 +72,10 @@ public static class UpdateTransactionPaths
             !Same(t.StagingRoot, staging) || !Same(transactionFile, Path.Combine(staging, "transaction.json")) ||
             Same(t.InstallRoot, UpdatesRoot) || Within(t.InstallRoot, UpdatesRoot) || Within(UpdatesRoot, t.InstallRoot))
             throw new InvalidDataException("Installation or staging identity mismatch.");
-        if (!Same(t.PayloadPath, Path.Combine(staging, "payload", "payload.zip")) ||
-            !Same(t.SignaturePath, Path.Combine(staging, "payload", "payload.zip.sig")) ||
+        if (!Same(t.PayloadPath, Path.Combine(staging, "payload", t.Manifest is null ? "payload.zip" : UpdateMaterials.Select(t.Manifest).FileName)) ||
+            !Same(t.SignaturePath, Path.Combine(staging, "payload", t.Manifest is null ? "payload.zip.sig" : UpdateMaterials.Select(t.Manifest).Signature.FileName)) ||
             !Same(t.ExtractionPath, Path.Combine(staging, "extracted")) ||
-            !Same(t.BackupPath, Path.Combine(staging, "previous")))
+            !Same(t.BackupPath, t.Manifest is null ? Path.Combine(staging, "previous") : Path.Combine(knownInstallRoot, ".cadence-previous")))
             throw new InvalidDataException("Invalid reserved staging paths.");
     }
 }

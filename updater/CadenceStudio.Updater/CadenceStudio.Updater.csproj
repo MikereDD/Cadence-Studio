@@ -3,7 +3,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <AssemblyName>CadenceStudio.Updater</AssemblyName>
-    <InformationalVersion>1.1-dev.4</InformationalVersion>
+    <InformationalVersion>1.1-dev.5</InformationalVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/CadenceStudio.Core/CadenceStudio.Core.csproj" />

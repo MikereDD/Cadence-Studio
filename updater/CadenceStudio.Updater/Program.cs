@@ -1,9 +1,9 @@
 using CadenceStudio.Core.Updates;
 
-// No install mode exists. Unknown, duplicate, or missing arguments fail closed.
-if (args.Length != 3 || args[0] != "--dry-run" || args[1] != "--transaction")
+// Unknown, duplicate, or missing arguments fail closed.
+if (args.Length != 3 || args[0] is not ("--dry-run" or "--install") || args[1] != "--transaction")
 {
-    Console.Error.WriteLine("Usage: CadenceStudio.Updater.exe --dry-run --transaction <absolute transaction.json>");
+    Console.Error.WriteLine("Usage: CadenceStudio.Updater.exe --dry-run|--install --transaction <absolute transaction.json>");
     return 2;
 }
 UpdateTransaction? transaction = null;
@@ -12,11 +12,18 @@ var ownsValidatedTransaction = false;
 try
 {
     var installRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, ".."));
-    transaction = UpdateTransactionStore.Read(args[2], installRoot);
+    transaction = UpdateTransactionStore.Read(args[2], installRoot, requirePrepared: args[0] == "--dry-run");
     var lockPath = Path.Combine(transaction.StagingRoot, "active.lock");
     UpdateTransactionPaths.Canonical(lockPath);
     lease = new FileStream(lockPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
-    transaction = UpdateTransactionStore.Read(args[2], installRoot);
+    transaction = UpdateTransactionStore.Read(args[2], installRoot, requirePrepared: args[0] == "--dry-run");
+    if (args[0] == "--install")
+    {
+        if (transaction.State != UpdateTransactionState.MaterialsVerified || transaction.Manifest is null || transaction.SyntheticTest)
+            return 2;
+        transaction = UpdateInstaller.Install(transaction);
+        return transaction.State == UpdateTransactionState.Restarted ? 0 : 1;
+    }
     ownsValidatedTransaction = true;
     transaction = UpdateTransactionStore.Transition(transaction, UpdateTransactionState.Validated, "Installation and staging paths validated.");
     var closed = UpdateProcessIdentity.IsClosed(transaction);
@@ -30,7 +37,7 @@ try
 catch (Exception exception)
 {
     // Unvalidated input must never select a log destination.
-    Console.Error.WriteLine($"Dry run rejected: {exception.GetType().Name}: {exception.Message}");
+    Console.Error.WriteLine($"Updater rejected: {exception.GetType().Name}: {exception.Message}");
     if (ownsValidatedTransaction && transaction is not null)
     {
         try { UpdateTransactionStore.Transition(transaction, UpdateTransactionState.Failed, exception.GetType().Name); }

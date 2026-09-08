@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+<PropertyGroup><TargetFramework>net8.0-windows</TargetFramework><OutputType>Exe</OutputType><AssemblyName>CadenceStudio</AssemblyName></PropertyGroup>
+<ItemGroup><ProjectReference Include="../SigningFixture.Core/SigningFixture.Core.csproj"/><ProjectReference Include="../SigningFixture.Updater/SigningFixture.Updater.csproj" ReferenceOutputAssembly="false"/><None Include="../SigningFixture.Core/test-only-private.pem" Link="test-only-private.pem" CopyToOutputDirectory="PreserveNewest"/></ItemGroup>
+<Target Name="CopyUpdater" AfterTargets="Build"><ItemGroup><FixtureUpdater Include="../SigningFixture.Updater/bin/$(Configuration)/$(TargetFramework)/*" /></ItemGroup><Copy SourceFiles="@(FixtureUpdater)" DestinationFolder="$(TargetDir)updater"/></Target>
+</Project>

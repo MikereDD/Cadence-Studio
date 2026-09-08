@@ -1,3 +1,11 @@
+## v1.1-dev.5 — updater trust, replacement and rollback foundation
+
+- Stage selected ZIP and detached signature; enforce exact names/sizes and both SHA-256 digests.
+- Verify pinned ECDSA P-256/SHA-256 DER detached signatures independently in the app and updater.
+- Validate signed package identity, reject unsafe archives, retain one verified backup, replace and hash-check files, and roll back replacement failures.
+- Keep the dry-run workflow and add isolated signed executable fixtures to the existing harness.
+- Production trust anchor intentionally unprovisioned pending owner-generated release key. Startup health remains dev.6.
+
 # Changelog
 
 ## v1.1-dev.4 — Separate updater and staging transactions
