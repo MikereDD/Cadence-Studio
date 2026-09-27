@@ -29,7 +29,8 @@ public static class ReleaseManifestValidator
         {
             "rsa-sha256",
             "ecdsa-sha256",
-            "ed25519"
+            "ed25519",
+            "typezero-ecdsa-p384-sha384-v1"
         };
 
     public static bool TryValidateForCadence(
@@ -48,6 +49,11 @@ public static class ReleaseManifestValidator
             return Fail(
                 $"Unsupported manifest schema {manifest.SchemaVersion}; expected {ProductInfo.ReleaseManifestSchemaVersion}.",
                 out error);
+        }
+
+        if (manifest.ManifestSequence <= 0)
+        {
+            return Fail("Manifest manifestSequence must be a positive integer.", out error);
         }
 
         if (!string.Equals(manifest.AppId, ProductInfo.AppId, StringComparison.Ordinal))

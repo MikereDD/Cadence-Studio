@@ -7,6 +7,9 @@ public sealed class ReleaseManifest
     [JsonPropertyName("schemaVersion")]
     public int SchemaVersion { get; set; }
 
+    [JsonPropertyName("manifestSequence")]
+    public long ManifestSequence { get; set; }
+
     [JsonPropertyName("appId")]
     public string AppId { get; set; } = string.Empty;
 

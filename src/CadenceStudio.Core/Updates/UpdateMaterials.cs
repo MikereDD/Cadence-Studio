@@ -62,18 +62,22 @@ public static class UpdateMaterials
                 throw new InvalidDataException("Payload size or SHA-256 mismatch.");
             if (!Hash(signature).Equals(asset.Signature.Sha256, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Signature-file SHA-256 mismatch.");
-            if (string.IsNullOrEmpty(ReleaseTrustAnchor.KeyId) || string.IsNullOrEmpty(ReleaseTrustAnchor.PublicKeyPem))
-                throw new InvalidDataException("Production release trust anchor has not been provisioned.");
-            using var key = ECDsa.Create();
-            key.ImportFromPem(ReleaseTrustAnchor.PublicKeyPem);
-            var fingerprint = Convert.ToHexString(SHA256.HashData(key.ExportSubjectPublicKeyInfo()));
-            if (asset.Signature.KeyId != ReleaseTrustAnchor.KeyId ||
-                asset.Signature.Algorithm != ReleaseTrustAnchor.Algorithm || key.KeySize != 256 ||
-                !fingerprint.Equals(asset.Signature.PublicKeySha256, StringComparison.OrdinalIgnoreCase))
+
+            var trusted = ReleaseTrustPolicy.RequireAuthorizingReleaseKey(
+                asset.Signature.KeyId,
+                asset.Signature.Algorithm);
+            if (!string.Equals(
+                    trusted.PublicKeySha256,
+                    asset.Signature.PublicKeySha256,
+                    StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Unapproved signing identity.");
+
+            var profile = ReleaseTrustPolicy.GetEcdsaProfile(trusted.Algorithm);
+            using var key = ECDsa.Create();
+            key.ImportFromPem(trusted.PublicKeyPem);
             var bytes = new byte[checked((int)signature.Length)];
             signature.ReadExactly(bytes);
-            if (!key.VerifyData(payload, bytes, HashAlgorithmName.SHA256, DSASignatureFormat.Rfc3279DerSequence))
+            if (!key.VerifyData(payload, bytes, profile.HashAlgorithm, DSASignatureFormat.Rfc3279DerSequence))
                 throw new InvalidDataException("Invalid detached signature.");
             payload.Position = 0;
             // Keep this handle open through extraction: Windows denies writes/deletes.

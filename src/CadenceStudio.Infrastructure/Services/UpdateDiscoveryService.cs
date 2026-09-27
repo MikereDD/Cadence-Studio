@@ -1,7 +1,6 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using CadenceStudio.Core;
@@ -25,6 +24,9 @@ public sealed class UpdateDiscoveryService
     public static Uri ManifestEndpoint { get; } = new(
         $"https://raw.githubusercontent.com/MikereDD/Cadence-Studio/main/updates/{ProductInfo.UpdateChannel}/release-manifest.json");
 
+    public static Uri ManifestSignatureEndpoint { get; } = new(
+        $"https://raw.githubusercontent.com/MikereDD/Cadence-Studio/main/updates/{ProductInfo.UpdateChannel}/release-manifest.json.sig");
+
     public async Task<UpdateCheckResult> CheckForUpdatesAsync(CancellationToken cancellationToken = default)
     {
         var architecture = GetCurrentArchitecture();
@@ -35,17 +37,19 @@ public sealed class UpdateDiscoveryService
                 $"Update discovery does not support process architecture {RuntimeInformation.ProcessArchitecture}.");
         }
 
-        if (!IsApprovedManifestEndpoint(ManifestEndpoint))
+        if (!IsApprovedManifestEndpoint(ManifestEndpoint, "release-manifest.json") ||
+            !IsApprovedManifestEndpoint(ManifestSignatureEndpoint, "release-manifest.json.sig"))
         {
             return new UpdateCheckResult(
                 UpdateCheckState.Failed,
-                "The configured update manifest endpoint is not an approved Cadence Studio HTTPS origin.");
+                "The configured update manifest endpoints are not approved Cadence Studio HTTPS origins.");
         }
 
         try
         {
             using var request = new HttpRequestMessage(HttpMethod.Get, ManifestEndpoint);
             request.Headers.CacheControl = new CacheControlHeaderValue { NoCache = true };
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             using var response = await HttpClient.SendAsync(
                 request,
@@ -66,24 +70,61 @@ public sealed class UpdateDiscoveryService
                     $"Update manifest endpoint returned HTTP {(int)response.StatusCode} ({response.ReasonPhrase}).");
             }
 
-            var json = await ReadManifestTextAsync(response.Content, cancellationToken);
+            var manifestBytes = await ReadBoundedBytesAsync(
+                response.Content,
+                MaximumManifestBytes,
+                "Manifest",
+                cancellationToken);
+
+            using var signatureRequest = new HttpRequestMessage(HttpMethod.Get, ManifestSignatureEndpoint);
+            signatureRequest.Headers.CacheControl = new CacheControlHeaderValue { NoCache = true };
+            signatureRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/octet-stream"));
+            using var signatureResponse = await HttpClient.SendAsync(
+                signatureRequest,
+                HttpCompletionOption.ResponseHeadersRead,
+                cancellationToken);
+
+            if (signatureResponse.StatusCode == HttpStatusCode.NotFound)
+            {
+                return new UpdateCheckResult(
+                    UpdateCheckState.InvalidManifest,
+                    "A release manifest was published without its required detached manifest signature.");
+            }
+
+            if (!signatureResponse.IsSuccessStatusCode)
+            {
+                return new UpdateCheckResult(
+                    UpdateCheckState.Failed,
+                    $"Manifest signature endpoint returned HTTP {(int)signatureResponse.StatusCode} ({signatureResponse.ReasonPhrase}).");
+            }
+
+            var signatureBytes = await ReadBoundedBytesAsync(
+                signatureResponse.Content,
+                ReleaseManifestAuthentication.MaximumSignatureBytes,
+                "Manifest signature",
+                cancellationToken);
+
+            // The exact published manifest bytes are authenticated before any remote
+            // security-sensitive field is deserialized or acted upon.
+            var authorization = ReleaseManifestAuthentication.VerifyExact(manifestBytes, signatureBytes);
+
             ReleaseManifest? manifest;
             try
             {
-                manifest = JsonSerializer.Deserialize<ReleaseManifest>(json, JsonOptions);
+                manifest = JsonSerializer.Deserialize<ReleaseManifest>(manifestBytes, JsonOptions);
             }
             catch (JsonException exception)
             {
                 return new UpdateCheckResult(
                     UpdateCheckState.InvalidManifest,
-                    $"Update manifest JSON was rejected: {exception.Message}");
+                    $"Authenticated update manifest JSON was rejected: {exception.Message}");
             }
 
             if (manifest is null)
             {
                 return new UpdateCheckResult(
                     UpdateCheckState.InvalidManifest,
-                    "Update manifest was empty.");
+                    "Authenticated update manifest was empty.");
             }
 
             if (!ReleaseManifestValidator.TryValidateForCadence(
@@ -95,8 +136,12 @@ public sealed class UpdateDiscoveryService
             {
                 return new UpdateCheckResult(
                     UpdateCheckState.InvalidManifest,
-                    $"Update manifest was rejected: {validationError}");
+                    $"Authenticated update manifest was rejected: {validationError}");
             }
+
+            var manifestHash = ReleaseManifestAuthentication.ComputeSha256(manifestBytes);
+            var replayStore = new ManifestReplayStateStore();
+            replayStore.Observe(manifest.ManifestSequence, manifestHash, manifest.PublishedAt);
 
             if (ProductInfo.UpdaterProtocolVersion < manifest.MinimumUpdaterProtocolVersion)
             {
@@ -129,8 +174,8 @@ public sealed class UpdateDiscoveryService
             if (comparison <= 0)
             {
                 var message = comparison == 0
-                    ? $"Cadence Studio {ProductInfo.DisplayVersion} is current on the {ProductInfo.UpdateChannel} channel."
-                    : $"This build is newer than the published {ProductInfo.UpdateChannel} manifest ({manifest.Version}).";
+                    ? $"Cadence Studio {ProductInfo.DisplayVersion} is current on the {ProductInfo.UpdateChannel} channel. Signed manifest sequence {manifest.ManifestSequence} is trusted."
+                    : $"This build is newer than the published {ProductInfo.UpdateChannel} manifest ({manifest.Version}). Signed manifest sequence {manifest.ManifestSequence} is trusted.";
 
                 return new UpdateCheckResult(
                     UpdateCheckState.Current,
@@ -142,10 +187,11 @@ public sealed class UpdateDiscoveryService
 
             return new UpdateCheckResult(
                 UpdateCheckState.UpdateAvailable,
-                $"Update v{manifest.Version} is available. Manifest discovery and compatibility validation passed. Installation requires a provisioned release trust anchor.",
+                $"Update v{manifest.Version} is available. Exact manifest bytes were authorized by {authorization.KeyId}; manifest sequence {manifest.ManifestSequence}, replay checks, and compatibility validation passed.",
                 manifest.Version,
                 manifest.Mandatory,
-                manifest.ReleaseNotesUrl, manifest);
+                manifest.ReleaseNotesUrl,
+                manifest);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -161,7 +207,7 @@ public sealed class UpdateDiscoveryService
         {
             return new UpdateCheckResult(
                 UpdateCheckState.Failed,
-                $"Update check could not reach the approved manifest endpoint: {exception.Message}");
+                $"Update check could not reach the approved manifest endpoints: {exception.Message}");
         }
         catch (InvalidDataException exception)
         {
@@ -186,9 +232,6 @@ public sealed class UpdateDiscoveryService
 
         client.DefaultRequestHeaders.UserAgent.ParseAdd(
             $"CadenceStudio/{ProductInfo.InformationalVersion}");
-        client.DefaultRequestHeaders.Accept.Add(
-            new MediaTypeWithQualityHeaderValue("application/json"));
-
         return client;
     }
 
@@ -200,10 +243,10 @@ public sealed class UpdateDiscoveryService
             _ => null
         };
 
-    private static bool IsApprovedManifestEndpoint(Uri uri)
+    private static bool IsApprovedManifestEndpoint(Uri uri, string fileName)
     {
         var expectedPath =
-            $"/MikereDD/Cadence-Studio/main/updates/{ProductInfo.UpdateChannel}/release-manifest.json";
+            $"/MikereDD/Cadence-Studio/main/updates/{ProductInfo.UpdateChannel}/{fileName}";
 
         return string.Equals(uri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase) &&
                string.Equals(uri.Host, "raw.githubusercontent.com", StringComparison.OrdinalIgnoreCase) &&
@@ -212,37 +255,31 @@ public sealed class UpdateDiscoveryService
                string.IsNullOrEmpty(uri.Fragment);
     }
 
-    private static async Task<string> ReadManifestTextAsync(
+    private static async Task<byte[]> ReadBoundedBytesAsync(
         HttpContent content,
+        int maximumBytes,
+        string label,
         CancellationToken cancellationToken)
     {
-        if (content.Headers.ContentLength is > MaximumManifestBytes)
-        {
-            throw new InvalidDataException(
-                $"Manifest exceeds the {MaximumManifestBytes / 1024} KiB size limit.");
-        }
+        if (content.Headers.ContentEncoding.Count != 0)
+            throw new InvalidDataException($"{label} response must not use content encoding.");
+        if (content.Headers.ContentLength is long contentLength && contentLength > maximumBytes)
+            throw new InvalidDataException($"{label} exceeds the {maximumBytes} byte size limit.");
 
         await using var source = await content.ReadAsStreamAsync(cancellationToken);
         using var buffer = new MemoryStream();
-
         var chunk = new byte[8192];
         while (true)
         {
             var read = await source.ReadAsync(chunk.AsMemory(0, chunk.Length), cancellationToken);
-            if (read == 0)
-            {
-                break;
-            }
-
-            if (buffer.Length + read > MaximumManifestBytes)
-            {
-                throw new InvalidDataException(
-                    $"Manifest exceeds the {MaximumManifestBytes / 1024} KiB size limit.");
-            }
-
+            if (read == 0) break;
+            if (buffer.Length + read > maximumBytes)
+                throw new InvalidDataException($"{label} exceeds the {maximumBytes} byte size limit.");
             await buffer.WriteAsync(chunk.AsMemory(0, read), cancellationToken);
         }
 
-        return Encoding.UTF8.GetString(buffer.ToArray());
+        if (buffer.Length == 0)
+            throw new InvalidDataException($"{label} response is empty.");
+        return buffer.ToArray();
     }
 }

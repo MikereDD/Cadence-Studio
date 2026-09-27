@@ -58,7 +58,8 @@ if (args is ["--prepare", var preparedScenario])
         : ProductInfo.UpdaterProtocolVersion;
     var manifest = new ReleaseManifest
     {
-        SchemaVersion = 2, AppId = ProductInfo.AppId, DisplayName = ProductInfo.Name, Platform = "windows",
+        SchemaVersion = ProductInfo.ReleaseManifestSchemaVersion, ManifestSequence = 100,
+        AppId = ProductInfo.AppId, DisplayName = ProductInfo.Name, Platform = "windows",
         Architecture = UpdateMaterials.Architecture, Channel = ProductInfo.UpdateChannel, Version = targetVersion,
         PublishedAt = DateTimeOffset.UtcNow.ToString("O"), MinimumVersion = ProductInfo.InformationalVersion,
         UpdaterProtocolVersion = releaseProtocol, MinimumUpdaterProtocolVersion = ProductInfo.UpdaterProtocolVersion,

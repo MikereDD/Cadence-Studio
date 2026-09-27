@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <AssemblyName>CadenceStudio.ManifestSecurity.Tests</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../SigningFixture.Core/SigningFixture.Core.csproj" />
+    <None Include="../SigningFixture.Core/test-only-private.pem" Link="test-only-private.pem" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>
