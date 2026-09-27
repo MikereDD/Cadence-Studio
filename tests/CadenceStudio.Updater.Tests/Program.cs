@@ -41,6 +41,7 @@ var file = Path.Combine(t.StagingRoot, "transaction.json");
 var updater = Path.Combine(install, "updater", "CadenceStudio.Updater.exe");
 void Validate(UpdateTransaction value) => UpdateTransactionPaths.Validate(value, file, install);
 Check(UpdateTransactionStore.Read(file, install) == t, "transaction round trip");
+Check(t.FormatVersion == 2 && t.HealthToken.Length == 64 && t.HealthMarkerPath == Path.Combine(t.StagingRoot, "health.json"), "dev.6 health transaction identity");
 Check(!UpdateProcessIdentity.IsClosed(t), "matching live process");
 Check(Run(updater, "--dry-run", "--transaction", file) == 0, "separate updater live-process handoff");
 Check(File.ReadAllText(Path.Combine(t.StagingRoot, "updater.log")).Contains("DryRunCompleted"), "logged terminal state");
@@ -55,7 +56,8 @@ using (var held = new FileStream(Path.Combine(lifecycle.StagingRoot, "active.loc
 {
     Check(Run(updater, "--dry-run", "--transaction", lifecycleFile) == 1 && UpdateTransactionStore.Read(lifecycleFile, install) == lifecycle,
         "lock contention cannot overwrite owner state");
-    foreach (var state in new[] { UpdateTransactionState.Validated, UpdateTransactionState.ProcessRunning, UpdateTransactionState.ProcessClosed, UpdateTransactionState.DryRunCompleted, UpdateTransactionState.Failed })
+    foreach (var state in new[] { UpdateTransactionState.Validated, UpdateTransactionState.ProcessRunning, UpdateTransactionState.ProcessClosed,
+        UpdateTransactionState.HealthPending, UpdateTransactionState.HealthConfirmed, UpdateTransactionState.DryRunCompleted, UpdateTransactionState.Failed })
     {
         lifecycle = UpdateTransactionStore.Transition(lifecycle, state, "Lifecycle persistence fixture.");
         Check(UpdateTransactionStore.Read(lifecycleFile, install, requirePrepared: false) == lifecycle, "durable transition " + state);
@@ -78,7 +80,7 @@ Check(Run(updater) == 2, "missing required arguments");
 Check(Run(updater, "--install", "--transaction", file) == 2, "install requires verified release transaction");
 Check(Run(updater, "--dry-run", "--transaction", file, "--dry-run") == 2, "extra argument rejected");
 Reject(() => Validate(t with { TransactionId = "../escape" }), "invalid transaction ID");
-Reject(() => Validate(t with { FormatVersion = 0 }), "old local format");
+Reject(() => Validate(t with { FormatVersion = 1 }), "old local format");
 Reject(() => Validate(t with { AppId = "other-app" }), "wrong application");
 Reject(() => Validate(t with { State = UpdateTransactionState.DryRunCompleted }), "invalid input state");
 Reject(() => Validate(t with { TargetVersion = "1.0" }), "downgrade/channel switch");
@@ -87,17 +89,19 @@ Reject(() => Validate(t with { RestartExecutable = t.PayloadPath }), "payload ca
 Reject(() => Validate(t with { InstallRoot = t.StagingRoot }), "install/staging mismatch");
 Reject(() => Validate(t with { PayloadPath = t.StagingRoot + "-sibling\\payload.zip" }), "prefix sibling escape");
 Reject(() => Validate(t with { BackupPath = install }), "backup escape");
+Reject(() => Validate(t with { HealthMarkerPath = Path.Combine(install, "health.json") }), "health marker escape");
+Reject(() => Validate(t with { HealthToken = new string('A', 64) }), "noncanonical health token");
 Reject(() => UpdateTransactionPaths.Canonical(t.StagingRoot + "\\..\\escape"), "traversal");
 Reject(() => UpdateTransactionPaths.Canonical(t.PayloadPath + ":stream"), "alternate data stream");
 Reject(() => UpdateTransactionPaths.Canonical(@"\\?\C:\test"), "device path");
 Reject(() => UpdateTransactionPaths.Canonical(t.StagingRoot + "\\trailing."), "trailing dot");
 Reject(() => UpdateProcessIdentity.IsClosed(t with { ProcessStartUtcTicks = t.ProcessStartUtcTicks - 1 }), "PID reuse identity conflict");
 var original = JsonSerializer.Serialize(t, new JsonSerializerOptions(json) { WriteIndented = true });
-File.WriteAllText(file, original.Replace("\"FormatVersion\": 1,", "\"Unexpected\": true, \"FormatVersion\": 1,"));
+File.WriteAllText(file, original.Replace("\"FormatVersion\": 2,", "\"Unexpected\": true, \"FormatVersion\": 2,"));
 Reject(() => UpdateTransactionStore.Read(file, install), "unknown JSON property");
 File.WriteAllText(file, new string(' ', 32769));
 Reject(() => UpdateTransactionStore.Read(file, install), "oversized JSON");
-File.WriteAllText(file, original.Replace("\"FormatVersion\": 1,", "\"FormatVersion\": 1, \"FormatVersion\": 1,"));
+File.WriteAllText(file, original.Replace("\"FormatVersion\": 2,", "\"FormatVersion\": 2, \"FormatVersion\": 2,"));
 Reject(() => UpdateTransactionStore.Read(file, install), "duplicate JSON property");
 File.WriteAllText(file, "{}");
 Reject(() => UpdateTransactionStore.Read(file, install), "missing required JSON fields");
@@ -151,7 +155,7 @@ foreach (var dir in new[] { t.StagingRoot, exitedStaging, lifecycle.StagingRoot,
 }
 UpdateTransactionStore.CleanupAbandoned();
 Check(!Directory.Exists(t.StagingRoot) && !Directory.Exists(exitedStaging), "expired flat staging cleanup");
-Console.WriteLine($"{passed} dev.4 regression tests passed.");
-Check(Run(Path.Combine(install, "signed-tests", "CadenceStudio.exe"), "--suite") == 0, "signed dev.5 integration suite");
+Console.WriteLine($"{passed} dev.4/dev.6 transaction regression tests passed.");
+Check(Run(Path.Combine(install, "signed-tests", "CadenceStudio.exe"), "--suite") == 0, "signed dev.6 integration suite");
 Console.WriteLine($"{passed} top-level checks passed.");
 return 0;

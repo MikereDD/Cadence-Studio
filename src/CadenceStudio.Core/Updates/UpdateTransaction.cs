@@ -1,6 +1,26 @@
 namespace CadenceStudio.Core.Updates;
 
-public enum UpdateTransactionState { Prepared, Validated, ProcessRunning, ProcessClosed, DryRunCompleted, Failed, Downloading, MaterialsVerified, Extracted, BackupReady, Replacing, InstalledVerified, Restarted, RollingBack, RolledBack, RollbackFailed }
+public enum UpdateTransactionState
+{
+    Prepared,
+    Validated,
+    ProcessRunning,
+    ProcessClosed,
+    DryRunCompleted,
+    Failed,
+    Downloading,
+    MaterialsVerified,
+    Extracted,
+    BackupReady,
+    Replacing,
+    InstalledVerified,
+    Restarted,
+    HealthPending,
+    HealthConfirmed,
+    RollingBack,
+    RolledBack,
+    RollbackFailed
+}
 
 // This local format is deliberately separate from the release-manifest protocol.
 // Installation materials are independently verified at each process boundary.
@@ -22,6 +42,8 @@ public sealed record UpdateTransaction
     public required string SignaturePath { get; init; }
     public required string ExtractionPath { get; init; }
     public required string BackupPath { get; init; }
+    public required string HealthMarkerPath { get; init; }
+    public required string HealthToken { get; init; }
     public required int ProcessId { get; init; }
     public required long ProcessStartUtcTicks { get; init; }
     public required DateTimeOffset CreatedUtc { get; init; }

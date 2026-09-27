@@ -22,7 +22,7 @@ try
         if (transaction.State != UpdateTransactionState.MaterialsVerified || transaction.Manifest is null || transaction.SyntheticTest)
             return 2;
         transaction = UpdateInstaller.Install(transaction);
-        return transaction.State == UpdateTransactionState.Restarted ? 0 : 1;
+        return transaction.State == UpdateTransactionState.HealthConfirmed ? 0 : 1;
     }
     ownsValidatedTransaction = true;
     transaction = UpdateTransactionStore.Transition(transaction, UpdateTransactionState.Validated, "Installation and staging paths validated.");
@@ -30,7 +30,7 @@ try
     transaction = UpdateTransactionStore.Transition(transaction, closed ? UpdateTransactionState.ProcessClosed : UpdateTransactionState.ProcessRunning,
         closed ? "Main process already exited." : "Main process identity matches; dry run leaves it running.");
     transaction = UpdateTransactionStore.Transition(transaction, UpdateTransactionState.DryRunCompleted,
-        "No download, verification, extraction, backup, replacement, restart, or rollback performed.");
+        "No download, verification, extraction, backup, replacement, restart, health handshake, or rollback performed.");
     Console.WriteLine($"Dry run completed: {transaction.TransactionId}");
     return 0;
 }

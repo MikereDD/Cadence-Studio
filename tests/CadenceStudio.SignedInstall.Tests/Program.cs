@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using CadenceStudio.Core;
@@ -9,6 +10,38 @@ using CadenceStudio.Core.Updates;
 var root = Path.TrimEndingDirectorySeparator(AppContext.BaseDirectory);
 var options = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } };
 var targetVersion = "1.1-dev.999";
+
+if (args.Length > 0 && args[0] == "--update-health" && File.Exists(Path.Combine(root, "fixture-mode")))
+{
+    if (File.Exists(Path.Combine(root, "health-fail"))) return 12;
+    if (args.Length != 7 || args[1] != "--transaction-id" || args[3] != "--target-version" || args[5] != "--health-marker") return 13;
+    var transactionId = args[2];
+    var version = args[4];
+    var marker = args[6];
+    var token = Environment.GetEnvironmentVariable(UpdateHealthHandshake.TokenEnvironmentVariable);
+    Environment.SetEnvironmentVariable(UpdateHealthHandshake.TokenEnvironmentVariable, null);
+    if (string.IsNullOrEmpty(token)) return 14;
+    using var process = Process.GetCurrentProcess();
+    var startTicks = process.StartTime.ToUniversalTime().Ticks;
+    var proofToken = File.Exists(Path.Combine(root, "health-bad-proof")) ? new string('0', 64) : token;
+    var receipt = new
+    {
+        formatVersion = 1,
+        transactionId,
+        targetVersion = version,
+        processId = process.Id,
+        processStartUtcTicks = startTicks,
+        confirmedUtc = DateTimeOffset.UtcNow,
+        proof = Proof(proofToken, transactionId, version, process.Id, startTicks)
+    };
+    var temp = Path.Combine(Path.GetDirectoryName(marker)!, "fixture-health-" + Guid.NewGuid().ToString("N") + ".tmp");
+    File.WriteAllText(temp, JsonSerializer.Serialize(receipt));
+    File.Move(temp, marker, overwrite: false);
+    File.WriteAllText(Path.Combine(root, "restarted.txt"), "validated installed executable launched and health-confirmed");
+    Thread.Sleep(1500);
+    return 0;
+}
+
 if (args.Length == 0 && File.Exists(Path.Combine(root, "fixture-mode")))
 {
     File.WriteAllText(Path.Combine(root, "restarted.txt"), "validated installed executable launched");
@@ -45,7 +78,7 @@ if (args is ["--prepare", var preparedScenario])
         {
             var relative = Path.GetRelativePath(root, file).Replace('\\', '/');
             if (relative.StartsWith(".cadence-previous/", StringComparison.Ordinal) || relative is "old-only.txt" or "test-only-private.pem") continue;
-            if ((preparedScenario is "valid" or "rollback" or "previous-protocol" && relative == "CadenceStudio.exe") ||
+            if ((preparedScenario is "valid" or "rollback" or "previous-protocol" or "health-failure" or "health-bad-proof" && relative == "CadenceStudio.exe") ||
                 (preparedScenario == "valid" && relative == "updater/CadenceStudio.Updater.exe"))
             {
                 using var output = zip.CreateEntry(relative).Open();
@@ -58,6 +91,8 @@ if (args is ["--prepare", var preparedScenario])
             architecture = UpdateMaterials.Architecture, channel = ProductInfo.UpdateChannel }));
         Add("a-new.txt", "new release");
         if (preparedScenario == "rollback") Add("z-blocked.txt", "replacement bytes");
+        if (preparedScenario == "health-failure") Add("health-fail", "exit before health confirmation");
+        if (preparedScenario == "health-bad-proof") Add("health-bad-proof", "write an invalid health proof");
         if (preparedScenario is "traversal" or "absolute" or "backslash" or "ads" or "reserved")
             Add(preparedScenario switch { "traversal" => "../escape.txt", "absolute" => "C:/escape.txt", "backslash" => "dir\\escape.txt",
                 "ads" => "a.txt:stream", _ => ".cadence-previous/escape.txt" }, "bad");
@@ -114,12 +149,12 @@ void Check(bool condition, string name)
     if (!condition) throw new InvalidOperationException("FAIL: " + name);
     Console.WriteLine("PASS: " + name); passed++;
 }
-var suiteRoot = Path.Combine(Path.GetTempPath(), "CadenceStudio-dev5-" + Guid.NewGuid().ToString("N"));
+var suiteRoot = Path.Combine(Path.GetTempPath(), "CadenceStudio-dev6-" + Guid.NewGuid().ToString("N"));
 Directory.CreateDirectory(suiteRoot);
 foreach (var scenario in new[] { "bad-hash", "bad-sig-hash", "invalid-signature", "wrong-key", "wrong-fingerprint", "tamper",
     "wrong-size", "wrong-sig-size", "wrong-name", "same-version", "downgrade", "escape", "restart-escape", "traversal", "absolute", "backslash", "ads",
     "reserved", "symlink", "reparse", "duplicate", "relabel", "junction", "replacement-junction", "protocol-too-old",
-    "previous-protocol", "rollback", "valid" })
+    "previous-protocol", "rollback", "health-failure", "health-bad-proof", "valid" })
 {
     if (args is ["--case", var only] && scenario != only) continue;
     var install = Path.Combine(suiteRoot, scenario);
@@ -162,23 +197,32 @@ foreach (var scenario in new[] { "bad-hash", "bad-sig-hash", "invalid-signature"
     var persisted = JsonSerializer.Deserialize<UpdateTransaction>(File.ReadAllText(transactionFile), options)!;
     if (scenario == "valid")
     {
-        Check(updater.ExitCode == 0 && persisted.State == UpdateTransactionState.Restarted, "fully valid signed install");
+        Check(updater.ExitCode == 0 && persisted.State == UpdateTransactionState.HealthConfirmed, "fully valid signed install reaches startup health");
         Check(File.Exists(Path.Combine(install, "a-new.txt")) && !File.Exists(Path.Combine(install, "old-only.txt")), "new inventory installed and obsolete file removed");
         Check(File.Exists(Path.Combine(backup, "old-only.txt")) && !File.Exists(Path.Combine(backup, "stale.txt")) &&
             !Directory.Exists(Path.Combine(backup, ".cadence-previous")), "one-backup policy");
-        Check(SpinWait.SpinUntil(() => File.Exists(Path.Combine(install, "restarted.txt")), 10000), "validated installed executable relaunched");
+        Check(SpinWait.SpinUntil(() => File.Exists(Path.Combine(install, "restarted.txt")), 10000), "validated installed executable health-confirmed");
         using var replay = Start(Path.Combine(install, "updater", "CadenceStudio.Updater.exe"), "--install", "--transaction", transactionFile);
         replay.WaitForExit(); Check(replay.ExitCode != 0, "successful transaction cannot replay");
     }
     else if (scenario == "previous-protocol")
     {
-        Check(updater.ExitCode == 0 && persisted.State == UpdateTransactionState.Restarted,
-            "previous supported updater protocol installs current release");
+        Check(updater.ExitCode == 0 && persisted.State == UpdateTransactionState.HealthConfirmed,
+            "previous supported updater protocol installs current release and confirms health");
     }
     else if (scenario == "rollback")
     {
         Check(updater.ExitCode != 0 && persisted.State == UpdateTransactionState.RolledBack, "failed replacement triggers rollback");
         Check(!File.Exists(Path.Combine(install, "a-new.txt")) && File.ReadAllText(Path.Combine(install, "old-only.txt")) == "old release", "rollback restores old state and removes new files");
+    }
+    else if (scenario is "health-failure" or "health-bad-proof")
+    {
+        Check(updater.ExitCode != 0 && persisted.State == UpdateTransactionState.RolledBack,
+            scenario + " triggers bounded startup-health rollback");
+        Check(!File.Exists(Path.Combine(install, "a-new.txt")) && File.ReadAllText(Path.Combine(install, "old-only.txt")) == "old release",
+            scenario + " restores previous known-good state");
+        using var replay = Start(Path.Combine(install, "updater", "CadenceStudio.Updater.exe"), "--install", "--transaction", transactionFile);
+        replay.WaitForExit(); Check(replay.ExitCode != 0, scenario + " rollback does not auto-retry or replay");
     }
     else if (scenario == "protocol-too-old")
     {
@@ -201,4 +245,11 @@ static Process Start(string exe, params string[] arguments)
     var start = new ProcessStartInfo(exe) { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true };
     foreach (var arg in arguments) start.ArgumentList.Add(arg);
     return Process.Start(start) ?? throw new IOException("Fixture launch failed.");
+}
+
+static string Proof(string token, string transactionId, string targetVersion, int processId, long startUtcTicks)
+{
+    var key = Convert.FromHexString(token);
+    var message = Encoding.UTF8.GetBytes($"{transactionId}\n{targetVersion}\n{processId}\n{startUtcTicks}");
+    return Convert.ToHexString(HMACSHA256.HashData(key, message)).ToLowerInvariant();
 }

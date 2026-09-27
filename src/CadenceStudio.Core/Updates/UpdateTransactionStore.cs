@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -22,7 +23,7 @@ public static class UpdateTransactionStore
         var staging = Path.Combine(UpdateTransactionPaths.UpdatesRoot, id);
         var t = new UpdateTransaction
         {
-            Manifest = manifest, FormatVersion = 1, AppId = ProductInfo.AppId, TransactionId = id,
+            Manifest = manifest, FormatVersion = 2, AppId = ProductInfo.AppId, TransactionId = id,
             CurrentVersion = ProductInfo.InformationalVersion, TargetVersion = targetVersion,
             SyntheticTest = syntheticTest, InstallRoot = installRoot,
             InstalledExecutable = Path.Combine(installRoot, "CadenceStudio.exe"),
@@ -30,6 +31,8 @@ public static class UpdateTransactionStore
             PayloadPath = Path.Combine(staging, "payload", manifest is null ? "payload.zip" : UpdateMaterials.Select(manifest).FileName),
             SignaturePath = Path.Combine(staging, "payload", manifest is null ? "payload.zip.sig" : UpdateMaterials.Select(manifest).Signature.FileName),
             ExtractionPath = Path.Combine(staging, "extracted"), BackupPath = manifest is null ? Path.Combine(staging, "previous") : Path.Combine(installRoot, ".cadence-previous"),
+            HealthMarkerPath = Path.Combine(staging, "health.json"),
+            HealthToken = Convert.ToHexString(RandomNumberGenerator.GetBytes(32)).ToLowerInvariant(),
             ProcessId = process.Id, ProcessStartUtcTicks = process.StartTime.ToUniversalTime().Ticks,
             CreatedUtc = DateTimeOffset.UtcNow, State = UpdateTransactionState.Prepared
         };
@@ -137,7 +140,7 @@ public static class UpdateTransactionStore
                 var entries = Directory.GetFileSystemEntries(dir);
                 if (!entries.Any(p => Path.GetFileName(p) == "transaction.json")) continue;
                 if (entries.Any(p => Directory.Exists(p) ||
-                    Path.GetFileName(p) is not ("transaction.json" or "updater.log" or "active.lock"))) continue;
+                    Path.GetFileName(p) is not ("transaction.json" or "updater.log" or "active.lock" or "health.json"))) continue;
                 foreach (var entry in entries)
                 {
                     UpdateTransactionPaths.Canonical(entry);

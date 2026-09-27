@@ -51,13 +51,14 @@ public static class UpdateTransactionPaths
 
     public static void Validate(UpdateTransaction t, string transactionFile, string knownInstallRoot, bool requirePrepared = true)
     {
-        if (t.FormatVersion != 1 || t.AppId != ProductInfo.AppId ||
+        if (t.FormatVersion != 2 || t.AppId != ProductInfo.AppId ||
             !Guid.TryParseExact(t.TransactionId, "N", out var id) || id == Guid.Empty ||
             t.TransactionId != id.ToString("N") || !Enum.IsDefined(t.State) ||
             (requirePrepared && t.State != UpdateTransactionState.Prepared) ||
+            !IsLowerHex(t.HealthToken, 64) ||
             t.ProcessId <= 0 || t.ProcessStartUtcTicks <= 0 || t.ProcessStartUtcTicks > DateTime.UtcNow.Ticks ||
             t.CreatedUtc > DateTimeOffset.UtcNow.AddMinutes(1) || t.CreatedUtc < DateTimeOffset.UtcNow.AddDays(-7))
-            throw new InvalidDataException("Invalid transaction identity, format, state, or lifetime.");
+            throw new InvalidDataException("Invalid transaction identity, format, health token, state, or lifetime.");
         if (t.CurrentVersion?.Length > 128 || t.TargetVersion?.Length > 128 ||
             !ReleaseVersion.TryParse(t.CurrentVersion, out var current) ||
             !ReleaseVersion.TryParse(t.TargetVersion, out var target) ||
@@ -75,7 +76,16 @@ public static class UpdateTransactionPaths
         if (!Same(t.PayloadPath, Path.Combine(staging, "payload", t.Manifest is null ? "payload.zip" : UpdateMaterials.Select(t.Manifest).FileName)) ||
             !Same(t.SignaturePath, Path.Combine(staging, "payload", t.Manifest is null ? "payload.zip.sig" : UpdateMaterials.Select(t.Manifest).Signature.FileName)) ||
             !Same(t.ExtractionPath, Path.Combine(staging, "extracted")) ||
-            !Same(t.BackupPath, t.Manifest is null ? Path.Combine(staging, "previous") : Path.Combine(knownInstallRoot, ".cadence-previous")))
+            !Same(t.BackupPath, t.Manifest is null ? Path.Combine(staging, "previous") : Path.Combine(knownInstallRoot, ".cadence-previous")) ||
+            !Same(t.HealthMarkerPath, Path.Combine(staging, "health.json")))
             throw new InvalidDataException("Invalid reserved staging paths.");
+    }
+
+    private static bool IsLowerHex(string? value, int length)
+    {
+        if (value is null || value.Length != length) return false;
+        foreach (var c in value)
+            if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f'))) return false;
+        return true;
     }
 }

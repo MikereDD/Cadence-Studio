@@ -19,6 +19,8 @@ public static class UpdateInstaller
         var changed = new List<string>();
         Dictionary<string, string>? previous = null;
         var destructive = false;
+        Process? launchedProcess = null;
+        long launchedStartUtcTicks = 0;
         try
         {
             var deadline = DateTime.UtcNow.AddSeconds(30);
@@ -60,18 +62,40 @@ public static class UpdateInstaller
             }
             foreach (var pair in files) UpdateFileTree.Verify(tree.Resolve(t.InstallRoot, pair.Key), pair.Value);
             t = UpdateTransactionStore.Transition(t, UpdateTransactionState.InstalledVerified, "Every installed package file matches the verified signed archive.");
-            // Restart failure is logged; startup health/rollback belongs to dev.6.
+
             UpdateTransactionPaths.Canonical(t.RestartExecutable);
+            if (File.Exists(t.HealthMarkerPath)) throw new InvalidDataException("Startup-health marker unexpectedly already exists.");
             using (var executable = new FileStream(t.RestartExecutable, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 if (UpdateMaterials.Hash(executable) != files["CadenceStudio.exe"])
                     throw new InvalidDataException("Restart executable changed.");
-                destructive = false;
-                using var process = Process.Start(new ProcessStartInfo(t.RestartExecutable)
-                { UseShellExecute = false, WorkingDirectory = t.InstallRoot }) ?? throw new IOException("Restart failed.");
             }
-            return UpdateTransactionStore.Transition(t, UpdateTransactionState.Restarted,
-                "Validated installed CadenceStudio.exe launched; startup health is not confirmed in dev.5.");
+
+            var start = new ProcessStartInfo(t.RestartExecutable)
+            {
+                UseShellExecute = false,
+                WorkingDirectory = t.InstallRoot
+            };
+            start.ArgumentList.Add("--update-health");
+            start.ArgumentList.Add("--transaction-id");
+            start.ArgumentList.Add(t.TransactionId);
+            start.ArgumentList.Add("--target-version");
+            start.ArgumentList.Add(t.TargetVersion);
+            start.ArgumentList.Add("--health-marker");
+            start.ArgumentList.Add(t.HealthMarkerPath);
+            start.Environment[UpdateHealthHandshake.TokenEnvironmentVariable] = t.HealthToken;
+            launchedProcess = Process.Start(start) ?? throw new IOException("Restart failed.");
+            launchedStartUtcTicks = launchedProcess.StartTime.ToUniversalTime().Ticks;
+            t = UpdateTransactionStore.Transition(t, UpdateTransactionState.Restarted,
+                $"Validated installed CadenceStudio.exe launched as PID {launchedProcess.Id}.");
+            t = UpdateTransactionStore.Transition(t, UpdateTransactionState.HealthPending,
+                "Waiting for transaction-scoped startup-health confirmation.");
+            if (!UpdateHealthHandshake.WaitForConfirmation(t, launchedProcess, launchedStartUtcTicks, UpdateHealthHandshake.StartupTimeout, out var healthError))
+                throw new IOException(healthError);
+            t = UpdateTransactionStore.Transition(t, UpdateTransactionState.HealthConfirmed,
+                $"Updated Cadence Studio PID {launchedProcess.Id} confirmed startup health for {t.TargetVersion}.");
+            destructive = false;
+            return t;
         }
         catch (Exception failure)
         {
@@ -81,6 +105,7 @@ public static class UpdateInstaller
                 TryRecord(ref t, UpdateTransactionState.RollingBack, failure.Message);
                 try
                 {
+                    UpdateHealthHandshake.StopForRollback(launchedProcess, t.RestartExecutable, launchedStartUtcTicks);
                     foreach (var relative in changed.AsEnumerable().Reverse().Distinct(StringComparer.OrdinalIgnoreCase))
                     {
                         var target = tree.Resolve(t.InstallRoot, relative);
@@ -94,7 +119,8 @@ public static class UpdateInstaller
                         else if (File.Exists(target)) File.Delete(target);
                     }
                     foreach (var pair in previous) UpdateFileTree.Verify(tree.Resolve(t.InstallRoot, pair.Key), pair.Value);
-                    return UpdateTransactionStore.Transition(t, UpdateTransactionState.RolledBack, "Prior file state restored; no automatic retry. Cause: " + failure.Message);
+                    return UpdateTransactionStore.Transition(t, UpdateTransactionState.RolledBack,
+                        "Prior known-good file state restored; no automatic retry. Cause: " + failure.Message);
                 }
                 catch (Exception rollback)
                 {
@@ -104,6 +130,10 @@ public static class UpdateInstaller
             }
             TryRecord(ref t, UpdateTransactionState.Failed, failure.Message);
             throw;
+        }
+        finally
+        {
+            launchedProcess?.Dispose();
         }
     }
 
