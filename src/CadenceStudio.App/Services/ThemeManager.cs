@@ -147,6 +147,10 @@ public static class ThemeManager
         SetBrushColor(SystemColors.ControlLightBrushKey, palette.SurfaceRaised);
         SetBrushColor(SystemColors.ControlDarkBrushKey, palette.Window);
         SetBrushColor(SystemColors.WindowBrushKey, palette.Window);
+        SetBrushColor(SystemColors.HighlightBrushKey, palette.AccentSoft);
+        SetBrushColor(SystemColors.HighlightTextBrushKey, palette.TextPrimary);
+        SetBrushColor(SystemColors.InactiveSelectionHighlightBrushKey, palette.SurfaceHover);
+        SetBrushColor(SystemColors.InactiveSelectionHighlightTextBrushKey, palette.TextPrimary);
 
         SetGradient("WindowDepthBrush", palette.WindowDepthTop, palette.WindowDepthMiddle, palette.WindowDepthBottom);
         SetGradient("AlbumArtPlaceholderBrush", palette.AlbumTop, palette.AlbumMiddle, palette.AlbumBottom);

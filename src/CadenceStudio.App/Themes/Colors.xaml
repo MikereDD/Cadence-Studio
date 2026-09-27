@@ -59,12 +59,16 @@
     <SolidColorBrush x:Key="VisualizerCoreBrush" Color="{StaticResource VisualizerCoreColor}" />
     <SolidColorBrush x:Key="VisualizerAtmosphereBrush" Color="{StaticResource VisualizerAtmosphereColor}" />
 
-    <!-- Keep WPF fallback chrome dark, including the ScrollViewer corner where
-         horizontal and vertical scrollbars meet. -->
+    <!-- Keep WPF fallback chrome dark, including ScrollViewer corners and native
+         selection chrome used by controls whose default templates consult SystemColors. -->
     <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="{StaticResource SurfaceColor}" />
     <SolidColorBrush x:Key="{x:Static SystemColors.ControlLightBrushKey}" Color="{StaticResource SurfaceRaisedColor}" />
     <SolidColorBrush x:Key="{x:Static SystemColors.ControlDarkBrushKey}" Color="{StaticResource WindowColor}" />
     <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="{StaticResource WindowColor}" />
+    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{StaticResource AccentSoftColor}" />
+    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="{StaticResource TextPrimaryColor}" />
+    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{StaticResource SurfaceHoverColor}" />
+    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="{StaticResource TextPrimaryColor}" />
 
     <LinearGradientBrush x:Key="WindowDepthBrush" StartPoint="0,0" EndPoint="0,1">
         <GradientStop Color="#10141A" Offset="0" />
