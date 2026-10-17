@@ -2582,7 +2582,7 @@
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
 
-                                <TextBlock Text="Equalizer settings are saved with the session and are applied to every supported audio format. Auto headroom lowers the effective preamp by the strongest positive band boost; a final limiter protects the output when headroom is disabled."
+                                <TextBlock Text="Equalizer settings are saved with the session and are applied to every supported audio format. Auto headroom adds only the reduction needed beyond your preamp setting to allow for the strongest band boost. Bypass disables all EQ processing. Extreme boosts can still clip; the final sample clamp is not a transparent limiter."
                                            Style="{StaticResource CaptionStyle}" TextWrapping="Wrap" Margin="2,8,2,4" />
                             </StackPanel>
                         </ScrollViewer>
@@ -2673,6 +2673,7 @@
                                 <Button Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="15"
                                         Content="{Binding VolumeGlyph}" Command="{Binding ToggleMuteCommand}" Cursor="Hand" ToolTip="Mute or unmute" />
                                 <Slider Grid.Column="1" Minimum="0" Maximum="1" Value="{Binding Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        ToolTip="Player volume: 100% preserves the EQ output level. Windows Volume mixer is a separate control."
                                         IsMoveToPointEnabled="True" SmallChange="0.01" LargeChange="0.05"
                                         Style="{StaticResource PlayerSliderStyle}" Margin="4,0,8,0" />
                                 <TextBlock Grid.Column="2" Text="{Binding VolumePercentText}" Style="{StaticResource CaptionStyle}" VerticalAlignment="Center" HorizontalAlignment="Right" />

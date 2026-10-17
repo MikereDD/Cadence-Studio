@@ -13,6 +13,7 @@ internal sealed class EqualizerSampleProvider : ISampleProvider
     private BiQuadFilter[][] _filters = [];
     private EqualizerSettings _settings = new();
     private float _preampMultiplier = 1f;
+    private int _channelPosition;
 
     public EqualizerSampleProvider(ISampleProvider source, EqualizerSettings settings)
     {
@@ -29,9 +30,17 @@ internal sealed class EqualizerSampleProvider : ISampleProvider
 
         lock (_sync)
         {
-            _settings = settings.Clone();
+            var next = settings.Clone();
+            var rebuild = _filters.Length == 0 ||
+                next.Enabled != _settings.Enabled ||
+                !next.BandGainsDb.SequenceEqual(_settings.BandGainsDb);
+            _settings = next;
             _preampMultiplier = DbToMultiplier(_settings.EffectivePreampDb);
-            RebuildFilters();
+            // Preamp/headroom changes must not reset the filters' audio history.
+            if (rebuild)
+            {
+                RebuildFilters();
+            }
         }
     }
 
@@ -47,6 +56,7 @@ internal sealed class EqualizerSampleProvider : ISampleProvider
         {
             if (!_settings.Enabled)
             {
+                _channelPosition = (_channelPosition + samplesRead) % Math.Max(1, WaveFormat.Channels);
                 return samplesRead;
             }
 
@@ -54,7 +64,8 @@ internal sealed class EqualizerSampleProvider : ISampleProvider
             for (var sampleIndex = 0; sampleIndex < samplesRead; sampleIndex++)
             {
                 var bufferIndex = offset + sampleIndex;
-                var channel = bufferIndex % channels;
+                var channel = _channelPosition;
+                _channelPosition = (_channelPosition + 1) % channels;
                 var sample = buffer[bufferIndex];
 
                 foreach (var filter in _filters[channel])

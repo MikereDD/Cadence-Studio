@@ -50,7 +50,9 @@ public sealed class EqualizerSettings
             }
 
             var highestBoost = BandGainsDb.Count == 0 ? 0 : Math.Max(0, BandGainsDb.Max());
-            return AutoHeadroomEnabled ? PreampDb - highestBoost : PreampDb;
+            // A negative user preamp already supplies headroom. Add only the
+            // missing reduction instead of subtracting the boost a second time.
+            return AutoHeadroomEnabled ? Math.Min(PreampDb, -highestBoost) : PreampDb;
         }
     }
 

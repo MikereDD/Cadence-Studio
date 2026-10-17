@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/CadenceStudio.Infrastructure/CadenceStudio.Infrastructure.csproj" />
+    <Compile Include="../../src/CadenceStudio.Infrastructure/Services/EqualizerSampleProvider.cs" Link="EqualizerSampleProvider.cs" />
+    <Compile Include="../../src/CadenceStudio.Infrastructure/Services/SpectrumSampleProvider.cs" Link="SpectrumSampleProvider.cs" />
+  </ItemGroup>
+</Project>

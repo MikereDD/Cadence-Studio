@@ -3,6 +3,8 @@ using CorePlaybackState = CadenceStudio.Core.Enums.PlaybackState;
 using NAudioPlaybackState = NAudio.Wave.PlaybackState;
 using CadenceStudio.Core.Models;
 using NAudio.Wave;
+using NAudio.CoreAudioApi;
+using NAudio.Wave.SampleProviders;
 
 namespace CadenceStudio.Infrastructure.Services;
 
@@ -12,7 +14,8 @@ public sealed class NAudioPlaybackService : IPlaybackService
     private readonly IAppLogger _logger;
     private readonly Timer _positionTimer;
 
-    private WaveOutEvent? _outputDevice;
+    private WasapiOut? _outputDevice;
+    private VolumeSampleProvider? _volumeProvider;
     private AudioFileReader? _audioReader;
     private EqualizerSampleProvider? _equalizerProvider;
     private SpectrumSampleProvider? _spectrumProvider;
@@ -65,23 +68,26 @@ public sealed class NAudioPlaybackService : IPlaybackService
                 try
                 {
                     var reader = new AudioFileReader(track.FilePath);
-                    var output = new WaveOutEvent
-                    {
-                        DesiredLatency = 120,
-                        NumberOfBuffers = 3
-                    };
+                    _audioReader = reader;
+                    var output = new WasapiOut(AudioClientShareMode.Shared, 120);
+                    _outputDevice = output;
 
                     var equalizer = new EqualizerSampleProvider(reader, _equalizerSettings);
                     var spectrum = new SpectrumSampleProvider(equalizer, _visualizerSettings);
+                    // The player slider scales only our samples. Never write the
+                    // legacy waveOut device/session volume behind Windows' mixer.
+                    var volume = new VolumeSampleProvider(spectrum)
+                    {
+                        Volume = (float)Math.Clamp(_snapshot.Volume, 0, 1)
+                    };
 
-                    _audioReader = reader;
                     _equalizerProvider = equalizer;
                     _spectrumProvider = spectrum;
-                    _outputDevice = output;
+                    _volumeProvider = volume;
                     output.PlaybackStopped += OnPlaybackStopped;
                     spectrum.FrameReady += OnVisualizerFrameReady;
-                    output.Init(spectrum);
-                    output.Volume = (float)Math.Clamp(_snapshot.Volume, 0, 1);
+                    output.Init(volume);
+                    _logger.Info($"Audio output: WASAPI shared; sample gain={volume.Volume:F3}; EQ={_equalizerSettings.Enabled}; effective preamp={_equalizerSettings.EffectivePreampDb:F1} dB.");
 
                     var hydratedTrack = track with
                     {
@@ -351,12 +357,12 @@ public sealed class NAudioPlaybackService : IPlaybackService
         {
             ThrowIfDisposed();
 
-            var normalized = Math.Clamp(volume, 0, 1);
+            var normalized = double.IsFinite(volume) ? Math.Clamp(volume, 0, 1) : 0;
             try
             {
-                if (_outputDevice is not null)
+                if (_volumeProvider is not null)
                 {
-                    _outputDevice.Volume = (float)normalized;
+                    _volumeProvider.Volume = (float)normalized;
                 }
 
                 _snapshot = _snapshot with { Volume = normalized };
@@ -524,6 +530,7 @@ public sealed class NAudioPlaybackService : IPlaybackService
         }
 
         _equalizerProvider = null;
+        _volumeProvider = null;
         _audioReader?.Dispose();
         _audioReader = null;
     }

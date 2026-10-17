@@ -43,6 +43,11 @@ public static class DiagnosticsReportBuilder
         builder.AppendLine($"  Library: {viewModel.IndexedTrackCountText}");
         builder.AppendLine($"  Library roots: {viewModel.LibraryRoots.Count}");
         builder.AppendLine();
+        builder.AppendLine("Audio settings");
+        builder.AppendLine($"  Player volume: {viewModel.VolumePercentText}; muted: {viewModel.IsMuted}");
+        builder.AppendLine($"  Equalizer: {viewModel.EqualizerStatusText}");
+        builder.AppendLine($"  Headroom: {viewModel.EqualizerHeadroomLabel}");
+        builder.AppendLine();
         builder.AppendLine("Data paths");
         AppendPath(builder, "Data root", paths.Root, isDirectory: true);
         AppendPath(builder, "Logs", paths.Logs, isDirectory: true);
