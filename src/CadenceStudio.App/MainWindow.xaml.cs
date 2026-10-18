@@ -259,6 +259,37 @@ public partial class MainWindow : Window
         Top = Math.Clamp(savedTop, minimumTop, maximumTop);
     }
 
+    // ClipToBounds is rectangular in WPF; clip the expanded shell to its real 20-DIP
+    // corner radius so blurred artwork/gradients cannot paint through the corners.
+    private void ExpandedNowPlayingMainStage_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (sender is not Border stage)
+        {
+            return;
+        }
+
+        var width = Math.Max(0d, e.NewSize.Width);
+        var height = Math.Max(0d, e.NewSize.Height);
+        stage.Clip = new RectangleGeometry(new Rect(0d, 0d, width, height), 20d, 20d);
+    }
+
+    // Both spectrum surfaces render gradients, particles and glow effects.  WPF's
+    // ClipToBounds is rectangular, so apply an actual rounded clip to each grid.
+    // SizeChanged keeps both masks correct while resizing, restoring or maximizing.
+    private void ExpandedVisualizerClip_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (sender is not FrameworkElement layer)
+        {
+            return;
+        }
+
+        var width = Math.Max(0d, e.NewSize.Width);
+        var height = Math.Max(0d, e.NewSize.Height);
+        var targetRadius = layer.Name == nameof(ExpandedVisualizerViewport) ? 15d : 11d;
+        var radius = Math.Min(targetRadius, Math.Min(width, height) * 0.5d);
+        layer.Clip = new RectangleGeometry(new Rect(0d, 0d, width, height), radius, radius);
+    }
+
     private void MainWindow_SizeChanged(object? sender, SizeChangedEventArgs e)
     {
         if (WindowState != WindowState.Minimized)
@@ -283,92 +314,206 @@ public partial class MainWindow : Window
         UpdateResponsivePanelWidths();
     }
 
+    private bool _compactInsightsDocked = true;
+    private bool _expandedInsightsDocked = true;
+    private bool _compactInsightsOpen;
+    private bool _expandedInsightsOpen;
+    private bool _compactExpandedHero;
+
+    private void NowPlayingInsightsToggle_Click(object sender, RoutedEventArgs e)
+    {
+        if (_viewModel.IsNowPlayingExpanded)
+        {
+            _expandedInsightsOpen = !_expandedInsightsOpen;
+        }
+        else
+        {
+            _compactInsightsOpen = !_compactInsightsOpen;
+        }
+        UpdateResponsivePanelWidths();
+    }
+
     private void UpdateResponsivePanelWidths()
     {
-        if (LibraryPanelColumn is null)
+        if (LibraryPanelColumn is null || NowPlayingPanelColumn is null)
         {
             return;
         }
 
-        if (_viewModel.IsNowPlayingExpanded)
+        // Grid dimensions are device-independent pixels, reflecting current window size
+        // and DPI. WindowState alone is not a reliable measure of usable content space.
+        var workspaceWidth = LibraryWorkspaceGrid.ActualWidth > 100d
+            ? LibraryWorkspaceGrid.ActualWidth
+            : Math.Max(760d, ActualWidth - 280d);
+        var expanded = _viewModel.IsNowPlayingExpanded;
+
+        if (expanded)
         {
-            LibraryPanelColumn.Width = new GridLength(0, GridUnitType.Pixel);
-            LibraryNowPlayingSpacerColumn.Width = new GridLength(0, GridUnitType.Pixel);
-            NowPlayingQueueSpacerColumn.Width = new GridLength(0, GridUnitType.Pixel);
-            QueuePanelColumn.Width = new GridLength(0, GridUnitType.Pixel);
+            LibraryPanelColumn.Width = new GridLength(0d);
+            LibraryNowPlayingSpacerColumn.Width = new GridLength(0d);
+            NowPlayingQueueSpacerColumn.Width = new GridLength(0d);
+            QueuePanelColumn.Width = new GridLength(0d);
         }
         else
         {
-            var targetWidth = WindowState == WindowState.Maximized
-                ? MaximizedLibraryPanelWidth
-                : RestoredLibraryPanelWidth;
-            LibraryPanelColumn.Width = new GridLength(targetWidth, GridUnitType.Pixel);
-            LibraryNowPlayingSpacerColumn.Width = new GridLength(16, GridUnitType.Pixel);
-            NowPlayingQueueSpacerColumn.Width = new GridLength(16, GridUnitType.Pixel);
-            QueuePanelColumn.Width = new GridLength(300, GridUnitType.Pixel);
+            var libraryWidth = Math.Clamp(workspaceWidth * 0.255d, 265d, 435d);
+            var queueWidth = Math.Clamp(workspaceWidth * 0.220d, 235d, 300d);
+            const double gap = 12d;
+            // Preserve a viable center stage at the supported minimum window width.
+            var centerWidth = workspaceWidth - libraryWidth - queueWidth - (gap * 2d);
+            if (centerWidth < 360d)
+            {
+                var shortfall = 360d - centerWidth;
+                libraryWidth = Math.Max(245d, libraryWidth - shortfall * 0.6d);
+                queueWidth = Math.Max(215d, queueWidth - shortfall * 0.4d);
+            }
+
+            LibraryPanelColumn.Width = new GridLength(libraryWidth);
+            LibraryNowPlayingSpacerColumn.Width = new GridLength(gap);
+            NowPlayingQueueSpacerColumn.Width = new GridLength(gap);
+            QueuePanelColumn.Width = new GridLength(queueWidth);
         }
 
-        if (EnrichmentPanelColumn is not null)
+        // Content-width breakpoints, with a 30-DIP return band to avoid flicker.
+        var compactWidth = workspaceWidth - LibraryPanelColumn.Width.Value - QueuePanelColumn.Width.Value
+                           - LibraryNowPlayingSpacerColumn.Width.Value - NowPlayingQueueSpacerColumn.Width.Value;
+        _compactInsightsDocked = compactWidth >= (_compactInsightsDocked ? 650d : 680d);
+        _expandedInsightsDocked = workspaceWidth >= (_expandedInsightsDocked ? 1010d : 1040d);
+
+        CompactInsightSpacerColumn.Width = new GridLength(_compactInsightsDocked ? 14d : 0d);
+        EnrichmentPanelColumn.Width = new GridLength(_compactInsightsDocked
+            ? Math.Clamp(compactWidth * 0.38d, 258d, 340d) : 0d);
+        Grid.SetColumn(CompactInsightsBorder, _compactInsightsDocked ? 2 : 0);
+        CompactNowPlayingMainStage.Visibility = (!_compactInsightsDocked && _compactInsightsOpen)
+            ? Visibility.Collapsed : Visibility.Visible;
+        CompactInsightsBorder.Visibility = (_compactInsightsDocked || _compactInsightsOpen)
+            ? Visibility.Visible : Visibility.Collapsed;
+
+        ExpandedEnrichmentPanelColumn.Width = new GridLength(_expandedInsightsDocked
+            ? Math.Clamp(workspaceWidth * 0.285d, 315d, 430d) : 0d);
+        Grid.SetColumn(ExpandedInsightsBorder, _expandedInsightsDocked ? 2 : 0);
+        ExpandedNowPlayingMainStage.Visibility = (!_expandedInsightsDocked && _expandedInsightsOpen)
+            ? Visibility.Collapsed : Visibility.Visible;
+        ExpandedInsightsBorder.Visibility = (_expandedInsightsDocked || _expandedInsightsOpen)
+            ? Visibility.Visible : Visibility.Collapsed;
+
+        var showInsightsToggle = expanded ? !_expandedInsightsDocked : !_compactInsightsDocked;
+        NowPlayingInsightsToggleButton.Visibility = showInsightsToggle ? Visibility.Visible : Visibility.Collapsed;
+        var insightsOpen = expanded ? _expandedInsightsOpen : _compactInsightsOpen;
+        NowPlayingInsightsToggleButton.Content = insightsOpen ? "NOW PLAYING" : "INSIGHTS";
+        NowPlayingInsightsToggleButton.ToolTip = insightsOpen
+            ? "Return to the Now Playing artwork and visualizer"
+            : "Show track details, lyrics, and artist biography";
+
+        // 1. All responsive choices use actual available WPF DIPs, never only WindowState.
+        var verticalRoom = Math.Clamp((ActualHeight - 720d) / 360d, 0d, 1d);
+        var compactVisualizerHeight = 163d + 72d * verticalRoom;
+        CompactVisualizerRow.Height = new GridLength(compactVisualizerHeight);
+        CompactVisualizerBars.Height = Math.Max(90d, compactVisualizerHeight - 65d);
+
+        // At restored sizes, stack artwork to the left of a readable two-line title.
+        // This prevents the art/title/metadata column from growing taller than the
+        // remaining stage above the visualizer. Full-sized layouts remain centered.
+        var availableCompactHeroWidth = compactWidth - (_compactInsightsDocked
+            ? EnrichmentPanelColumn.Width.Value + CompactInsightSpacerColumn.Width.Value : 0d) - 36d;
+        var compactSideBySide = !_compactInsightsDocked && availableCompactHeroWidth < 670d;
+        var compactArtworkSize = compactSideBySide
+            ? Math.Clamp((ActualHeight - 700d) * 0.14d + 118d, 118d, 165d)
+            : 138d + 76d * verticalRoom;
+        NowPlayingArtworkBorder.Width = compactArtworkSize;
+        NowPlayingArtworkBorder.Height = compactArtworkSize;
+        CompactHeroArtworkColumn.Width = compactSideBySide
+            ? new GridLength(compactArtworkSize + 6d) : new GridLength(1d, GridUnitType.Star);
+        CompactHeroGapColumn.Width = new GridLength(compactSideBySide ? 12d : 0d);
+        CompactHeroGrid.ColumnDefinitions[2].Width = compactSideBySide
+            ? new GridLength(1d, GridUnitType.Star) : new GridLength(0d);
+        Grid.SetColumn(CompactHeroMetadata, compactSideBySide ? 2 : 0);
+        Grid.SetRow(CompactHeroMetadata, compactSideBySide ? 0 : 1);
+        CompactHeroMetadata.Margin = compactSideBySide
+            ? new Thickness(4d, 0d, 4d, 0d) : new Thickness(18d, 10d, 18d, 4d);
+
+        // Queue rows use a 192-DIP intrinsic minimum after the XAML fix. Leave
+        // enough content room for play/remove actions and a visible track title.
+        if (!expanded && QueuePanelColumn.Width.Value < 250d)
         {
-            var enrichmentWidth = WindowState == WindowState.Maximized
-                ? MaximizedEnrichmentPanelWidth
-                : RestoredEnrichmentPanelWidth;
-            EnrichmentPanelColumn.Width = new GridLength(enrichmentWidth, GridUnitType.Pixel);
+            var additional = 250d - QueuePanelColumn.Width.Value;
+            var candidate = Math.Max(250d, LibraryPanelColumn.Width.Value - additional);
+            var recovered = LibraryPanelColumn.Width.Value - candidate;
+            if (recovered > 0d)
+            {
+                LibraryPanelColumn.Width = new GridLength(candidate);
+                QueuePanelColumn.Width = new GridLength(QueuePanelColumn.Width.Value + recovered);
+            }
         }
 
-        if (ExpandedEnrichmentPanelColumn is not null)
+        // The playback dock is independent of the Library view, so it must also
+        // resize. Reduce its side columns before clipping any transport buttons.
+        var dockWidth = PlayerDockLayoutGrid.ActualWidth > 400d
+            ? PlayerDockLayoutGrid.ActualWidth : Math.Max(700d, ActualWidth - 310d);
+        var trackWidth = Math.Clamp(dockWidth * 0.215d, 174d, 300d);
+        var volumeWidth = Math.Clamp(dockWidth * 0.175d, 158d, 300d);
+        PlayerDockTrackColumn.Width = new GridLength(trackWidth);
+        PlayerDockVolumeColumn.Width = new GridLength(volumeWidth);
+        PlayerDockControlsGrid.Margin = new Thickness(dockWidth < 1120d ? 8d : 20d, 0d,
+            dockWidth < 1120d ? 8d : 20d, 0d);
+        var shortDock = dockWidth < 950d;
+        DockRepeatText.Visibility = shortDock ? Visibility.Collapsed : Visibility.Visible;
+        DockShuffleText.Visibility = shortDock ? Visibility.Collapsed : Visibility.Visible;
+
+        // Expanded stage keeps artwork and title balanced at normal-window sizes.
+        var availableExpandedStageWidth = workspaceWidth - (_expandedInsightsDocked
+            ? ExpandedEnrichmentPanelColumn.Width.Value + 18d : 0d) - 44d;
+        // Restored windows often have nearly the same height as maximized ones,
+        // but significantly less width. Adapt the hero to available stage size,
+        // not WindowState, so the entire visualizer fits above the player dock.
+        // A 40-DIP hysteresis band avoids jumping repeatedly at the threshold.
+        if (_compactExpandedHero)
         {
-            var expandedWidth = WindowState == WindowState.Maximized
-                ? MaximizedExpandedEnrichmentWidth
-                : RestoredExpandedEnrichmentWidth;
-            ExpandedEnrichmentPanelColumn.Width = new GridLength(expandedWidth, GridUnitType.Pixel);
+            _compactExpandedHero = availableExpandedStageWidth < 875d || ActualHeight < 790d;
+        }
+        else
+        {
+            _compactExpandedHero = availableExpandedStageWidth < 835d || ActualHeight < 770d;
         }
 
-        if (NowPlayingArtworkBorder is not null)
-        {
-            var artworkSize = WindowState == WindowState.Maximized
-                ? MaximizedArtworkSize
-                : RestoredArtworkSize;
-            NowPlayingArtworkBorder.Width = artworkSize;
-            NowPlayingArtworkBorder.Height = artworkSize;
-        }
+        var expandedArtByHeight = Math.Clamp((ActualHeight - 720d) * 0.25d + 165d,
+            175d, 300d);
+        var expandedArtworkSize = _compactExpandedHero
+            ? Math.Clamp(Math.Min(availableExpandedStageWidth * 0.26d,
+                ActualHeight * 0.19d), 155d, 178d)
+            : Math.Clamp(Math.Min(availableExpandedStageWidth * 0.35d,
+                expandedArtByHeight), 175d, 300d);
+        ExpandedNowPlayingArtworkBorder.Width = expandedArtworkSize;
+        ExpandedNowPlayingArtworkBorder.Height = expandedArtworkSize;
+        ExpandedNowPlayingMainStage.Padding = new Thickness(_compactExpandedHero ? 12d : 18d);
+        ExpandedHeroArtColumn.Width = new GridLength(expandedArtworkSize + (_compactExpandedHero ? 10d : 16d));
+        ExpandedHeroGapColumn.Width = new GridLength(_compactExpandedHero ? 12d : 16d);
+        ExpandedHeroGrid.MinHeight = expandedArtworkSize + (_compactExpandedHero ? 4d : 12d);
+        ExpandedHeroToVisualizerGapRow.Height = new GridLength(_compactExpandedHero ? 8d : 14d);
 
-        if (ExpandedNowPlayingArtworkBorder is not null)
-        {
-            var expandedArtworkSize = WindowState == WindowState.Maximized
-                ? MaximizedExpandedArtworkSize
-                : RestoredExpandedArtworkSize;
-            ExpandedNowPlayingArtworkBorder.Width = expandedArtworkSize;
-            ExpandedNowPlayingArtworkBorder.Height = expandedArtworkSize;
-        }
+        var titleSpace = availableExpandedStageWidth - expandedArtworkSize - 32d;
+        ExpandedHeroTitleText.FontSize = _compactExpandedHero ? 29d :
+            (titleSpace < 500d ? 30d : (titleSpace < 650d ? 34d : 38d));
+        ExpandedHeroTitleText.Margin = new Thickness(0d,
+            _compactExpandedHero ? 8d : (ActualHeight < 950d ? 12d : 20d), 0d, 0d);
+        ExpandedHeroArtistText.Margin = new Thickness(0d, _compactExpandedHero ? 6d : 10d, 0d, 0d);
+        ExpandedHeroAlbumText.Margin = new Thickness(0d, _compactExpandedHero ? 3d : 7d, 0d, 0d);
+        ExpandedHeroMetadataWrap.Margin = new Thickness(0d, _compactExpandedHero ? 9d : 20d, 0d, 0d);
+        ExpandedHeroAccentRule.Margin = new Thickness(0d, _compactExpandedHero ? 9d : 22d, 0d, 0d);
 
-        // Expanded Eye Candy uses the vertical room progressively. dev.10.5.3
-        // gives Up next a more substantial artwork-led stage while keeping the
-        // visualizer sizing from dev.10.5.2 intact. Taller windows add modest
-        // queue breathing room without crowding transport or insights.
-        var heightProgress = Math.Clamp((ActualHeight - 720d) / 360d, 0d, 1d);
-        if (ExpandedVisualizerBorder is not null)
-        {
-            ExpandedVisualizerBorder.Height = 170d + (100d * heightProgress);
-        }
+        var expandedVisualizerHeight = _compactExpandedHero
+            ? Math.Clamp(ActualHeight * 0.16d, 132d, 155d)
+            : 155d + (85d * verticalRoom);
+        ExpandedVisualizerBorder.Height = expandedVisualizerHeight;
+        ExpandedVisualizerBars.Height = expandedVisualizerHeight - 48d;
+        _viewModel.SetExpandedVisualizerHeight(ExpandedVisualizerBars.Height - 4d);
 
-        if (ExpandedVisualizerBars is not null)
-        {
-            ExpandedVisualizerBars.Height = 122d + (100d * heightProgress);
-            _viewModel.SetExpandedVisualizerHeight(ExpandedVisualizerBars.Height - 4d);
-        }
-
-        if (ExpandedQueueBorder is not null)
-        {
-            ExpandedQueueBorder.Height = 190d + (40d * heightProgress);
-        }
-
-        if (ExpandedHorizontalQueueListBox is not null)
-        {
-            ExpandedHorizontalQueueListBox.Height = 138d + (18d * heightProgress);
-        }
+        // Up Next occupies available remaining space but its cards do not grow.
+        // The scroll viewer keeps all contents reachable when height is limited.
+        ExpandedQueueBorder.Height = double.NaN;
+        ExpandedQueueBorder.MinHeight = 178d + (46d * verticalRoom);
+        ExpandedHorizontalQueueListBox.Height = 128d + (20d * verticalRoom);
     }
-
     private void NowPlayingMode_Click(object sender, RoutedEventArgs e)
     {
         // The command toggles the persisted VM state; update columns after WPF
