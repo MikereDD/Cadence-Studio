@@ -1018,8 +1018,8 @@
                                                             <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Rows="1" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                                                             <ItemsControl.ItemTemplate>
                                                                 <DataTemplate DataType="{x:Type vm:VisualizerBarViewModel}">
-                                                                    <Grid Margin="1,0">
-                                                                        <Border Height="{Binding ExpandedHeight}" VerticalAlignment="Center" Background="{Binding ExpandedFill}" CornerRadius="8" MinHeight="10">
+                                                                    <Grid Margin="1,0"><Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                                                                        <Border Grid.Row="0" Height="{Binding ExpandedHeight}" MaxHeight="76" VerticalAlignment="Bottom" Background="{Binding ExpandedFill}" CornerRadius="6,6,2,2" MinHeight="10">
                                                                             <Border.Effect><BlurEffect Radius="8" /></Border.Effect>
                                                                         </Border>
                                                                     </Grid>
@@ -1033,25 +1033,24 @@
                                                             <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Rows="1" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                                                             <ItemsControl.ItemTemplate>
                                                                 <DataTemplate DataType="{x:Type vm:VisualizerBarViewModel}">
-                                                                    <Grid Margin="2,0">
-                                                                        <Border Height="{Binding ExpandedHeight}" VerticalAlignment="Center" Background="{Binding ExpandedFill}" CornerRadius="6" MinHeight="8">
+                                                                    <Grid Margin="2,0"><Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                                                                        <Border Grid.Row="0" Height="{Binding ExpandedHeight}" MaxHeight="76" VerticalAlignment="Bottom" Background="{Binding ExpandedFill}" CornerRadius="6,6,2,2" MinHeight="8">
                                                                             <Border.Effect><DropShadowEffect Color="#AA00FFFF" BlurRadius="12" ShadowDepth="0" Opacity="0.72" /></Border.Effect>
                                                                         </Border>
-                                                                        <Border Height="2" VerticalAlignment="Center" Background="#CCFFFFFF" CornerRadius="1" Opacity="0.38" />
+                                                                        <Border Grid.RowSpan="2" Height="2" VerticalAlignment="Center" Background="#CCFFFFFF" CornerRadius="1" Opacity="0.38" />
                                                                     </Grid>
                                                                 </DataTemplate>
                                                             </ItemsControl.ItemTemplate>
                                                         </ItemsControl>
 
                                                         <!-- Mirrored spectral reflection: restrained depth beneath the live bars. -->
-                                                        <ItemsControl ItemsSource="{Binding VisualizerBars}" Height="72" VerticalAlignment="Center" Margin="0,74,0,0" IsHitTestVisible="False" Opacity="0.16" RenderTransformOrigin="0.5,0.5">
+                                                        <ItemsControl ItemsSource="{Binding VisualizerBars}" Height="164" VerticalAlignment="Center" IsHitTestVisible="False" Opacity="0.16">
                                                             <ItemsControl.Style><Style TargetType="ItemsControl"><Setter Property="Visibility" Value="Visible"/><Style.Triggers><DataTrigger Binding="{Binding IsSpectrumHorizonMode}" Value="False"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></ItemsControl.Style>
-                                                            <ItemsControl.RenderTransform><ScaleTransform ScaleY="-0.72" /></ItemsControl.RenderTransform>
                                                             <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Rows="1" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                                                             <ItemsControl.ItemTemplate>
                                                                 <DataTemplate DataType="{x:Type vm:VisualizerBarViewModel}">
-                                                                    <Grid Margin="2,0">
-                                                                        <Border Height="{Binding ExpandedHeight}" VerticalAlignment="Top" Background="{Binding ExpandedFill}" CornerRadius="5" MinHeight="6">
+                                                                    <Grid Margin="2,0"><Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                                                                        <Border Grid.Row="1" Height="{Binding ExpandedHeight}" MaxHeight="52" VerticalAlignment="Top" Background="{Binding ExpandedFill}" CornerRadius="2,2,5,5" MinHeight="6">
                                                                             <Border.Effect><BlurEffect Radius="4" /></Border.Effect>
                                                                         </Border>
                                                                     </Grid>
@@ -1067,10 +1066,9 @@
                                                                 <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Rows="1"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                                                                 <ItemsControl.ItemTemplate><DataTemplate DataType="{x:Type vm:VisualizerBarViewModel}"><Grid Margin="2,0"><Border Height="{Binding ExpandedHeight}" MaxHeight="76" VerticalAlignment="Bottom" Background="{Binding ExpandedFill}" CornerRadius="5,5,2,2"><Border.Effect><DropShadowEffect Color="#AA00FFFF" BlurRadius="11" ShadowDepth="0" Opacity="0.70"/></Border.Effect></Border></Grid></DataTemplate></ItemsControl.ItemTemplate>
                                                             </ItemsControl>
-                                                            <ItemsControl Grid.Row="1" ItemsSource="{Binding VisualizerBars}" VerticalAlignment="Top" Height="80" Opacity="0.70" RenderTransformOrigin="0.5,0">
-                                                                <ItemsControl.RenderTransform><ScaleTransform ScaleY="-1"/></ItemsControl.RenderTransform>
+                                                            <ItemsControl Grid.Row="1" ItemsSource="{Binding VisualizerBars}" VerticalAlignment="Top" Height="80" Opacity="0.70">
                                                                 <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Rows="1"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
-                                                                <ItemsControl.ItemTemplate><DataTemplate DataType="{x:Type vm:VisualizerBarViewModel}"><Grid Margin="2,0"><Border Height="{Binding ExpandedHeight}" MaxHeight="76" VerticalAlignment="Top" Background="{Binding ExpandedFill}" CornerRadius="5,5,2,2"><Border.Effect><BlurEffect Radius="1.5"/></Border.Effect></Border></Grid></DataTemplate></ItemsControl.ItemTemplate>
+                                                                <ItemsControl.ItemTemplate><DataTemplate DataType="{x:Type vm:VisualizerBarViewModel}"><Grid Margin="2,0"><Border Height="{Binding ExpandedHeight}" MaxHeight="76" VerticalAlignment="Top" Background="{Binding ExpandedFill}" CornerRadius="2,2,5,5"><Border.Effect><BlurEffect Radius="1.5"/></Border.Effect></Border></Grid></DataTemplate></ItemsControl.ItemTemplate>
                                                             </ItemsControl>
                                                             <Border Grid.RowSpan="2" Height="2" VerticalAlignment="Center" Background="#E6FFFFFF"><Border.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="18" ShadowDepth="0" Opacity="0.9"/></Border.Effect></Border>
                                                         </Grid>
