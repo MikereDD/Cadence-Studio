@@ -153,8 +153,16 @@ foreach (var dir in new[] { t.StagingRoot, exitedStaging, lifecycle.StagingRoot,
     foreach (var entry in Directory.GetFiles(dir)) File.SetLastWriteTimeUtc(entry, DateTime.UtcNow.AddDays(-8));
     Directory.SetLastWriteTimeUtc(dir, DateTime.UtcNow.AddDays(-8));
 }
+var scanned = Directory.EnumerateDirectories(UpdateTransactionPaths.UpdatesRoot)
+    .Take(256)
+    .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
 UpdateTransactionStore.CleanupAbandoned();
-Check(!Directory.Exists(t.StagingRoot) && !Directory.Exists(exitedStaging), "expired flat staging cleanup");
+
+Check(
+    Directory.Exists(t.StagingRoot) == !scanned.Contains(t.StagingRoot) &&
+    Directory.Exists(exitedStaging) == !scanned.Contains(exitedStaging),
+    "bounded flat staging cleanup respects scan limit");
 Console.WriteLine($"{passed} dev.4/dev.6 transaction regression tests passed.");
 Check(Run(Path.Combine(install, "signed-tests", "CadenceStudio.exe"), "--suite") == 0, "signed dev.6 integration suite");
 Console.WriteLine($"{passed} top-level checks passed.");

@@ -1,3 +1,12 @@
+## v1.1-dev.7 — Verified staged updater runner
+
+- Stage and hash-check a transaction-specific updater beside the installation before the application exits, allowing installed updater files to be replaced.
+- Bind staged-runner location and inventory to the installation and transaction; reject mismatched identities, unexpected files, and modified copies.
+- Keep updater protocol 3, transaction format 2, release verification, startup-health confirmation, and rollback behavior.
+- Link the new runner-location helper into signed updater fixtures and advance five release version declarations to dev.7.
+- Qualify the Release build with manifest security/replay, transaction, and signed-install regression suites; preserve prior Sandbox artifacts separately.
+
+
 ## v1.1-dev.5 — updater trust, replacement and rollback foundation
 
 - Stage selected ZIP and detached signature; enforce exact names/sizes and both SHA-256 digests.

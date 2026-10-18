@@ -1,4 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
 <PropertyGroup><TargetFramework>net8.0-windows</TargetFramework><OutputType>Exe</OutputType><AssemblyName>CadenceStudio.Updater</AssemblyName></PropertyGroup>
-<ItemGroup><Compile Include="../../updater/CadenceStudio.Updater/Program.cs" Link="Program.cs"/><ProjectReference Include="../SigningFixture.Core/SigningFixture.Core.csproj" /></ItemGroup>
+<ItemGroup><Compile Include="../../updater/CadenceStudio.Updater/Program.cs" Link="Program.cs"/><Compile Include="../../updater/CadenceStudio.Updater/UpdaterRunLocation.cs" Link="UpdaterRunLocation.cs"/><ProjectReference Include="../SigningFixture.Core/SigningFixture.Core.csproj" /></ItemGroup>
 </Project>

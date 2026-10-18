@@ -11,7 +11,7 @@ FileStream? lease = null;
 var ownsValidatedTransaction = false;
 try
 {
-    var installRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, ".."));
+    var installRoot = UpdaterRunLocation.Resolve(AppContext.BaseDirectory, args[2]);
     transaction = UpdateTransactionStore.Read(args[2], installRoot, requirePrepared: args[0] == "--dry-run");
     var lockPath = Path.Combine(transaction.StagingRoot, "active.lock");
     UpdateTransactionPaths.Canonical(lockPath);

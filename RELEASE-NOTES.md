@@ -1,3 +1,39 @@
+# Cadence Studio v1.1-dev.7 — Development pre-release
+
+This development build moves the updater into a verified temporary runner beside the installation before handing off an update. The running updater can then replace the installed updater files along with the application.
+
+## Changes
+
+- Copy the installed updater inventory into a transaction-specific sibling directory and verify each copied file with SHA-256 before launch.
+- Derive the installation path from the runner's location, bind the runner to the transaction ID, and reject unexpected locations, inventory changes, and differing file contents.
+- Preserve updater protocol 3, transaction format 2, independent release verification, one prior-version backup, bounded startup-health confirmation, and rollback behavior.
+- Update application and updater version declarations to `1.1-dev.7` and link the runner-location helper into the signed regression fixture.
+
+The existing security baseline includes authenticated schema-3 release manifests, retained sequence replay protection, and pinned `cadence-release-2026-01` ECDSA P-256/SHA-256 release signatures.
+
+## Packages
+
+- Windows x64 self-contained portable ZIP, including the .NET runtime.
+- Windows x64 framework-dependent portable ZIP, requiring the .NET 8 Windows Desktop Runtime.
+- Per-user Windows x64 installer.
+- Canonically named self-contained updater payload: `Cadence-Studio-v1.1-dev.7-win-x64.zip`.
+
+Detached release signatures use the pinned Cadence release identity. These signatures are separate from Windows Authenticode publisher signing.
+
+## Development limitations
+
+- Creating the runner requires write access beside the installation directory. Transaction-specific runner directories are retained after execution; automatic runner cleanup is not included in this increment.
+- The staged copy expects the normal published updater inventory. Added empty directories in the installed updater can cause inventory validation to reject the handoff.
+- This remains a development pre-release. Local packaging and automated qualification do not establish that the final packaged WPF application has completed an interactive Windows Sandbox update.
+
+## Qualification
+
+The Release regression run on NETZACH on October 18, 2026 passed with 0 build errors and 88 warnings: 18 manifest security/replay checks, 101 signed security/integration checks, and 57 top-level checks. All 30 signed-install scenarios proved the final or restored executable hash. The full log and separate staged-runner qualification evidence accompany the prepared release files.
+
+Publication requires owner approval. No release tag, source commit for these working-tree changes, or published discovery manifest is implied by this local package preparation.
+
+---
+
 ## v1.1-dev.5
 
 The update transaction foundation now supports verified downloads, independent updater verification, safe extraction, one prior-version backup, bounded replacement, final hashes, validated restart and rollback of failed replacement.
