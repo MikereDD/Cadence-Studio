@@ -8,7 +8,7 @@
         xmlns:models="clr-namespace:CadenceStudio.Core.Models;assembly=CadenceStudio.Core"
         mc:Ignorable="d"
         Title="Cadence Studio"
-        Icon="Assets/cadence-studio-icon-256.png"
+        Icon="Assets/cadence-studio-icon.ico"
         Width="1440"
         Height="900"
         MinWidth="1260"
@@ -55,7 +55,7 @@
                         </Border>
                         <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
                             <TextBlock Text="CADENCE STUDIO" FontFamily="{DynamicResource AppDisplayFontFamily}" FontWeight="Bold" FontSize="16" />
-                            <TextBlock Text="AUDIO EXPERIENCE" FontSize="9" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" Margin="0,2,0,0" />
+                            <TextBlock Text="AUDIO EXPERIENCE" FontSize="{DynamicResource AppSmallFontSize}" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" Margin="0,2,0,0" />
                         </StackPanel>
                         <Border Background="{DynamicResource SurfaceRaisedBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
                                 CornerRadius="11" Padding="9,4" Margin="14,0,0,0">
@@ -291,7 +291,7 @@
                                                             </Border>
                                                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                                                 <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
-                                                                <TextBlock Text="{Binding Subtitle}" Margin="0,2,0,0" FontSize="11"
+                                                                <TextBlock Text="{Binding Subtitle}" Margin="0,2,0,0" FontSize="{DynamicResource AppCaptionFontSize}"
                                                                            Foreground="{DynamicResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
                                                             </StackPanel>
                                                             <TextBlock Grid.Column="2" Text="▶" Margin="12,0,4,0" VerticalAlignment="Center"
@@ -321,9 +321,56 @@
                                 </Border>
                             </Popup>
                             <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
-                                <Border Background="{DynamicResource AccentSoftBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1" CornerRadius="12" Padding="12,7" Margin="0,0,10,0">
-                                    <TextBlock Text="{Binding ThemeName}" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" />
-                                </Border>
+                                <!-- Universal v1.5: unobtrusive, fully functional quick theme switcher. -->
+                                <Button x:Name="QuickThemeButton" Style="{StaticResource QuickThemeButtonStyle}"
+                                        Click="QuickThemeButton_Click" AutomationProperties.Name="Quick theme switcher"
+                                        ToolTip="{Binding ThemeName, StringFormat='Current theme: {0}'}">
+                                    <Button.ContextMenu>
+                                        <ContextMenu Style="{StaticResource QuickThemeContextMenuStyle}"
+                                                     DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                            <MenuItem Header="Dark Monochrome" Style="{StaticResource QuickThemeChoiceStyle}"
+                                                      Command="{Binding ApplyThemeCommand}" CommandParameter="DarkMonochrome"
+                                                      IsCheckable="True" IsChecked="{Binding IsDarkMonochromeTheme, Mode=OneWay}">
+                                                <MenuItem.Icon><Ellipse Width="12" Height="12" Fill="#777BC7" /></MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="OLED Black" Style="{StaticResource QuickThemeChoiceStyle}"
+                                                      Command="{Binding ApplyThemeCommand}" CommandParameter="OledBlack"
+                                                      IsCheckable="True" IsChecked="{Binding IsOledBlackTheme, Mode=OneWay}">
+                                                <MenuItem.Icon><Ellipse Width="12" Height="12" Fill="#767CB8" /></MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="Graphite" Style="{StaticResource QuickThemeChoiceStyle}"
+                                                      Command="{Binding ApplyThemeCommand}" CommandParameter="Graphite"
+                                                      IsCheckable="True" IsChecked="{Binding IsGraphiteTheme, Mode=OneWay}">
+                                                <MenuItem.Icon><Ellipse Width="12" Height="12" Fill="#85899B" /></MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="Midnight Indigo" Style="{StaticResource QuickThemeChoiceStyle}"
+                                                      Command="{Binding ApplyThemeCommand}" CommandParameter="MidnightIndigo"
+                                                      IsCheckable="True" IsChecked="{Binding IsMidnightIndigoTheme, Mode=OneWay}">
+                                                <MenuItem.Icon><Ellipse Width="12" Height="12" Fill="#8A7CFF" /></MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="Obsidian Gold" Style="{StaticResource QuickThemeChoiceStyle}"
+                                                      Command="{Binding ApplyThemeCommand}" CommandParameter="ObsidianGold"
+                                                      IsCheckable="True" IsChecked="{Binding IsObsidianGoldTheme, Mode=OneWay}">
+                                                <MenuItem.Icon><Ellipse Width="12" Height="12" Fill="#D8A84E" /></MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="Aurora Pulse" Style="{StaticResource QuickThemeChoiceStyle}"
+                                                      Command="{Binding ApplyThemeCommand}" CommandParameter="AuroraPulse"
+                                                      IsCheckable="True" IsChecked="{Binding IsAuroraPulseTheme, Mode=OneWay}">
+                                                <MenuItem.Icon><Ellipse Width="12" Height="12" Fill="#2AD4C8" /></MenuItem.Icon>
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </Button.ContextMenu>
+                                    <Viewbox Width="20" Height="20" Stretch="Uniform" IsHitTestVisible="False">
+                                        <Canvas Width="24" Height="24">
+                                            <Path Data="M12,2 C6.5,2 2,6.5 2,12 C2,17.5 6.5,22 12,22 C13.7,22 15,20.7 15,19.2 C15,18.2 14.4,17.5 14.4,16.8 C14.4,15.6 15.3,14.7 16.5,14.7 H18.4 C20.4,14.7 22,13.2 22,11.1 C22,6.2 17.6,2 12,2 Z"
+                                                  Stroke="{DynamicResource AccentBrush}" StrokeThickness="1.8" Fill="Transparent" />
+                                            <Ellipse Width="2.9" Height="2.9" Canvas.Left="6" Canvas.Top="8" Fill="{DynamicResource AccentBrush}" />
+                                            <Ellipse Width="2.9" Height="2.9" Canvas.Left="10" Canvas.Top="5" Fill="{DynamicResource AccentBrush}" />
+                                            <Ellipse Width="2.9" Height="2.9" Canvas.Left="15" Canvas.Top="7" Fill="{DynamicResource AccentBrush}" />
+                                            <Ellipse Width="2.9" Height="2.9" Canvas.Left="6" Canvas.Top="13" Fill="{DynamicResource AccentBrush}" />
+                                        </Canvas>
+                                    </Viewbox>
+                                </Button>
                                 <Border Background="{DynamicResource WindowBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="12" Padding="12,7">
                                     <StackPanel Orientation="Horizontal"><Ellipse Width="7" Height="7" Fill="{DynamicResource SuccessBrush}" Margin="0,0,8,0"/><TextBlock Text="Playback online" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/></StackPanel>
                                 </Border>
@@ -461,7 +508,7 @@
                                                     </Grid.ColumnDefinitions>
                                                     <StackPanel MinWidth="0">
                                                         <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip="{Binding FullPath}" />
-                                                        <TextBlock Text="{Binding Summary}" Style="{StaticResource CaptionStyle}" FontSize="10" Margin="0,2,0,0" />
+                                                        <TextBlock Text="{Binding Summary}" Style="{StaticResource CaptionStyle}" Margin="0,2,0,0" />
                                                     </StackPanel>
                                                     <Button Grid.Column="1" Style="{StaticResource TreeActionButtonStyle}" Content="＋"
                                                             Command="{Binding DataContext.AddLibraryFolderCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
@@ -487,10 +534,10 @@
                                                     </Grid.ColumnDefinitions>
                                                     <TextBlock Text="{Binding TrackNumber}" Style="{StaticResource CaptionStyle}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,7,0" />
                                                     <StackPanel Grid.Column="1">
-                                                        <TextBlock Text="{Binding Title}" TextWrapping="NoWrap" ToolTip="{Binding FilePath}" FontSize="12" />
-                                                        <TextBlock Text="{Binding FormatDescription}" Style="{StaticResource CaptionStyle}" FontSize="9" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" />
+                                                        <TextBlock Text="{Binding Title}" TextWrapping="NoWrap" ToolTip="{Binding FilePath}" FontSize="{DynamicResource AppControlFontSize}" />
+                                                        <TextBlock Text="{Binding FormatDescription}" Style="{StaticResource CaptionStyle}" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" />
                                                     </StackPanel>
-                                                    <TextBlock Grid.Column="2" Text="{Binding DurationText}" Style="{StaticResource CaptionStyle}" FontSize="10" VerticalAlignment="Center" Margin="6,0" />
+                                                    <TextBlock Grid.Column="2" Text="{Binding DurationText}" Style="{StaticResource CaptionStyle}" VerticalAlignment="Center" Margin="6,0" />
                                                     <Button Grid.Column="3" Style="{StaticResource TreeActionButtonStyle}" Content="＋"
                                                             Command="{Binding DataContext.AddLibraryTrackCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
                                                             CommandParameter="{Binding}" ToolTip="Add track to queue" />
@@ -545,125 +592,61 @@
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="8" />
-                                        <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
                                     <StackPanel>
                                         <TextBlock Text="Now playing" Style="{StaticResource PanelTitleStyle}" />
                                         <TextBlock Text="{Binding PlaybackStatusText}" Style="{StaticResource CaptionStyle}" Margin="0,4,0,0" />
                                     </StackPanel>
-                                    <Border Grid.Column="1" Background="{DynamicResource SurfaceRaisedBrush}" BorderBrush="{DynamicResource BorderBrush}"
-                                            BorderThickness="1" CornerRadius="11" Padding="10,5">
-                                        <TextBlock Text="STABLE RELEASE" FontFamily="{DynamicResource AppTechnicalFontFamily}" FontSize="{DynamicResource AppSmallFontSize}" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" />
-                                    </Border>
-                                    <Button Grid.Column="3"
-                                            Content="{Binding NowPlayingModeLabel}"
-                                            Command="{Binding ToggleNowPlayingModeCommand}"
-                                            Click="NowPlayingMode_Click"
-                                            ToolTip="Toggle compact and expanded Now Playing modes">
-                                        <Button.Style>
-                                            <Style TargetType="Button" BasedOn="{StaticResource FocusModeButtonStyle}">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsNowPlayingExpanded}" Value="True">
-                                                        <Setter Property="Background" Value="{DynamicResource AccentSoftBrush}" />
-                                                        <Setter Property="BorderBrush" Value="{DynamicResource ControlActiveBrush}" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Button.Style>
-                                    </Button>
 
-                                    <!-- Slim split-pill: one shell, one divider, two hit targets. -->
-                                    <Border Grid.Column="5"
-                                            Height="34"
-                                            MinWidth="168"
-                                            VerticalAlignment="Center"
-                                            Background="{DynamicResource SurfaceRaisedBrush}"
-                                            BorderBrush="{DynamicResource BorderStrongBrush}"
-                                            BorderThickness="1"
-                                            CornerRadius="10"
-                                            SnapsToDevicePixels="True">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="32"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Button x:Name="WindowVisualizerLaunchButton"
-                                                    Grid.Column="0"
-                                                    Content="Window Visualizer"
-                                                    Click="OpenWindowVisualizer_Click"
-                                                    Padding="13,0,11,0"
-                                                    Background="Transparent"
-                                                    BorderThickness="0"
-                                                    Foreground="{DynamicResource TextPrimaryBrush}"
-                                                    FontSize="12"
-                                                    FontWeight="SemiBold"
-                                                    HorizontalContentAlignment="Center"
-                                                    VerticalContentAlignment="Center"
-                                                    Cursor="Hand"
-                                                    ToolTip="Open the Window Visualizer in the last-used mode (Ctrl+Shift+V)">
-                                                <Button.Template>
-                                                    <ControlTemplate TargetType="Button">
-                                                        <Border x:Name="LaunchSurface" Background="{TemplateBinding Background}" CornerRadius="9,0,0,9">
-                                                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                                              Margin="{TemplateBinding Padding}"/>
-                                                        </Border>
-                                                        <ControlTemplate.Triggers>
-                                                            <Trigger Property="IsMouseOver" Value="True">
-                                                                <Setter TargetName="LaunchSurface" Property="Background" Value="{DynamicResource AccentSoftBrush}"/>
-                                                            </Trigger>
-                                                            <Trigger Property="IsPressed" Value="True">
-                                                                <Setter TargetName="LaunchSurface" Property="Background" Value="{DynamicResource SelectionBrush}"/>
-                                                            </Trigger>
-                                                        </ControlTemplate.Triggers>
-                                                    </ControlTemplate>
-                                                </Button.Template>
-                                            </Button>
-                                            <Border Grid.Column="1" Width="1" HorizontalAlignment="Left" Margin="0,7" Background="{DynamicResource BorderBrush}"/>
-                                            <Button x:Name="WindowVisualizerMenuButton"
-                                                    Grid.Column="1"
-                                                    Content="▾"
-                                                    Click="WindowVisualizerMenu_Click"
-                                                    Padding="0"
-                                                    Background="Transparent"
-                                                    BorderThickness="0"
-                                                    Foreground="{DynamicResource TextSecondaryBrush}"
-                                                    FontSize="13"
-                                                    FontWeight="Bold"
-                                                    HorizontalContentAlignment="Center"
-                                                    VerticalContentAlignment="Center"
-                                                    Cursor="Hand"
-                                                    ToolTip="Choose Window Visualizer mode">
-                                                <Button.Template>
-                                                    <ControlTemplate TargetType="Button">
-                                                        <Border x:Name="MenuSurface" Background="{TemplateBinding Background}" CornerRadius="0,9,9,0">
-                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                        </Border>
-                                                        <ControlTemplate.Triggers>
-                                                            <Trigger Property="IsMouseOver" Value="True">
-                                                                <Setter TargetName="MenuSurface" Property="Background" Value="{DynamicResource AccentSoftBrush}"/>
-                                                                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
-                                                            </Trigger>
-                                                            <Trigger Property="IsPressed" Value="True">
-                                                                <Setter TargetName="MenuSurface" Property="Background" Value="{DynamicResource SelectionBrush}"/>
-                                                            </Trigger>
-                                                        </ControlTemplate.Triggers>
-                                                    </ControlTemplate>
-                                                </Button.Template>
-                                                <Button.ContextMenu>
-                                                    <ContextMenu Placement="Bottom">
-                                                        <MenuItem Header="Open pop-out" Click="OpenWindowVisualizerPopOut_Click"/>
-                                                        <MenuItem Header="Open floating" Click="OpenWindowVisualizerFloating_Click"/>
-                                                        <MenuItem Header="Open fullscreen" Click="OpenWindowVisualizerFullscreen_Click"/>
-                                                        <Separator/>
-                                                        <MenuItem Header="Bring to front" Click="BringWindowVisualizerToFront_Click"/>
-                                                        <MenuItem Header="Close Window Visualizer" Click="CloseWindowVisualizer_Click"/>
-                                                    </ContextMenu>
-                                                </Button.ContextMenu>
-                                            </Button>
-                                        </Grid>
-                                    </Border>
+                                    <!-- Universal v1.6: single icon instead of release badge and split text button.
+                                         Existing visualizer modes and Compact/Expand command remain accessible. -->
+                                    <Button x:Name="WindowVisualizerMenuButton" Grid.Column="1"
+                                            Style="{StaticResource UtilityPillButtonStyle}"
+                                            Width="38" Height="34" Padding="7,5"
+                                            Click="WindowVisualizerMenu_Click"
+                                            ToolTip="Window Visualizer" AutomationProperties.Name="Window Visualizer"
+                                            AutomationProperties.HelpText="Choose window visualizer mode">
+                                        <Button.ContextMenu>
+                                            <ContextMenu Placement="Bottom"
+                                                         Style="{StaticResource CompactVisualizerContextMenuStyle}"
+                                                         DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                                <MenuItem Header="Open (last-used mode)"
+                                                          Style="{StaticResource CompactVisualizerMenuItemStyle}"
+                                                          Click="OpenWindowVisualizer_Click" />
+                                                <Separator />
+                                                <MenuItem Header="Open pop-out"
+                                                          Style="{StaticResource CompactVisualizerMenuItemStyle}"
+                                                          Click="OpenWindowVisualizerPopOut_Click" />
+                                                <MenuItem Header="Open floating"
+                                                          Style="{StaticResource CompactVisualizerMenuItemStyle}"
+                                                          Click="OpenWindowVisualizerFloating_Click" />
+                                                <MenuItem Header="Open fullscreen"
+                                                          Style="{StaticResource CompactVisualizerMenuItemStyle}"
+                                                          Click="OpenWindowVisualizerFullscreen_Click" />
+                                                <Separator />
+                                                <MenuItem Header="Bring to front"
+                                                          Style="{StaticResource CompactVisualizerMenuItemStyle}"
+                                                          Click="BringWindowVisualizerToFront_Click" />
+                                                <MenuItem Header="Close Window Visualizer"
+                                                          Style="{StaticResource CompactVisualizerMenuItemStyle}"
+                                                          Click="CloseWindowVisualizer_Click" />
+                                                <Separator />
+                                                <MenuItem Header="{Binding NowPlayingModeLabel}"
+                                                          Style="{StaticResource CompactVisualizerMenuItemStyle}"
+                                                          Command="{Binding ToggleNowPlayingModeCommand}"
+                                                          Click="NowPlayingMode_Click" />
+                                            </ContextMenu>
+                                        </Button.ContextMenu>
+                                        <Viewbox Width="19" Height="19" Stretch="Uniform" IsHitTestVisible="False">
+                                            <Canvas Width="24" Height="24">
+                                                <Line X1="3" Y1="10" X2="3" Y2="14" Stroke="{DynamicResource AccentBrush}" StrokeThickness="2.1" StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                                                <Line X1="8" Y1="6" X2="8" Y2="18" Stroke="{DynamicResource AccentBrush}" StrokeThickness="2.1" StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                                                <Line X1="13" Y1="3" X2="13" Y2="21" Stroke="{DynamicResource AccentBrush}" StrokeThickness="2.1" StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                                                <Line X1="18" Y1="7" X2="18" Y2="17" Stroke="{DynamicResource AccentBrush}" StrokeThickness="2.1" StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                                                <Line X1="23" Y1="10" X2="23" Y2="14" Stroke="{DynamicResource AccentBrush}" StrokeThickness="2.1" StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                                            </Canvas>
+                                        </Viewbox>
+                                    </Button>
                                 </Grid>
 
                                 <!-- Compact practical layout: Library and Queue remain visible. -->
@@ -745,9 +728,9 @@
                                                            Margin="0,5,0,0" TextAlignment="Center" TextTrimming="CharacterEllipsis" ToolTip="{Binding NowPlayingArtist}" />
                                                 <TextBlock Text="{Binding NowPlayingAlbum}" Foreground="{DynamicResource TextMutedBrush}" FontSize="12"
                                                            Margin="0,3,0,0" TextAlignment="Center" TextTrimming="CharacterEllipsis" ToolTip="{Binding NowPlayingAlbum}" />
-                                                <TextBlock Text="{Binding NowPlayingMetadata}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10"
+                                                <TextBlock Text="{Binding NowPlayingMetadata}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{DynamicResource AppCaptionFontSize}"
                                                            Margin="0,5,0,0" TextAlignment="Center" TextTrimming="CharacterEllipsis" />
-                                                <TextBlock Text="{Binding NowPlayingFormat}" Foreground="{DynamicResource TextMutedBrush}" FontSize="10"
+                                                <TextBlock Text="{Binding NowPlayingFormat}" Foreground="{DynamicResource TextMutedBrush}" FontSize="{DynamicResource AppCaptionFontSize}"
                                                            Margin="0,4,0,0" TextAlignment="Center" TextTrimming="CharacterEllipsis" />
                                             </StackPanel>
                                             </Grid>
@@ -823,7 +806,7 @@
                                             </Grid>
                                             <Grid x:Name="CompactInsightContent" Grid.Row="2" Margin="0,6,0,8">
                                                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                                                    <TextBlock Text="{Binding NowPlayingDetailsText}" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" LineHeight="18">
+                                                    <TextBlock Text="{Binding NowPlayingDetailsText}" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{DynamicResource AppBodyFontSize}" LineHeight="18">
                                                         <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding IsDetailsTabActive}" Value="True"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></TextBlock.Style>
                                                     </TextBlock>
                                                 </ScrollViewer>
@@ -838,7 +821,7 @@
                                                 </ScrollViewer>
                                                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                                                     <ScrollViewer.Style><Style TargetType="ScrollViewer"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding IsBioTabActive}" Value="True"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></ScrollViewer.Style>
-                                                    <TextBlock Text="{Binding ArtistBioText}" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" LineHeight="19" />
+                                                    <TextBlock Text="{Binding ArtistBioText}" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{DynamicResource AppBodyFontSize}" LineHeight="19" />
                                                 </ScrollViewer>
                                                 <Border Style="{StaticResource InsightLoadingOverlayStyle}" Panel.ZIndex="20">
                                                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="180">
@@ -919,7 +902,7 @@
                                                             <Border CornerRadius="27" BorderBrush="#66FFFFFF" BorderThickness="1" Margin="1" />
                                                             <Border CornerRadius="27" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="2" Opacity="0.34" />
                                                             <Border VerticalAlignment="Bottom" Background="#E1080B10" CornerRadius="0,0,27,27" Padding="14,10">
-                                                                <TextBlock Text="{Binding NowPlayingArtworkSource}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                                                <TextBlock Text="{Binding NowPlayingArtworkSource}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{DynamicResource AppCaptionFontSize}" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" />
                                                             </Border>
                                                         </Grid>
                                                     </Border>
@@ -1798,7 +1781,7 @@
                                     </Grid.ColumnDefinitions>
                                     <StackPanel>
                                         <TextBlock Text="Visual Language" Style="{StaticResource PanelTitleStyle}" />
-                                        <TextBlock Text="Choose a complete Cadence atmosphere. Every preset now drives layered metal, luminous depth, tactile controls, and premium menus."
+                                        <TextBlock Text="Choose a consistent Cadence appearance. Colors, controls, typography, and selection states follow the active theme."
                                                    Style="{StaticResource CaptionStyle}" Margin="0,5,0,0" TextWrapping="Wrap" />
                                     </StackPanel>
                                     <Border Grid.Column="1" Background="{DynamicResource SurfaceRaisedBrush}" BorderBrush="{DynamicResource BorderBrush}"
@@ -1817,7 +1800,7 @@
                                         <Border Width="54" Height="54" CornerRadius="17" Background="{DynamicResource AccentSoftBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1">
                                             <Grid>
                                                 <Ellipse Width="34" Height="34" Stroke="{DynamicResource AccentBrush}" StrokeThickness="2" Opacity="0.78"/>
-                                                <Ellipse Width="12" Height="12" Fill="{DynamicResource AccentBrush}"><Ellipse.Effect><DropShadowEffect Color="{DynamicResource AccentColor}" BlurRadius="14" ShadowDepth="0" Opacity="0.9"/></Ellipse.Effect></Ellipse>
+                                                <Ellipse Width="12" Height="12" Fill="{DynamicResource AccentBrush}"></Ellipse>
                                             </Grid>
                                         </Border>
                                         <StackPanel Grid.Column="1" Margin="16,0,20,0" VerticalAlignment="Center">
@@ -1826,7 +1809,7 @@
                                         <Border Grid.Column="2" Background="{DynamicResource PremiumSelectionBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1" CornerRadius="12" Padding="12,8" VerticalAlignment="Center">
                                             <StackPanel>
                                                 <TextBlock Text="VISUAL DIRECTION" Style="{StaticResource CaptionStyle}" FontWeight="Bold" HorizontalAlignment="Center"/>
-                                                <TextBlock Text="BOLD • CINEMATIC" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,3,0,0" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="CLEAN • CONSISTENT" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,3,0,0" HorizontalAlignment="Center"/>
                                             </StackPanel>
                                         </Border>
                                     </Grid>
@@ -1837,12 +1820,12 @@
                                                   Command="{Binding ApplyThemeCommand}" CommandParameter="DarkMonochrome">
                                         <StackPanel>
                                             <StackPanel Orientation="Horizontal">
-                                                <Border Width="30" Height="22" CornerRadius="6" Background="#090B0F" BorderBrush="#2A313C" BorderThickness="1" />
-                                                <Border Width="30" Height="22" CornerRadius="6" Background="#171C24" BorderBrush="#2A313C" BorderThickness="1" Margin="6,0,0,0" />
-                                                <Border Width="30" Height="22" CornerRadius="6" Background="#777BC7" Margin="6,0,0,0" />
+                                                <Border Width="30" Height="22" CornerRadius="6" Background="#07090C" BorderBrush="#394351" BorderThickness="1" />
+                                                <Border Width="30" Height="22" CornerRadius="6" Background="#181E27" BorderBrush="#394351" BorderThickness="1" Margin="6,0,0,0" />
+                                                <Border Width="30" Height="22" CornerRadius="6" Background="#D7DCE4" Margin="6,0,0,0" />
                                             </StackPanel>
                                             <TextBlock Text="Dark Monochrome" FontWeight="Bold" Margin="0,12,0,0" />
-                                            <TextBlock Text="Layered graphite • violet light" Style="{StaticResource CaptionStyle}" Margin="0,4,0,0" />
+                                            <TextBlock Text="Charcoal • silver accents" Style="{StaticResource CaptionStyle}" Margin="0,4,0,0" />
                                         </StackPanel>
                                     </ToggleButton>
 
@@ -1852,10 +1835,10 @@
                                             <StackPanel Orientation="Horizontal">
                                                 <Border Width="30" Height="22" CornerRadius="6" Background="#000000" BorderBrush="#292E35" BorderThickness="1" />
                                                 <Border Width="30" Height="22" CornerRadius="6" Background="#101317" BorderBrush="#292E35" BorderThickness="1" Margin="6,0,0,0" />
-                                                <Border Width="30" Height="22" CornerRadius="6" Background="#767CB8" Margin="6,0,0,0" />
+                                                <Border Width="30" Height="22" CornerRadius="6" Background="#E5E9EE" Margin="6,0,0,0" />
                                             </StackPanel>
                                             <TextBlock Text="OLED Black" FontWeight="Bold" Margin="0,12,0,0" />
-                                            <TextBlock Text="OLED depth • cool luminosity" Style="{StaticResource CaptionStyle}" Margin="0,4,0,0" />
+                                            <TextBlock Text="True black • clean silver" Style="{StaticResource CaptionStyle}" Margin="0,4,0,0" />
                                         </StackPanel>
                                     </ToggleButton>
 
@@ -1865,10 +1848,10 @@
                                             <StackPanel Orientation="Horizontal">
                                                 <Border Width="30" Height="22" CornerRadius="6" Background="#141619" BorderBrush="#3B424C" BorderThickness="1" />
                                                 <Border Width="30" Height="22" CornerRadius="6" Background="#252930" BorderBrush="#3B424C" BorderThickness="1" Margin="6,0,0,0" />
-                                                <Border Width="30" Height="22" CornerRadius="6" Background="#85899B" Margin="6,0,0,0" />
+                                                <Border Width="30" Height="22" CornerRadius="6" Background="#C2CAD4" Margin="6,0,0,0" />
                                             </StackPanel>
                                             <TextBlock Text="Graphite" FontWeight="Bold" Margin="0,12,0,0" />
-                                            <TextBlock Text="Gunmetal • polished silver" Style="{StaticResource CaptionStyle}" Margin="0,4,0,0" />
+                                            <TextBlock Text="Neutral graphite • silver" Style="{StaticResource CaptionStyle}" Margin="0,4,0,0" />
                                         </StackPanel>
                                     </ToggleButton>
 
@@ -1878,10 +1861,10 @@
                                             <StackPanel Orientation="Horizontal">
                                                 <Border Width="34" Height="24" CornerRadius="7" Background="#060816" BorderBrush="#3B4770" BorderThickness="1" />
                                                 <Border Width="34" Height="24" CornerRadius="7" Background="#171F3B" BorderBrush="#3B4770" BorderThickness="1" Margin="6,0,0,0" />
-                                                <Border Width="34" Height="24" CornerRadius="7" Background="#8A7CFF" Margin="6,0,0,0"><Border.Effect><DropShadowEffect Color="#8A7CFF" BlurRadius="9" ShadowDepth="0" Opacity="0.65"/></Border.Effect></Border>
+                                                <Border Width="34" Height="24" CornerRadius="7" Background="#9C8BFF" Margin="6,0,0,0"></Border>
                                             </StackPanel>
                                             <TextBlock Text="Midnight Indigo" FontWeight="Bold" Margin="0,12,0,0" />
-                                            <TextBlock Text="Violet night glass" Style="{StaticResource CaptionStyle}" Margin="0,4,0,0" />
+                                            <TextBlock Text="Midnight blue • violet" Style="{StaticResource CaptionStyle}" Margin="0,4,0,0" />
                                         </StackPanel>
                                     </ToggleButton>
 
@@ -1891,10 +1874,10 @@
                                             <StackPanel Orientation="Horizontal">
                                                 <Border Width="34" Height="24" CornerRadius="7" Background="#080807" BorderBrush="#5A4B2A" BorderThickness="1" />
                                                 <Border Width="34" Height="24" CornerRadius="7" Background="#201C14" BorderBrush="#5A4B2A" BorderThickness="1" Margin="6,0,0,0" />
-                                                <Border Width="34" Height="24" CornerRadius="7" Background="#D8A84E" Margin="6,0,0,0"><Border.Effect><DropShadowEffect Color="#D8A84E" BlurRadius="10" ShadowDepth="0" Opacity="0.72"/></Border.Effect></Border>
+                                                <Border Width="34" Height="24" CornerRadius="7" Background="#D8A84E" Margin="6,0,0,0"></Border>
                                             </StackPanel>
                                             <TextBlock Text="Obsidian Gold" FontWeight="Bold" Margin="0,12,0,0" />
-                                            <TextBlock Text="Black metal • warm luxury" Style="{StaticResource CaptionStyle}" Margin="0,4,0,0" />
+                                            <TextBlock Text="Obsidian black • warm gold" Style="{StaticResource CaptionStyle}" Margin="0,4,0,0" />
                                         </StackPanel>
                                     </ToggleButton>
 
@@ -1904,10 +1887,10 @@
                                             <StackPanel Orientation="Horizontal">
                                                 <Border Width="34" Height="24" CornerRadius="7" Background="#050B12" BorderBrush="#28506A" BorderThickness="1" />
                                                 <Border Width="34" Height="24" CornerRadius="7" Background="#112437" BorderBrush="#28506A" BorderThickness="1" Margin="6,0,0,0" />
-                                                <Border Width="34" Height="24" CornerRadius="7" Background="#2AD4C8" Margin="6,0,0,0"><Border.Effect><DropShadowEffect Color="#2AD4C8" BlurRadius="10" ShadowDepth="0" Opacity="0.72"/></Border.Effect></Border>
+                                                <Border Width="34" Height="24" CornerRadius="7" Background="#2AD4C8" Margin="6,0,0,0"></Border>
                                             </StackPanel>
                                             <TextBlock Text="Aurora Pulse" FontWeight="Bold" Margin="0,12,0,0" />
-                                            <TextBlock Text="Electric teal atmosphere" Style="{StaticResource CaptionStyle}" Margin="0,4,0,0" />
+                                            <TextBlock Text="Deep blue • bright teal" Style="{StaticResource CaptionStyle}" Margin="0,4,0,0" />
                                         </StackPanel>
                                     </ToggleButton>
                                 </WrapPanel>
@@ -2219,7 +2202,7 @@
 
                                 <StackPanel Margin="0,0,0,22">
                                     <TextBlock Text="Visualizer experience" Style="{StaticResource PanelTitleStyle}" />
-                                    <TextBlock Text="Shape the embedded Now Playing stage and prepare the detached Window Visualizer from one premium control center." Style="{StaticResource CaptionStyle}" Margin="0,5,0,0" TextWrapping="Wrap" />
+                                    <TextBlock Text="Configure the embedded Now Playing stage and detached Window Visualizer in one place." Style="{StaticResource CaptionStyle}" Margin="0,5,0,0" TextWrapping="Wrap" />
 
                                     <Grid Margin="0,18,0,0">
                                         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="16"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>

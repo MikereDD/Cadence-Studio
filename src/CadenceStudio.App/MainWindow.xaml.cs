@@ -216,12 +216,12 @@ public partial class MainWindow : Window
 
     private void UpdateWindowVisualizerLaunchState(bool isOpen)
     {
-        if (WindowVisualizerLaunchButton is null)
+        if (WindowVisualizerMenuButton is null)
             return;
-        WindowVisualizerLaunchButton.Content = isOpen ? "BRING VISUALIZER FRONT" : "WINDOW VISUALIZER";
-        WindowVisualizerLaunchButton.ToolTip = isOpen
-            ? "Bring the open Window Visualizer to front"
-            : "Open the Window Visualizer in the last-used mode (Ctrl+Shift+V)";
+        // v1.6: keep the audio-bars icon intact, updating only its tooltip.
+        WindowVisualizerMenuButton.ToolTip = isOpen
+            ? "Window Visualizer (open) - choose a mode or bring to front"
+            : "Window Visualizer";
     }
 
 
@@ -668,6 +668,18 @@ public partial class MainWindow : Window
     {
         ExecuteCommand(_viewModel.NextCommand);
         e.Handled = true;
+    }
+
+    // Universal v1.5: the normal left-click opens the native WPF context menu.
+    // Existing theme selection, persistence and visualizer handling are unchanged.
+    private void QuickThemeButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.ContextMenu is ContextMenu menu)
+        {
+            menu.PlacementTarget = button;
+            menu.Placement = PlacementMode.Bottom;
+            menu.IsOpen = true;
+        }
     }
 
     private void Shortcuts_Click(object sender, RoutedEventArgs e) => ShowKeyboardShortcuts();

@@ -56,6 +56,7 @@ public partial class WindowVisualizerWindow : Window
             ApplyPresetVisuals(false);
             StartAmbientAnimations();
             ApplyPlaybackPresentation();
+            UpdateDockLayout();
             ShowControls();
         };
     }
@@ -66,6 +67,18 @@ public partial class WindowVisualizerWindow : Window
             _viewModel.CaptureWindowVisualizerPlacement(Left, Top, ActualWidth, ActualHeight);
         _viewModel.PropertyChanged -= ViewModel_PropertyChanged;
         base.OnClosing(e);
+    }
+
+    private void VisualizerWindow_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateDockLayout();
+
+    // At compact widths, remove the readout's entire column so the song title
+    // gets all available room. Wide windows restore a balanced three-column dock.
+    private void UpdateDockLayout()
+    {
+        if (DockStatusColumn is null || DockTechnicalStatus is null) return;
+        var isWide = ActualWidth >= 980;
+        DockStatusColumn.Width = isWide ? new GridLength(1, GridUnitType.Star) : new GridLength(0);
+        DockTechnicalStatus.Visibility = isWide ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void Window_MouseMove(object sender, MouseEventArgs e) => ShowControls();

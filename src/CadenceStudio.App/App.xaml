@@ -11,7 +11,13 @@
                 <ResourceDictionary Source="Themes/Typography.xaml" />
                 <ResourceDictionary Source="Themes/Controls.xaml" />
                 <ResourceDictionary Source="Themes/EyeCandy.xaml" />
+                <ResourceDictionary Source="Themes/CadenceMenus.xaml" />
                 <ResourceDictionary Source="Themes/PremiumFoundation.xaml" />
+                <ResourceDictionary Source="Themes/CadenceUniversal.xaml" />
+                <ResourceDictionary Source="Themes/CadenceReadability.xaml" />
+                <ResourceDictionary Source="Themes/CadenceRings.xaml" />
+                <ResourceDictionary Source="Themes/CadenceQuickThemes.xaml" />
+                <ResourceDictionary Source="Themes/CadenceVisualizerMenu.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <converters:ByteArrayToImageSourceConverter x:Key="AlbumArtConverter" />
             <converters:LibraryRowWidthConverter x:Key="LibraryRowWidthConverter" />

@@ -6,20 +6,236 @@
         Width="1180" Height="720" MinWidth="640" MinHeight="420"
         WindowStyle="None" AllowsTransparency="False" ResizeMode="CanResize"
         Background="{DynamicResource WindowBrush}" ShowInTaskbar="True" KeyDown="Window_KeyDown"
-        MouseMove="Window_MouseMove">
+        MouseMove="Window_MouseMove" SizeChanged="VisualizerWindow_SizeChanged">
     <shell:WindowChrome.WindowChrome>
-        <shell:WindowChrome CaptionHeight="34" ResizeBorderThickness="6" CornerRadius="0" GlassFrameThickness="0" UseAeroCaptionButtons="False"/>
+        <!-- Only the first 58px is draggable; interactive buttons explicitly opt back in. -->
+        <shell:WindowChrome CaptionHeight="58" ResizeBorderThickness="6" CornerRadius="0"
+                            GlassFrameThickness="0" UseAeroCaptionButtons="False"/>
     </shell:WindowChrome.WindowChrome>
+    <Window.Resources>
+        <!-- All controls below are pop-out-local. No shared resources are modified. -->
+        <Style x:Key="VisualizerChromeButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="30"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Margin" Value="1,0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid SnapsToDevicePixels="True">
+                            <Border x:Name="Shell" CornerRadius="9" Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1"/>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Border x:Name="FocusOutline" CornerRadius="9" BorderBrush="{DynamicResource AccentBrush}"
+                                    BorderThickness="2" Opacity="0" IsHitTestVisible="False"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Tag" Value="Pinned">
+                                <Setter TargetName="Shell" Property="Background" Value="{DynamicResource AccentSoftBrush}"/>
+                                <Setter TargetName="Shell" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Shell" Property="Background" Value="{DynamicResource SurfaceHoverBrush}"/>
+                                <Setter TargetName="Shell" Property="BorderBrush" Value="{DynamicResource BorderSoftBrush}"/>
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="Tag" Value="Close"/>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="Shell" Property="Background" Value="#664A2430"/>
+                                <Setter TargetName="Shell" Property="BorderBrush" Value="#AD5960"/>
+                            </MultiTrigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Shell" Property="Background" Value="{DynamicResource PremiumButtonPressedBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="FocusOutline" Property="Opacity" Value="1"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.45"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="VisualizerPinButtonStyle" TargetType="Button" BasedOn="{StaticResource VisualizerChromeButtonStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Topmost, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                    <Setter Property="Tag" Value="Pinned"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <!-- Pop-out-only preset selector: icon face, unchanged native ComboBox menu and selection handling. -->
+        <Style x:Key="VisualizerPresetIconComboStyle" TargetType="ComboBox">
+            <Setter Property="Width" Value="34"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="ItemContainerStyle" Value="{StaticResource CadenceUnifiedComboBoxItemStyle}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid SnapsToDevicePixels="True">
+                            <ToggleButton x:Name="IconToggle" ClickMode="Press" Focusable="False"
+                                          shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                                          IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Grid SnapsToDevicePixels="True">
+                                            <Border x:Name="ButtonSurface" CornerRadius="9" Background="Transparent"
+                                                    BorderBrush="Transparent" BorderThickness="1"/>
+                                            <Viewbox Width="19" Height="19" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <Canvas Width="24" Height="24">
+                                                    <!-- Sparkles: center star plus two small glints. -->
+                                                    <Path Data="M 12,3 L 13.7,9.7 L 20.4,11.4 L 13.7,13.1 L 12,19.8 L 10.3,13.1 L 3.6,11.4 L 10.3,9.7 Z"
+                                                          Stroke="{DynamicResource TextPrimaryBrush}" StrokeThickness="1.6"
+                                                          StrokeLineJoin="Round" Fill="Transparent"/>
+                                                    <Path Data="M 19,2.5 L 19.7,4.3 L 21.5,5 L 19.7,5.7 L 19,7.5 L 18.3,5.7 L 16.5,5 L 18.3,4.3 Z"
+                                                          Stroke="{DynamicResource AccentBrush}" StrokeThickness="1.2"
+                                                          StrokeLineJoin="Round" Fill="Transparent"/>
+                                                    <Path Data="M 5,17 L 5.6,18.4 L 7,19 L 5.6,19.6 L 5,21 L 4.4,19.6 L 3,19 L 4.4,18.4 Z"
+                                                          Stroke="{DynamicResource AccentBrush}" StrokeThickness="1.1"
+                                                          StrokeLineJoin="Round" Fill="Transparent"/>
+                                                </Canvas>
+                                            </Viewbox>
+                                            <Border x:Name="FocusRing" CornerRadius="9" BorderBrush="{DynamicResource AccentBrush}"
+                                                    BorderThickness="2" Opacity="0" IsHitTestVisible="False"/>
+                                        </Grid>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="ButtonSurface" Property="Background" Value="{DynamicResource SurfaceHoverBrush}"/>
+                                                <Setter TargetName="ButtonSurface" Property="BorderBrush" Value="{DynamicResource BorderSoftBrush}"/>
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter TargetName="ButtonSurface" Property="Background" Value="{DynamicResource AccentSoftBrush}"/>
+                                                <Setter TargetName="ButtonSurface" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Setter TargetName="ButtonSurface" Property="Background" Value="{DynamicResource PremiumButtonPressedBrush}"/>
+                                            </Trigger>
+                                            <Trigger Property="IsEnabled" Value="False">
+                                                <Setter Property="Opacity" Value="0.45"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <Popup x:Name="PART_Popup" Placement="Bottom" HorizontalOffset="-242" VerticalOffset="8"
+                                   AllowsTransparency="True" Focusable="False" StaysOpen="False"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}" PopupAnimation="Fade">
+                                <Border Width="276" Style="{StaticResource CadenceMenuChromeStyle}">
+                                    <StackPanel>
+                                        <TextBlock Text="VISUALIZER PRESETS" Style="{StaticResource CadenceMenuHeadingStyle}"/>
+                                        <Border Style="{StaticResource CadenceMenuRuleStyle}"/>
+                                        <ScrollViewer CanContentScroll="True" HorizontalScrollBarVisibility="Disabled"
+                                                      VerticalScrollBarVisibility="Auto" MaxHeight="260">
+                                            <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                        </ScrollViewer>
+                                    </StackPanel>
+                                </Border>
+                            </Popup>
+                            <Border x:Name="KeyboardFocusRing" CornerRadius="9" BorderBrush="{DynamicResource AccentBrush}"
+                                    BorderThickness="2" Opacity="0" IsHitTestVisible="False"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="KeyboardFocusRing" Property="Opacity" Value="1"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.45"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- Previous/next are quiet, touchable glyphs; only play/pause is a colored disk. -->
+        <Style x:Key="VisualizerTransportButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="34"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Margin" Value="2,0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid SnapsToDevicePixels="True">
+                            <Border x:Name="Shell" CornerRadius="11" Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1"/>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Border x:Name="FocusOutline" CornerRadius="11" BorderBrush="{DynamicResource AccentBrush}"
+                                    BorderThickness="2" Opacity="0" IsHitTestVisible="False"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Shell" Property="Background" Value="{DynamicResource SurfaceHoverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Shell" Property="Background" Value="{DynamicResource PremiumButtonPressedBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="FocusOutline" Property="Opacity" Value="1"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.45"/></Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="VisualizerHeroPlayButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="46"/>
+            <Setter Property="Height" Value="46"/>
+            <Setter Property="Margin" Value="4,0"/>
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid SnapsToDevicePixels="True">
+                            <Ellipse x:Name="Disk" Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="1"/>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Ellipse x:Name="FocusOutline" Stroke="{DynamicResource TextPrimaryBrush}"
+                                     StrokeThickness="2" Margin="2" Opacity="0" IsHitTestVisible="False"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Disk" Property="Stroke" Value="{DynamicResource TextPrimaryBrush}"/></Trigger>
+                            <Trigger Property="IsPressed" Value="True"><Setter TargetName="Disk" Property="Opacity" Value="0.82"/></Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="FocusOutline" Property="Opacity" Value="1"/></Trigger>
+                            <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.45"/></Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
 
-    <Grid x:Name="VisualizerRoot" ClipToBounds="True" Opacity="1">
-        <Grid.Background>
-            <RadialGradientBrush Center="0.5,0.47" GradientOrigin="0.5,0.47" RadiusX="0.78" RadiusY="0.92">
-                <GradientStop Color="{DynamicResource VisualizerAtmosphereColor}" Offset="0"/>
-                <GradientStop Color="{DynamicResource SurfaceRaisedColor}" Offset="0.43"/>
-                <GradientStop Color="{DynamicResource WindowColor}" Offset="1"/>
-            </RadialGradientBrush>
-        </Grid.Background>
-
+    <!-- Edge-to-edge presentation; NO full-width title or transport bars. -->
+    <Grid ClipToBounds="True" Background="{DynamicResource WindowBrush}">
+        <!-- The entire scene covers the window; only its outer edges crop, never its central focal geometry. -->
+        <Viewbox Stretch="UniformToFill" StretchDirection="Both"
+                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False">
+            <Grid x:Name="VisualizerRoot" Width="1180" Height="620" ClipToBounds="True" Opacity="1">
+                    <Grid.Background>
+                        <RadialGradientBrush Center="0.5,0.47" GradientOrigin="0.5,0.47" RadiusX="0.78" RadiusY="0.92">
+                            <GradientStop Color="{DynamicResource VisualizerAtmosphereColor}" Offset="0"/>
+                            <GradientStop Color="{DynamicResource SurfaceRaisedColor}" Offset="0.43"/>
+                            <GradientStop Color="{DynamicResource WindowColor}" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Grid.Background>
         <!-- cinematic atmospheric color fields -->
         <Ellipse Width="920" Height="540" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.28">
             <Ellipse.Fill><RadialGradientBrush><GradientStop Color="{DynamicResource VisualizerAtmosphereColor}" Offset="0"/><GradientStop Color="{DynamicResource AccentSoftColor}" Offset="0.48"/><GradientStop Color="#00000000" Offset="1"/></RadialGradientBrush></Ellipse.Fill>
@@ -41,15 +257,15 @@
             <Ellipse x:Name="ParticleE" Width="2" Height="2" Fill="White" Canvas.Left="50" Canvas.Top="290"/>
             <Ellipse x:Name="ParticleF" Width="2" Height="2" Fill="White" Canvas.Right="68" Canvas.Top="248"/>
         </Canvas>
-        <Ellipse x:Name="OrbitOuter" Width="730" Height="730" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{DynamicResource VisualizerBand1Brush}" StrokeThickness="2" RenderTransformOrigin="0.5,0.5"><Ellipse.RenderTransform><RotateTransform/></Ellipse.RenderTransform></Ellipse>
-        <Ellipse x:Name="OrbitMiddle" Width="600" Height="600" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{DynamicResource BorderBrush}" StrokeThickness="1" StrokeDashArray="2,7" RenderTransformOrigin="0.5,0.5"><Ellipse.RenderTransform><RotateTransform/></Ellipse.RenderTransform></Ellipse>
-        <Ellipse x:Name="OrbitInner" Width="470" Height="470" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{DynamicResource VisualizerBand5Brush}" StrokeThickness="1.5" StrokeDashArray="5,3" RenderTransformOrigin="0.5,0.5"><Ellipse.RenderTransform><RotateTransform/></Ellipse.RenderTransform></Ellipse>
-        <Ellipse x:Name="CelestialDottedRing" Width="350" Height="350" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#55E6B65D" StrokeThickness="2" StrokeDashArray="1,4"/>
+        <Ellipse x:Name="OrbitOuter" Width="570" Height="570" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{DynamicResource VisualizerBand1Brush}" StrokeThickness="2" RenderTransformOrigin="0.5,0.5"><Ellipse.RenderTransform><RotateTransform/></Ellipse.RenderTransform></Ellipse>
+        <Ellipse x:Name="OrbitMiddle" Width="480" Height="480" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{DynamicResource BorderBrush}" StrokeThickness="1" StrokeDashArray="2,7" RenderTransformOrigin="0.5,0.5"><Ellipse.RenderTransform><RotateTransform/></Ellipse.RenderTransform></Ellipse>
+        <Ellipse x:Name="OrbitInner" Width="385" Height="385" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{DynamicResource VisualizerBand5Brush}" StrokeThickness="1.5" StrokeDashArray="5,3" RenderTransformOrigin="0.5,0.5"><Ellipse.RenderTransform><RotateTransform/></Ellipse.RenderTransform></Ellipse>
+        <Ellipse x:Name="CelestialDottedRing" Width="300" Height="300" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#55E6B65D" StrokeThickness="2" StrokeDashArray="1,4"/>
 
         <!-- orbital nodes -->
-        <Ellipse Width="12" Height="12" Fill="{DynamicResource VisualizerCoreBrush}" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,82,0,0"><Ellipse.Effect><DropShadowEffect Color="{DynamicResource VisualizerCoreColor}" BlurRadius="18" ShadowDepth="0"/></Ellipse.Effect></Ellipse>
-        <Ellipse Width="8" Height="8" Fill="{DynamicResource VisualizerBand6Brush}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="180,0,0,0"/>
-        <Ellipse Width="8" Height="8" Fill="{DynamicResource VisualizerBand6Brush}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,180,0"/>
+        <Ellipse Width="12" Height="12" Fill="{DynamicResource VisualizerCoreBrush}" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,58,0,0"><Ellipse.Effect><DropShadowEffect Color="{DynamicResource VisualizerCoreColor}" BlurRadius="18" ShadowDepth="0"/></Ellipse.Effect></Ellipse>
+        <Ellipse Width="8" Height="8" Fill="{DynamicResource VisualizerBand6Brush}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="235,0,0,0"/>
+        <Ellipse Width="8" Height="8" Fill="{DynamicResource VisualizerBand6Brush}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,235,0"/>
 
         <!-- alternate preset layers: each preset has its own geometry and atmosphere -->
         <Grid x:Name="AuroraCascadeLayer" Visibility="Collapsed" IsHitTestVisible="False">
@@ -97,7 +313,7 @@
         </Grid>
 
         <!-- spectrum stage -->
-        <Grid x:Name="SpectrumStage" Margin="58,88,58,112" RenderTransformOrigin="0.5,0.5"><Grid.RenderTransform><ScaleTransform ScaleX="1" ScaleY="1"/></Grid.RenderTransform>
+        <Grid x:Name="SpectrumStage" Margin="42,58,42,92" RenderTransformOrigin="0.5,0.5"><Grid.RenderTransform><ScaleTransform ScaleX="1" ScaleY="1"/></Grid.RenderTransform>
             <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
             <ItemsControl Grid.Row="0" ItemsSource="{Binding VisualizerBars}" VerticalAlignment="Bottom" Height="230" Opacity="0.34" IsHitTestVisible="False">
                 <ItemsControl.Effect><BlurEffect Radius="11"/></ItemsControl.Effect>
@@ -136,83 +352,185 @@
         </Grid>
 
         <!-- reflective platform -->
-        <Ellipse x:Name="ReflectionPlatform" Width="520" Height="90" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,68" Stroke="#70F5C96C" StrokeThickness="2" Fill="#0EFFFFFF"/>
-        <Ellipse x:Name="ReflectionInner" Width="390" Height="58" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,82" Stroke="#50FFFFFF" StrokeThickness="1"/>
+        <Ellipse x:Name="ReflectionPlatform" Width="520" Height="90" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,45" Stroke="#70F5C96C" StrokeThickness="2" Fill="#0EFFFFFF"/>
+        <Ellipse x:Name="ReflectionInner" Width="390" Height="58" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,57" Stroke="#50FFFFFF" StrokeThickness="1"/>
 
-        <!-- top chrome -->
-        <Grid VerticalAlignment="Top" Height="48" Background="#9005070B" shell:WindowChrome.IsHitTestVisibleInChrome="False">
-            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="18,0,0,0">
-                <TextBlock Text="CADENCE STUDIO" Foreground="#CDE7E7EA" FontWeight="SemiBold" FontSize="13"/>
-                <TextBlock Text=" — WINDOW VISUALIZER" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold" FontSize="13"/>
-                <TextBlock Text="  •  " Foreground="#AFC8CAD2" FontSize="11" VerticalAlignment="Center"/><TextBlock Text="{Binding WindowVisualizerPresetLabel}" Foreground="#AFC8CAD2" FontSize="11" VerticalAlignment="Center"/>
-                <TextBlock x:Name="PresetCreditText" Text="  •  Inspired by TMWrath" Foreground="#8FA6A8B2" FontSize="10" VerticalAlignment="Center"/>
-            </StackPanel>
-            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,0,8,0" VerticalAlignment="Center">
-                <ComboBox x:Name="PresetSelector" Width="172" Height="30" Margin="0,0,10,0" Style="{StaticResource PremiumComboBoxStyle}" SelectionChanged="PresetSelector_SelectionChanged" shell:WindowChrome.IsHitTestVisibleInChrome="True">
-                    <ComboBoxItem Content="Celestial Resonance" Tag="CelestialResonance"/>
-                    <ComboBoxItem Content="Aurora Cascade" Tag="AuroraCascade"/>
-                    <ComboBoxItem Content="Glass Horizon" Tag="GlassHorizon"/>
-                    <ComboBoxItem Content="Infinite Windows" Tag="InfiniteWindows"/>
-                </ComboBox>
-                <Button Content="PIN" Click="Pin_Click" Width="50" Height="28" Margin="2,0,5,0" Background="{DynamicResource PremiumButtonBrush}" BorderBrush="{DynamicResource AccentBrush}" Foreground="{DynamicResource TextPrimaryBrush}" shell:WindowChrome.IsHitTestVisibleInChrome="True"/>
-                <Button Content="▣" Click="Fullscreen_Click" Width="38" Height="28" Margin="2,0,5,0" Background="{DynamicResource PremiumButtonBrush}" BorderBrush="{DynamicResource AccentBrush}" Foreground="White" FontSize="14" shell:WindowChrome.IsHitTestVisibleInChrome="True"/>
-                <Button Content="✕" Click="Close_Click" Width="38" Height="28" Margin="2,0,5,0" Background="{DynamicResource PremiumButtonBrush}" BorderBrush="{DynamicResource AccentBrush}" Foreground="White" shell:WindowChrome.IsHitTestVisibleInChrome="True"/>
-            </StackPanel>
-        </Grid>
+            </Grid>
+        </Viewbox>
 
-        <!-- bottom hover controls -->
-        <Border x:Name="ControlsPanel" VerticalAlignment="Bottom" Margin="18,18,18,14" Padding="10,9" CornerRadius="13" Background="{DynamicResource PremiumMenuBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1" Opacity="0">
-            <Grid>
-                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <Border Width="52" Height="52" CornerRadius="8" Margin="0,0,10,0" BorderBrush="#66F0C36B" BorderThickness="1">
-                        <Border.Background><ImageBrush ImageSource="{Binding NowPlayingArtwork, Converter={StaticResource AlbumArtConverter}}" Stretch="UniformToFill"/></Border.Background>
-                    </Border>
+        <!-- Left and right are separate floating chips; uncovered caption space remains draggable. -->
+        <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="46" Margin="14,12,14,0"
+              Panel.ZIndex="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <!-- Non-interactive glass brand card doubles as the window's drag affordance. -->
+            <Grid Grid.Column="0" Width="184" Height="46" IsHitTestVisible="False">
+                <Border Background="{DynamicResource SurfaceRaisedBrush}" Opacity="0.84" CornerRadius="13"
+                        BorderBrush="{DynamicResource BorderSoftBrush}" BorderThickness="1"/>
+                <StackPanel Orientation="Horizontal" Margin="10,0" VerticalAlignment="Center">
+                    <Image Source="Assets/cadence-studio-icon-256.png" Width="25" Height="25" Stretch="Uniform" Margin="0,0,8,0"/>
                     <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="{Binding NowPlayingTitle}" Foreground="White" FontSize="16" FontWeight="Bold" TextTrimming="CharacterEllipsis" MaxWidth="310"/>
-                        <TextBlock Text="{Binding NowPlayingArtist}" Foreground="#CCF0C36B" FontSize="13"/>
-                        <TextBlock Text="{Binding NowPlayingAlbum}" Foreground="#AFC8CAD2" FontSize="12" FontStyle="Italic"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="CADENCE" FontSize="11.5" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBlock Text="  /  VISUALIZER" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}"/>
+                        </StackPanel>
+                        <TextBlock x:Name="PresetCreditText" Text="Inspired by TMWrath" FontSize="9.5"
+                                   Foreground="{DynamicResource TextMutedBrush}" Margin="0,3,0,0"/>
                     </StackPanel>
                 </StackPanel>
-                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Button Style="{StaticResource TransportButtonStyle}" Content="◀" Command="{Binding PreviousCommand}" Margin="6"/>
-                    <Button Style="{StaticResource PlayButtonStyle}" Command="{Binding TogglePlaybackCommand}" Margin="8">
-                        <Grid Width="30" Height="30">
-                            <Path Data="M 7,4 L 25,15 L 7,26 Z" Fill="{DynamicResource AccentTextBrush}">
+            </Grid>
+
+            <Grid Grid.Column="2" Height="44" VerticalAlignment="Center">
+                <Border Background="{DynamicResource SurfaceRaisedBrush}" Opacity="0.86" CornerRadius="13"
+                        BorderBrush="{DynamicResource BorderSoftBrush}" BorderThickness="1" IsHitTestVisible="False"/>
+                <StackPanel Orientation="Horizontal" Margin="6,0" VerticalAlignment="Center">
+                    <ComboBox x:Name="PresetSelector" Margin="0,0,5,0"
+                              Style="{StaticResource VisualizerPresetIconComboStyle}"
+                              SelectionChanged="PresetSelector_SelectionChanged"
+                              ToolTip="{Binding WindowVisualizerPresetLabel, StringFormat='Visualizer preset: {0} (Left / Right to cycle)'}"
+                              AutomationProperties.Name="Choose visualizer preset"
+                              AutomationProperties.HelpText="{Binding WindowVisualizerPresetLabel}"
+                              shell:WindowChrome.IsHitTestVisibleInChrome="True">
+                        <ComboBoxItem Content="Celestial Resonance" Tag="CelestialResonance"/>
+                        <ComboBoxItem Content="Aurora Cascade" Tag="AuroraCascade"/>
+                        <ComboBoxItem Content="Glass Horizon" Tag="GlassHorizon"/>
+                        <ComboBoxItem Content="Infinite Windows" Tag="InfiniteWindows"/>
+                    </ComboBox>
+                    <Button x:Name="PinButton" Style="{StaticResource VisualizerPinButtonStyle}" Click="Pin_Click"
+                            ToolTip="Always on top" AutomationProperties.Name="Toggle always on top"
+                            shell:WindowChrome.IsHitTestVisibleInChrome="True">
+                        <Path Width="14" Height="14" Stretch="Uniform" Fill="Transparent" Stroke="{DynamicResource TextPrimaryBrush}"
+                              StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                              Data="M 8,3 L 16,3 L 15,8 L 18,11 L 18,13 L 6,13 L 6,11 L 9,8 Z M 12,13 L 12,21"/>
+                    </Button>
+                    <Button Style="{StaticResource VisualizerChromeButtonStyle}" Click="Fullscreen_Click"
+                            ToolTip="Fullscreen / restore (F11)" AutomationProperties.Name="Toggle fullscreen"
+                            shell:WindowChrome.IsHitTestVisibleInChrome="True">
+                        <Path Width="14" Height="14" Stretch="Uniform" Fill="Transparent" Stroke="{DynamicResource TextPrimaryBrush}"
+                              StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                              Data="M 9,3 L 3,3 L 3,9 M 15,3 L 21,3 L 21,9 M 21,15 L 21,21 L 15,21 M 9,21 L 3,21 L 3,15"/>
+                    </Button>
+                    <Button Style="{StaticResource VisualizerChromeButtonStyle}" Tag="Close" Click="Close_Click"
+                            ToolTip="Close visualizer" AutomationProperties.Name="Close visualizer"
+                            shell:WindowChrome.IsHitTestVisibleInChrome="True">
+                        <Path Width="14" Height="14" Stretch="Uniform" Fill="Transparent" Stroke="{DynamicResource TextPrimaryBrush}"
+                              StrokeThickness="1.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                              Data="M 4,4 L 20,20 M 20,4 L 4,20"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Grid>
+
+        <!-- A single coordinated glass dock. Compact: metadata gets the full left side,
+             playback remains at right, technical readout disappears. Wide: transport
+             moves to center and the readout returns at right. No overlapping cards. -->
+        <Grid x:Name="ControlsPanel" VerticalAlignment="Bottom" Height="78" Margin="14,0,14,12"
+              Opacity="0" Panel.ZIndex="11">
+            <Border Background="{DynamicResource SurfaceRaisedBrush}" Opacity="0.88" CornerRadius="16"
+                    BorderBrush="{DynamicResource BorderSoftBrush}" BorderThickness="1" IsHitTestVisible="False">
+                <Border.Effect>
+                    <DropShadowEffect Color="#000000" BlurRadius="18" ShadowDepth="0" Opacity="0.24"/>
+                </Border.Effect>
+            </Border>
+            <Grid Margin="12,7" ClipToBounds="True">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MinWidth="0"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition x:Name="DockStatusColumn" Width="0" MinWidth="0"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Album cover and two clean metadata lines; title receives all free
+                     space at compact widths, instead of being limited to half the footer. -->
+                <Grid Grid.Column="0" MinWidth="0" Margin="0,0,9,0" VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*" MinWidth="0"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Width="38" Height="38" CornerRadius="10" Margin="0,0,11,0" ClipToBounds="True"
+                            Background="{DynamicResource WindowBrush}" BorderBrush="{DynamicResource BorderSoftBrush}"
+                            BorderThickness="1" VerticalAlignment="Center">
+                        <Grid>
+                            <Image Source="Assets/cadence-studio-icon-256.png" Width="31" Height="31" Stretch="Uniform"/>
+                            <Border>
+                                <Border.Background>
+                                    <ImageBrush ImageSource="{Binding NowPlayingArtwork, Converter={StaticResource AlbumArtConverter}}"
+                                                Stretch="UniformToFill"/>
+                                </Border.Background>
+                            </Border>
+                        </Grid>
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" ClipToBounds="True">
+                        <TextBlock Text="{Binding NowPlayingTitle}" FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis"
+                                   TextWrapping="NoWrap" ToolTip="{Binding NowPlayingTitle}"/>
+                        <TextBlock Text="{Binding NowPlayingArtist}" FontSize="11" Margin="0,4,0,0"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- No nested black capsule: the three controls share the same glass dock. -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"
+                            HorizontalAlignment="Center">
+                    <Button Style="{StaticResource VisualizerTransportButtonStyle}" Command="{Binding PreviousCommand}"
+                            ToolTip="Previous track" AutomationProperties.Name="Previous track">
+                        <Path Width="16" Height="16" Stretch="Uniform" Fill="{DynamicResource TextPrimaryBrush}"
+                              Data="M 3,3 L 6,3 L 6,21 L 3,21 Z M 19,3 L 8,12 L 19,21 Z"/>
+                    </Button>
+                    <Button Style="{StaticResource VisualizerHeroPlayButtonStyle}" Command="{Binding TogglePlaybackCommand}"
+                            ToolTip="Play or pause (Space)" AutomationProperties.Name="Play or pause">
+                        <Grid Width="20" Height="20">
+                            <Path Fill="{DynamicResource CadenceOnAccentBrush}" Data="M 6,2 L 23,12 L 6,22 Z">
                                 <Path.Style>
                                     <Style TargetType="Path">
                                         <Setter Property="Visibility" Value="Visible"/>
-                                        <Style.Triggers><DataTrigger Binding="{Binding IsPlaybackPlaying}" Value="True"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsPlaybackPlaying}" Value="True">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
                                     </Style>
                                 </Path.Style>
                             </Path>
-                            <Grid>
+                            <Grid Width="16" Height="19" HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <Grid.Style>
                                     <Style TargetType="Grid">
                                         <Setter Property="Visibility" Value="Collapsed"/>
-                                        <Style.Triggers><DataTrigger Binding="{Binding IsPlaybackPlaying}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsPlaybackPlaying}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
                                     </Style>
                                 </Grid.Style>
-                                <Rectangle Width="7" Height="24" Fill="{DynamicResource AccentTextBrush}" HorizontalAlignment="Left"/>
-                                <Rectangle Width="7" Height="24" Fill="{DynamicResource AccentTextBrush}" HorizontalAlignment="Right"/>
+                                <Rectangle Width="5" RadiusX="1" RadiusY="1" Fill="{DynamicResource CadenceOnAccentBrush}"
+                                           HorizontalAlignment="Left"/>
+                                <Rectangle Width="5" RadiusX="1" RadiusY="1" Fill="{DynamicResource CadenceOnAccentBrush}"
+                                           HorizontalAlignment="Right"/>
                             </Grid>
                         </Grid>
                     </Button>
-                    <Button Style="{StaticResource TransportButtonStyle}" Content="▶" Command="{Binding NextCommand}" Margin="6"/>
+                    <Button Style="{StaticResource VisualizerTransportButtonStyle}" Command="{Binding NextCommand}"
+                            ToolTip="Next track" AutomationProperties.Name="Next track">
+                        <Path Width="16" Height="16" Stretch="Uniform" Fill="{DynamicResource TextPrimaryBrush}"
+                              Data="M 16,3 L 19,3 L 19,21 L 16,21 Z M 5,3 L 16,12 L 5,21 Z"/>
+                    </Button>
                 </StackPanel>
-                <StackPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center">
-                    <TextBlock Text="FULL RANGE • 20 Hz — 20 kHz" Foreground="#AFC8CAD2" FontSize="11" HorizontalAlignment="Right"/>
-                    <TextBlock Text="{Binding WindowVisualizerQualityLabel}" Foreground="{DynamicResource AccentBrush}" FontSize="11" HorizontalAlignment="Right" Margin="0,5,0,0"/>
+
+                <!-- The readout only occupies a third column when there is genuinely
+                     room for it; the resize handler updates its visibility and width. -->
+                <StackPanel x:Name="DockTechnicalStatus" Grid.Column="2" Visibility="Collapsed"
+                            HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,0,3,0"
+                            IsHitTestVisible="False">
+                    <TextBlock Text="20 Hz — 20 kHz" FontSize="10" HorizontalAlignment="Right"
+                               Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    <TextBlock Text="{Binding WindowVisualizerQualityLabel}" FontSize="11"
+                               Margin="0,3,0,0" HorizontalAlignment="Right"
+                               Foreground="{DynamicResource AccentBrush}"/>
                 </StackPanel>
             </Grid>
-        </Border>
-
-
-        <Border x:Name="IdleBadge" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,106" Padding="12,5" CornerRadius="11" Background="#9905080D" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Opacity="0.78" IsHitTestVisible="False">
-            <TextBlock Text="PAUSED • AMBIENT IDLE" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" FontWeight="SemiBold"/>
-            <Border.Style><Style TargetType="Border"><Setter Property="Visibility" Value="Visible"/><Style.Triggers><DataTrigger Binding="{Binding IsPlaybackPlaying}" Value="True"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></Border.Style>
-        </Border>
-        <Border BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1" Opacity="0.62" IsHitTestVisible="False"/>
+        </Grid>
     </Grid>
 </Window>

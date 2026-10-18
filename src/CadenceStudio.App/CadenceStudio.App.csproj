@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <Resource Include="Assets\cadence-studio-icon-256.png" />
+    <Resource Include="Assets\cadence-studio-icon.ico" />
     <Content Include="Assets\cadence-studio.ico" Link="cadence-studio.ico" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>

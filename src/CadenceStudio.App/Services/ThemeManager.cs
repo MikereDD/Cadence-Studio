@@ -165,6 +165,20 @@ public static class ThemeManager
         SetGradient("PremiumAccentButtonHoverBrush", palette.ControlActive, palette.Accent, palette.AccentSoft);
         SetGradient("PremiumMenuBrush", palette.SurfaceRaised, palette.Surface, palette.Window);
         SetTwoStopGradient("PremiumSelectionBrush", palette.AccentSoft, palette.SurfaceHover);
+        // Cadence Universal v1.2: explicitly refresh solid surface brushes.
+        // The overlay replaces the original premium GRADIENTS with SOLID brushes.
+        // SetGradient ignores solids, so without this block previous theme colors survive.
+        RefreshUniversalSolidBrush("WindowDepthBrush", palette.Window);
+        RefreshUniversalSolidBrush("PremiumCardBrush", palette.SurfaceRaised);
+        RefreshUniversalSolidBrush("PremiumCardHoverBrush", palette.SurfaceHover);
+        RefreshUniversalSolidBrush("PremiumButtonBrush", palette.SurfaceRaised);
+        RefreshUniversalSolidBrush("PremiumButtonHoverBrush", palette.SurfaceHover);
+        RefreshUniversalSolidBrush("PremiumButtonPressedBrush", palette.Surface);
+        RefreshUniversalSolidBrush("PremiumAccentButtonBrush", palette.Accent);
+        RefreshUniversalSolidBrush("PremiumAccentButtonHoverBrush", palette.Accent);
+        RefreshUniversalSolidBrush("PremiumMenuBrush", palette.SurfaceRaised);
+        RefreshUniversalSolidBrush("PremiumSelectionBrush", palette.AccentSoft);
+        RefreshUniversalSolidBrush("CadenceOnAccentBrush", palette.Window);
     }
 
     private static ThemePalette Palette(params string[] colors)
@@ -246,6 +260,33 @@ public static class ThemeManager
         {
             SetResourceValue(key, target);
         }
+    }
+
+    // Recolor the winning overlay brush in place, leaving the original gradients alone
+    // when CadenceUniversal.xaml is not loaded. WPF resolves later merged dictionaries
+    // first, so scan in reverse and never replace an earlier hidden definition.
+    private static void RefreshUniversalSolidBrush(string key, Color color)
+    {
+        RefreshUniversalSolidBrushInDictionary(Application.Current.Resources, key, color);
+    }
+
+    private static bool RefreshUniversalSolidBrushInDictionary(ResourceDictionary dictionary, string key, Color color)
+    {
+        for (var i = dictionary.MergedDictionaries.Count - 1; i >= 0; i--)
+        {
+            if (RefreshUniversalSolidBrushInDictionary(dictionary.MergedDictionaries[i], key, color))
+                return true;
+        }
+
+        if (!dictionary.Contains(key) || dictionary[key] is not SolidColorBrush brush)
+            return false;
+
+        if (brush.IsFrozen)
+            dictionary[key] = new SolidColorBrush(color);
+        else
+            brush.Color = color;
+
+        return true;
     }
 
     private static void SetResourceValue(object key, object value)

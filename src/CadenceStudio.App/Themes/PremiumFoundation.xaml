@@ -321,31 +321,8 @@
         <Setter Property="MinHeight" Value="100" />
     </Style>
 
-    <Style x:Key="PremiumComboBoxItemStyle" TargetType="ComboBoxItem">
-        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Padding" Value="12,9" />
-        <Setter Property="Margin" Value="3,2" />
-        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="ComboBoxItem">
-                    <Border x:Name="ItemShell" Background="{TemplateBinding Background}" CornerRadius="10" Padding="{TemplateBinding Padding}" BorderBrush="Transparent" BorderThickness="1">
-                        <Grid>
-                            <Border x:Name="AccentRail" Width="3" HorizontalAlignment="Left" Margin="-7,2,0,2" Background="{DynamicResource AccentBrush}" CornerRadius="2" Opacity="0" />
-                            <ContentPresenter />
-                        </Grid>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsHighlighted" Value="True"><Setter TargetName="ItemShell" Property="Background" Value="{DynamicResource PremiumButtonHoverBrush}"/><Setter TargetName="ItemShell" Property="BorderBrush" Value="{DynamicResource BorderBrush}"/></Trigger>
-                        <Trigger Property="IsSelected" Value="True"><Setter TargetName="ItemShell" Property="Background" Value="{DynamicResource PremiumSelectionBrush}"/><Setter TargetName="ItemShell" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/><Setter TargetName="AccentRail" Property="Opacity" Value="1"/></Trigger>
-                        <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.38"/></Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
+    <Style x:Key="PremiumComboBoxItemStyle" TargetType="ComboBoxItem"
+           BasedOn="{StaticResource CadenceUnifiedComboBoxItemStyle}"/>
 
     <Style x:Key="PremiumComboBoxStyle" TargetType="ComboBox">
         <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
@@ -385,9 +362,9 @@
                             <ToggleButton.Template><ControlTemplate TargetType="ToggleButton"><Border Background="Transparent"/></ControlTemplate></ToggleButton.Template>
                         </ToggleButton>
                         <Popup x:Name="PART_Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Fade">
-                            <Border MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}" MaxHeight="440" Margin="0,7,0,0"
-                                    Background="{DynamicResource PremiumMenuBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="15" Padding="4">
-                                <Border.Effect><DropShadowEffect Color="#000000" BlurRadius="26" ShadowDepth="8" Opacity="0.78"/></Border.Effect>
+                            <Border Style="{StaticResource CadenceMenuChromeStyle}"
+                                    MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                                    MaxHeight="440" Margin="0,7,0,0">
                                 <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><ItemsPresenter/></ScrollViewer>
                             </Border>
                         </Popup>
@@ -407,69 +384,9 @@
     <Style TargetType="ComboBoxItem" BasedOn="{StaticResource PremiumComboBoxItemStyle}" />
 
     <!-- Theme-aware premium popup system shared by visualizer launchers, context menus, and future command menus. -->
-    <Style TargetType="ContextMenu">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
-        <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Padding" Value="0" />
-        <Setter Property="HasDropShadow" Value="False" />
-        <Setter Property="SnapsToDevicePixels" Value="True" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="ContextMenu">
-                    <Grid Margin="8">
-                        <Border CornerRadius="14" Background="#02000000">
-                            <Border.Effect><DropShadowEffect Color="#000000" BlurRadius="28" ShadowDepth="8" Opacity="0.74"/></Border.Effect>
-                        </Border>
-                        <Border x:Name="Chrome" Background="{DynamicResource PremiumMenuBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1.25" CornerRadius="14" Padding="7">
-                            <Grid>
-                                <Border Margin="1" CornerRadius="12" BorderBrush="#26FFFFFF" BorderThickness="1" IsHitTestVisible="False"/>
-                                <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle"/>
-                            </Grid>
-                        </Border>
-                    </Grid>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <Style TargetType="MenuItem">
-        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="BorderBrush" Value="Transparent" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Padding" Value="15,10" />
-        <Setter Property="Margin" Value="2" />
-        <Setter Property="FontFamily" Value="{DynamicResource AppBodyFontFamily}" />
-        <Setter Property="FontSize" Value="12" />
-        <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="MenuItem">
-                    <Border x:Name="ItemChrome" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="9" Padding="{TemplateBinding Padding}">
-                        <Grid MinWidth="165">
-                            <Grid.ColumnDefinitions><ColumnDefinition Width="4"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                            <Border x:Name="AccentRail" Grid.Column="0" Width="3" Margin="0,1,10,1" HorizontalAlignment="Left" Background="{DynamicResource AccentBrush}" CornerRadius="2" Opacity="0"/>
-                            <ContentPresenter Grid.Column="1" ContentSource="Header" RecognizesAccessKey="True" VerticalAlignment="Center"/>
-                            <Path x:Name="SubmenuArrow" Grid.Column="2" Data="M 0 0 L 4 4 L 0 8" Stroke="{DynamicResource TextMutedBrush}" StrokeThickness="1.4" Margin="12,0,2,0" VerticalAlignment="Center" Visibility="Collapsed"/>
-                        </Grid>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="Role" Value="SubmenuHeader"><Setter TargetName="SubmenuArrow" Property="Visibility" Value="Visible"/></Trigger>
-                        <Trigger Property="IsHighlighted" Value="True">
-                            <Setter TargetName="ItemChrome" Property="Background" Value="{DynamicResource PremiumSelectionBrush}"/>
-                            <Setter TargetName="ItemChrome" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
-                            <Setter TargetName="AccentRail" Property="Opacity" Value="1"/>
-                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True"><Setter TargetName="ItemChrome" Property="Background" Value="{DynamicResource PremiumButtonPressedBrush}"/></Trigger>
-                        <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.38"/></Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
+    <!-- Default WPF context menus inherit the exact same chrome/row language. -->
+    <Style TargetType="ContextMenu" BasedOn="{StaticResource CadenceUnifiedContextMenuStyle}"/>
+    <Style TargetType="MenuItem" BasedOn="{StaticResource CadenceUnifiedMenuItemStyle}"/>
 
     <Style TargetType="Separator">
         <Setter Property="Margin" Value="10,6"/>

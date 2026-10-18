@@ -1,0 +1,123 @@
+{
+  "schemaVersion": "1.0",
+  "product": "Cadence Studio",
+  "status": "design-contract-only",
+  "description": "Portable semantic token contract for future WPF, Android, and Linux adapters. The Windows overlay currently reads ThemeManager color resources, not this JSON file.",
+  "source": "CadenceStudio.App/Services/ThemeManager.cs at dev/v1.1, with corrected onAccent token",
+  "shape": {
+    "cardRadius": 13,
+    "buttonRadius": 10,
+    "navRadius": 9,
+    "chipRadius": 9,
+    "searchRadius": 11,
+    "transportShape": "circle"
+  },
+  "type": {
+    "bodyFamily": "Segoe UI Variable Text, Segoe UI",
+    "displayFamily": "Segoe UI Variable Display, Segoe UI",
+    "minimumWeight": "Medium",
+    "bodySizeSp": 13,
+    "navigationSizeSp": 14,
+    "pageTitleSizeSp": 30
+  },
+  "stateRoles": {
+    "hover": "surfaceHover",
+    "checked": "selection",
+    "focusOutline": "accent",
+    "disabledOpacity": 0.4,
+    "activeTransportFill": "accent",
+    "activeTransportForeground": "onAccent"
+  },
+  "palettes": {
+    "obsidian-gold": {
+      "window": "#080807",
+      "sidebar": "#0E0D0A",
+      "surface": "#15130F",
+      "surfaceRaised": "#201C14",
+      "surfaceHover": "#2E281A",
+      "border": "#5A4B2A",
+      "borderSoft": "#302816",
+      "textPrimary": "#FFF8E8",
+      "textSecondary": "#D1C5AA",
+      "textMuted": "#8F8269",
+      "accent": "#D8A84E",
+      "onAccent": "#080807",
+      "selection": "#4A3918"
+    },
+    "dark-monochrome": {
+      "window": "#07090C",
+      "sidebar": "#0B0E13",
+      "surface": "#10141A",
+      "surfaceRaised": "#181E27",
+      "surfaceHover": "#242C38",
+      "border": "#394351",
+      "borderSoft": "#202730",
+      "textPrimary": "#F6F7F9",
+      "textSecondary": "#B9C0CA",
+      "textMuted": "#7D8795",
+      "accent": "#D7DCE4",
+      "onAccent": "#07090C",
+      "selection": "#3B424C"
+    },
+    "oled-black": {
+      "window": "#000000",
+      "sidebar": "#020304",
+      "surface": "#050607",
+      "surfaceRaised": "#0B0E11",
+      "surfaceHover": "#12171C",
+      "border": "#2B323A",
+      "borderSoft": "#11161B",
+      "textPrimary": "#FAFBFC",
+      "textSecondary": "#C2C7CE",
+      "textMuted": "#7C848D",
+      "accent": "#E5E9EE",
+      "onAccent": "#000000",
+      "selection": "#353B42"
+    },
+    "graphite": {
+      "window": "#101215",
+      "sidebar": "#15181C",
+      "surface": "#1B1F24",
+      "surfaceRaised": "#252A31",
+      "surfaceHover": "#303740",
+      "border": "#4A535F",
+      "borderSoft": "#2B3138",
+      "textPrimary": "#F3F4F6",
+      "textSecondary": "#C0C5CC",
+      "textMuted": "#848B95",
+      "accent": "#C2CAD4",
+      "onAccent": "#101215",
+      "selection": "#454B54"
+    },
+    "midnight-indigo": {
+      "window": "#050612",
+      "sidebar": "#080B1C",
+      "surface": "#0D1329",
+      "surfaceRaised": "#161F3D",
+      "surfaceHover": "#24315B",
+      "border": "#4A5790",
+      "borderSoft": "#212B4B",
+      "textPrimary": "#F8F6FF",
+      "textSecondary": "#C9C6EB",
+      "textMuted": "#898DB5",
+      "accent": "#9C8BFF",
+      "onAccent": "#050612",
+      "selection": "#403582"
+    },
+    "aurora-pulse": {
+      "window": "#050B12",
+      "sidebar": "#07101A",
+      "surface": "#0B1723",
+      "surfaceRaised": "#112437",
+      "surfaceHover": "#18364D",
+      "border": "#28506A",
+      "borderSoft": "#142B3B",
+      "textPrimary": "#EFFCFF",
+      "textSecondary": "#A8CFD8",
+      "textMuted": "#6D909A",
+      "accent": "#2AD4C8",
+      "onAccent": "#050B12",
+      "selection": "#164946"
+    }
+  }
+}

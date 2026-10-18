@@ -1,0 +1,12 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- v1.6: same clean menu language as the v1.5 quick-theme switcher,
+         but with a visualizer-specific heading. No player or view-model changes. -->
+    <!-- Same popup chrome and rows as Quick Themes and pop-out preset menu. -->
+    <Style x:Key="CompactVisualizerContextMenuStyle" TargetType="ContextMenu"
+           BasedOn="{StaticResource CadenceUnifiedContextMenuStyle}">
+        <Setter Property="Tag" Value="WINDOW VISUALIZER"/>
+    </Style>
+    <Style x:Key="CompactVisualizerMenuItemStyle" TargetType="MenuItem"
+           BasedOn="{StaticResource CadenceUnifiedMenuItemStyle}"/>
+</ResourceDictionary>

@@ -47,11 +47,11 @@ public sealed partial class MainWindowViewModel
     public string ThemeDescription => CurrentTheme switch
     {
         AppTheme.OledBlack => "True-black surfaces for OLED displays with restrained cool accents.",
-        AppTheme.Graphite => "A softer neutral-gray Studio workspace with reduced contrast.",
-        AppTheme.MidnightIndigo => "Deep indigo glass, luminous violet accents, and richer night-sky depth.",
-        AppTheme.ObsidianGold => "Blackened metal, warm gold illumination, and cinematic luxury inspired by the new visualizer direction.",
-        AppTheme.AuroraPulse => "Deep ocean-black surfaces with electric teal light and cool atmospheric depth.",
-        _ => "The Studio suite signature: layered graphite metal, luminous violet accents, and premium tactile depth."
+        AppTheme.Graphite => "Balanced charcoal surfaces with neutral silver controls and clear separation.",
+        AppTheme.MidnightIndigo => "Midnight blue surfaces with clear violet controls and consistent selection states.",
+        AppTheme.ObsidianGold => "Obsidian-black surfaces, readable warm-gold controls, and restrained selection highlights.",
+        AppTheme.AuroraPulse => "Deep navy surfaces with bright teal controls and clean selection states.",
+        _ => "Dark charcoal surfaces with crisp silver accents and clean, readable controls."
     };
 
     public bool IsDarkMonochromeTheme => CurrentTheme == AppTheme.DarkMonochrome;
