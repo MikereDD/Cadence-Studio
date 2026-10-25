@@ -9,7 +9,13 @@ using CadenceStudio.Core.Updates;
 
 var root = Path.TrimEndingDirectorySeparator(AppContext.BaseDirectory);
 var options = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } };
-var targetVersion = "1.1-dev.999";
+var currentVersion = ProductInfo.InformationalVersion;
+var developmentMarker = currentVersion.IndexOf("-dev.", StringComparison.Ordinal);
+var targetVersion = string.Equals(ProductInfo.UpdateChannel, "stable", StringComparison.Ordinal)
+    ? currentVersion + ".1"
+    : developmentMarker > 0
+        ? currentVersion[..developmentMarker] + "-dev.999999"
+        : currentVersion + "-dev.999999";
 
 if (args.Length > 0 && args[0] == "--update-health" && File.Exists(Path.Combine(root, "fixture-mode")))
 {

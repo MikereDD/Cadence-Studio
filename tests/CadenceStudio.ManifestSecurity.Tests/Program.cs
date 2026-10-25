@@ -51,7 +51,13 @@ Reject(() => ReleaseManifestAuthentication.AuthorizeReleaseKey("cadence-test-rec
 Reject(() => ReleaseManifestAuthentication.AuthorizeReleaseKey("unapproved", "ecdsa-sha256"),
     "unknown remote key identity cannot establish trust");
 
-var candidateVersion = "1.1-dev.999";
+var currentVersion = CadenceStudio.Core.ProductInfo.InformationalVersion;
+var developmentMarker = currentVersion.IndexOf("-dev.", StringComparison.Ordinal);
+var candidateVersion = string.Equals(CadenceStudio.Core.ProductInfo.UpdateChannel, "stable", StringComparison.Ordinal)
+    ? currentVersion + ".1"
+    : developmentMarker > 0
+        ? currentVersion[..developmentMarker] + "-dev.999999"
+        : currentVersion + "-dev.999999";
 var assetName = $"Cadence-Studio-v{candidateVersion}-{UpdateMaterials.Architecture}.zip";
 var baseUrl = $"https://github.com/MikereDD/Cadence-Studio/releases/download/v{candidateVersion}/";
 var validManifest = new ReleaseManifest
@@ -62,10 +68,10 @@ var validManifest = new ReleaseManifest
     DisplayName = "Cadence Studio",
     Platform = "windows",
     Architecture = UpdateMaterials.Architecture,
-    Channel = "development",
+    Channel = CadenceStudio.Core.ProductInfo.UpdateChannel,
     Version = candidateVersion,
     PublishedAt = DateTimeOffset.UtcNow.ToString("O"),
-    MinimumVersion = "1.1-dev.6",
+    MinimumVersion = CadenceStudio.Core.ProductInfo.InformationalVersion,
     UpdaterProtocolVersion = 3,
     MinimumUpdaterProtocolVersion = 3,
     ReleaseNotesUrl = "notes.md",
@@ -80,7 +86,7 @@ var validManifest = new ReleaseManifest
     {
         Supported = true,
         RetainVersions = 1,
-        MinimumRollbackVersion = "1.1-dev.6"
+        MinimumRollbackVersion = CadenceStudio.Core.ProductInfo.InformationalVersion
     },
     Assets =
     [

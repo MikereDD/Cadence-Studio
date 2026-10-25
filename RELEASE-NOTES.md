@@ -1,149 +1,101 @@
-# Cadence Studio v1.1-dev.7 — Development pre-release
+# Cadence Studio v1.1 — Stable Release
 
-This development build moves the updater into a verified temporary runner beside the installation before handing off an update. The running updater can then replace the installed updater files along with the application.
+Cadence Studio v1.1 is the second stable release of the Windows music player. It keeps the local-first playback and library workflow of v1.0 while adding a stronger Windows background-player experience, refined audio and visual behavior, and a hardened signed-update foundation.
 
-## Changes
+## Release model
 
-- Copy the installed updater inventory into a transaction-specific sibling directory and verify each copied file with SHA-256 before launch.
-- Derive the installation path from the runner's location, bind the runner to the transaction ID, and reject unexpected locations, inventory changes, and differing file contents.
-- Preserve updater protocol 3, transaction format 2, independent release verification, one prior-version backup, bounded startup-health confirmation, and rollback behavior.
-- Update application and updater version declarations to `1.1-dev.7` and link the runner-location helper into the signed regression fixture.
+v1.1 is a **manual-install stable release**.
 
-The existing security baseline includes authenticated schema-3 release manifests, retained sequence replay protection, and pinned `cadence-release-2026-01` ECDSA P-256/SHA-256 release signatures.
+The updater foundation remains present and fully regression-tested, but the stable online discovery manifest is intentionally **not published**. Automatic updating is therefore not an approved production delivery path for this release. Users should install or upgrade v1.1 through the published installer or portable packages.
+
+## Highlights
+
+### Windows background player
+
+- Persistent system-tray presence using the Cadence Studio application icon.
+- Closing the main window can send Cadence Studio to the tray while playback continues.
+- Optional minimize-to-tray behavior.
+- Tray controls for Open, Exit, Previous, Play/Pause, and Next.
+- Current-track tray tooltip text.
+- Improved single-instance behavior so relaunching Cadence Studio restores the existing window.
+
+### Media keys and startup
+
+- Global Previous, Play/Pause, Stop, and Next hardware-media-key handling while Cadence Studio is visible, minimized, or hidden.
+- Nonfatal registration when another application already owns an individual media key.
+- Optional **Start Cadence with Windows** preference.
+- Per-user Windows startup registration with no administrator requirement.
+
+### Audio and visual refinements
+
+- Improved equalizer headroom and filter-state behavior.
+- Player-volume isolation from unrelated audio state.
+- Responsive Now Playing and visualizer layout improvements.
+- Corrected mirrored waveform direction and horizon baseline behavior.
+- Refreshed public screenshots representing the current v1.1 interface.
+
+### Update-security foundation
+
+The v1.1 development cycle established and qualified:
+
+- Authenticated schema-3 release manifests.
+- Positive manifest sequencing with retained replay protection.
+- Pinned Cadence release signing identity and detached ECDSA signatures.
+- Independent application/updater release verification.
+- Strict package identity, path, archive, hash, and signature validation.
+- One known-good backup.
+- Bounded startup-health confirmation.
+- Rollback on failed replacement or failed health confirmation.
+- Transaction-specific staged updater runners with copied-file SHA-256 verification.
+
+These mechanisms remain dormant for public delivery until a stable online discovery manifest is intentionally published and the live automatic-update path is separately approved.
 
 ## Packages
 
-- Windows x64 self-contained portable ZIP, including the .NET runtime.
-- Windows x64 framework-dependent portable ZIP, requiring the .NET 8 Windows Desktop Runtime.
-- Per-user Windows x64 installer.
-- Canonically named self-contained updater payload: `Cadence-Studio-v1.1-dev.7-win-x64.zip`.
+The stable v1.1 release pipeline produces:
 
-Detached release signatures use the pinned Cadence release identity. These signatures are separate from Windows Authenticode publisher signing.
+- `CadenceStudio-1.1-win-x64-self-contained-portable.zip`
+- `CadenceStudio-1.1-win-x64-framework-dependent-portable.zip`
+- `CadenceStudio-1.1-win-x64-Setup.exe`
 
-## Development limitations
+SHA-256 checksum sidecars are produced and verified by the packaging workflow.
 
-- Creating the runner requires write access beside the installation directory. Transaction-specific runner directories are retained after execution; automatic runner cleanup is not included in this increment.
-- The staged copy expects the normal published updater inventory. Added empty directories in the installed updater can cause inventory validation to reject the handoff.
-- This remains a development pre-release. Local packaging and automated qualification do not establish that the final packaged WPF application has completed an interactive Windows Sandbox update.
+The self-contained portable package includes the .NET runtime. The framework-dependent package requires the .NET 8 Windows Desktop Runtime. The installer is per-user and preserves `%LOCALAPPDATA%\CadenceStudio` across upgrades and uninstall.
 
 ## Qualification
 
-The Release regression run on NETZACH on October 18, 2026 passed with 0 build errors and 88 warnings: 18 manifest security/replay checks, 101 signed security/integration checks, and 57 top-level checks. All 30 signed-install scenarios proved the final or restored executable hash. The full log and separate staged-runner qualification evidence accompany the prepared release files.
+The stable-promotion Release qualification on NETZACH on October 25, 2026 completed with:
 
-Publication requires owner approval. No release tag, source commit for these working-tree changes, or published discovery manifest is implied by this local package preparation.
+- 100 analyzer warnings and **0 build errors**.
+- **18/18** manifest security and replay checks.
+- **56/56** updater transaction regression checks.
+- **101/101** signed security/integration checks.
+- **57/57** top-level updater checks.
 
----
+The negative updater cases intentionally produced rejection messages for tampered hashes, signatures, identities, paths, packages, version transitions, reparse points, and protocol mismatches. Those expected rejections are part of the passing security suite.
 
-## v1.1-dev.5
+Before stable promotion, the packaged v1.1-dev.7 self-contained portable build and per-user installer were also manually exercised on NETZACH. The packaged application launched correctly, restored the existing library and queue, rendered artwork and visualizers, played audio, preserved user state, and the installer ran from the expected `%LOCALAPPDATA%\Programs\Cadence Studio` path.
 
-The update transaction foundation now supports verified downloads, independent updater verification, safe extraction, one prior-version backup, bounded replacement, final hashes, validated restart and rollback of failed replacement.
+Final stable `1.1` packages are produced only after this promotion metadata and documentation are in place, then receive the final package smoke test before publication.
 
-Production updates fail closed until the release public key is provisioned. See `docs/UPDATER-DEV5.md` for build, tests, key setup and runtime steps. No startup-health handshake is implemented in this increment.
+## Automatic updates
 
-# Cadence Studio v1.1-dev.3 — Development Build
+No `updates/stable/release-manifest.json` is published for v1.1.
 
-## v1.1-dev.4 — Separate updater and staging transactions
+The About-dialog update check therefore remains a safe no-manifest path rather than initiating an automatic update. This is intentional for the v1.1 stable release.
 
-- Added a separate CadenceStudio.Updater executable with a dry-run-only command contract.
-- Added randomized local-app-data staging, strict transaction/path validation, process identity checks and already-exited handling.
-- Added transaction state logging, exclusive active leases and conservative abandoned-staging cleanup.
-- Added the About-dialog test handoff, including an explicitly synthetic offline test when no update is eligible.
-- Included updater build/publish wiring and 37 automated regression checks.
-- Preserved discovery behavior. No payload download, signature verification, installed-file replacement or rollback is enabled.
-- See docs/UPDATER-TRANSACTIONS.md for exact build/runtime tests and validation limits.
+## User data
 
-
-The third v1.1 development increment establishes the read-only updater discovery foundation. Cadence Studio can now perform a user-initiated check against a pinned, approved HTTPS manifest endpoint and strictly validate release identity, channel, architecture, manifest schema, numeric version ordering, source metadata, payload metadata, detached-signature metadata, rollback policy, and updater-protocol compatibility before declaring an update eligible.
-
-## Added in dev.3
-
-- Canonical Typezer∅ release-manifest revision 2 data model.
-- Strict rejection of unknown JSON properties.
-- Cadence-specific manifest validation for:
-  - `appId`, product name, Windows platform, architecture, and channel;
-  - Stable/development version grammar and numeric multi-part comparison;
-  - source repository, exact `v<version>` tag, and full commit identifier;
-  - canonical updater payload filename;
-  - exact asset size/hash metadata;
-  - detached-signature metadata and pinned-key fingerprint metadata shape;
-  - Windows rollback policy retaining one known-good version;
-  - updater protocol compatibility and direct-update minimum version.
-- Approved development manifest endpoint pinned to the Cadence Studio GitHub repository over HTTPS.
-- 256 KiB manifest size ceiling and bounded network timeout.
-- A manual **Check for updates** control in About.
-- Clear dev.3 boundary: discovery and compatibility checks only.
-
-## Intentionally not implemented yet
-
-v1.1-dev.3 does **not** download release payloads, create staging transactions, verify actual downloaded hashes/signatures, launch a separate updater, replace installed files, perform startup-health confirmation, or roll back. Those operations belong to the later updater increments.
-
-Until a development manifest is published at the approved endpoint, the expected runtime result is a clean **No development update manifest is published...** message rather than a failure or crash.
-
-The tray lifecycle, media keys, and optional Start with Windows behavior from dev.1 and dev.2 are retained.
-
-This is a development build and is not the stable v1.0 release.
-
----
-
-# Cadence Studio v1.0 — Stable Release
-
-Cadence Studio v1.0 is the first stable release of the modern Windows music player. It preserves the direct, local workflow of Cadence Classic while delivering a separate C#, WPF, XAML, and MVVM application with premium presentation, reliable playback, deep library tools, and a complete release pipeline.
-
-## Validated release experience
-
-- Per-user Windows installer with Start Menu integration and optional desktop shortcut.
-- Self-contained and framework-dependent portable packages.
-- Upgrade-safe user data stored outside the installation directory.
-- Automatic Inno Setup discovery, artifact verification, release manifests, and SHA-256 checksums.
-- Successful portable launch, installed launch, library restoration, queue restoration, artwork, lyrics, playback, themes, and detached visualizer validation.
-
-## Included product experience
-
-- Local Library indexing with real folder hierarchy and cached startup.
-- Queue and playlist management with persistent session state.
-- Compact and expanded Now Playing workspaces.
-- Live embedded spectrum and detached Window Visualizer presets.
-- Six isolated themes and three typography profiles with adjustable text sizing.
-- Real-time equalizer, artwork enrichment, lyrics, artist information, and global search.
-- Single-track and album Metadata Workshops with review, backup, selective writes, and verification.
-- Song-change notifications, keyboard shortcuts, diagnostics, logs, cache access, and About information.
-
-## Final v1.0 polish
-
-- Improved compact Queue filename readability.
-- Simplified finished-product wording throughout the interface.
-- Updated the main brand subtitle to **Audio Experience**.
-- Updated release-stage badges to **Stable Release**.
-- Finalized README and changelog organization.
-
-## Build commands
-
-Portable packages only:
-
-```powershell
-.\packaging\New-Release.ps1 -SkipInstaller
-```
-
-Complete release set:
-
-```powershell
-.\packaging\New-Release.ps1
-```
-
-Artifacts are written to:
-
-```text
-artifacts\release\1.0
-```
-
-User data remains under:
+Cadence Studio user data remains under:
 
 ```text
 %LOCALAPPDATA%\CadenceStudio
 ```
 
-Uninstalling Cadence Studio removes the application and shortcuts while intentionally preserving that user-data directory.
+Uninstalling or upgrading the application intentionally preserves this directory.
 
-## Final release presentation
+---
 
-The public v1.0 repository uses the final Cadence Studio application icon across the app, installer, and README. Release binaries are distributed through GitHub Releases rather than stored in source control.
+# Cadence Studio v1.0 — Stable Release
+
+Cadence Studio v1.0 was the first stable standalone release of the modern Windows music player. It established the local-first library, queue and playlist workflow, metadata tools, visualizer suite, theme system, equalizer, notifications, packaging pipeline, and per-user installer that v1.1 builds upon.

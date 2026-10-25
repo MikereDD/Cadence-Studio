@@ -1,3 +1,20 @@
+# Changelog
+
+All notable Cadence Studio changes are recorded here in reverse chronological order. Repeated micro-build entries from the development cycle are consolidated under their final milestone versions for clarity.
+
+## v1.1 — Stable release
+
+- Promoted the validated v1.1 development line to the second stable Cadence Studio release.
+- Added persistent Windows system-tray/background-player behavior and improved single-instance restoration.
+- Added global hardware-media-key support and optional per-user Start with Windows integration.
+- Improved equalizer headroom, filter state, and player-volume isolation.
+- Refined responsive Now Playing and detached visualizer rendering, including waveform direction and horizon-baseline corrections.
+- Preserved the signed-update security foundation: schema-3 authenticated manifests, replay protection, strict signed-package validation, startup-health confirmation, rollback, and staged updater runners.
+- Kept automatic update discovery intentionally unpublished for v1.1; stable delivery remains installer/portable manual installation.
+- Promoted version/channel metadata to `1.1` / `stable`, corrected installer file metadata to `1.1.0.0`, and made packaged update identity derive its channel from the release version.
+- Qualified the stable promotion with 0 build errors, 18 manifest security/replay checks, 56 updater transaction checks, 101 signed security/integration checks, and 57 top-level checks.
+- Updated README, release notes, changelog, and refreshed application screenshots for the stable release.
+
 ## v1.1-dev.7 — Verified staged updater runner
 
 - Stage and hash-check a transaction-specific updater beside the installation before the application exits, allowing installed updater files to be replaced.
@@ -15,8 +32,6 @@
 - Keep the dry-run workflow and add isolated signed executable fixtures to the existing harness.
 - Production trust anchor intentionally unprovisioned pending owner-generated release key. Startup health remains dev.6.
 
-# Changelog
-
 ## v1.1-dev.4 — Separate updater and staging transactions
 
 - Added a separate CadenceStudio.Updater executable with a dry-run-only command contract.
@@ -27,8 +42,6 @@
 - Preserved discovery behavior. No payload download, signature verification, installed-file replacement or rollback is enabled.
 - See docs/UPDATER-TRANSACTIONS.md for exact build/runtime tests and validation limits.
 
-
-All notable Cadence Studio changes are recorded here in reverse chronological order. Repeated micro-build entries from the development cycle have been consolidated under their final milestone versions for clarity.
 ## v1.1-dev.3 — Updater discovery foundation
 
 - Added the Typezer∅ release-manifest revision 2 model and strict manifest validation.
@@ -64,7 +77,6 @@ All notable Cadence Studio changes are recorded here in reverse chronological or
 - Adopted the final Cadence Studio application icon across the executable, installer, About UI, and README branding.
 - Prepared the standalone public repository for GitHub Releases by removing tracked release binaries and ignoring generated `release/` and `artifacts/` output.
 - Updated public project metadata and enrichment user-agent references for the standalone Cadence Studio repository.
-
 - Promoted the validated v1.0 release candidate to the first stable Cadence Studio release.
 - Replaced release-candidate interface badges with **Stable Release**.
 - Finalized product versioning, README presentation, release notes, installer metadata, and packaging output for v1.0.
@@ -341,4 +353,3 @@ All notable Cadence Studio changes are recorded here in reverse chronological or
 ## v1.0-dev.7 — Equalizer and audio processing
 
 - Added the real-time 10-band equalizer, preamp, presets, custom profile, and headroom protection.
-

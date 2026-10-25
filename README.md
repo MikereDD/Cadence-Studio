@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.0-b8872c" alt="Version 1.0">
+  <img src="https://img.shields.io/badge/version-1.1-b8872c" alt="Version 1.1">
   <img src="https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-555b66" alt="Windows 10 and 11">
   <img src="https://img.shields.io/badge/.NET-8-555b66" alt=".NET 8">
   <img src="https://img.shields.io/badge/audio-NAudio%202.3.0-555b66" alt="NAudio 2.3.0">
@@ -29,11 +29,13 @@
 
 ---
 
-## Cadence Studio v1.0
+## Cadence Studio v1.1
 
 Cadence Studio is a modern Windows music player focused on dependable local playback, expressive visuals, strong metadata tools, and a carefully designed desktop experience.
 
-The first stable release was promoted only after installer, portable-package, upgrade, persistence, long-session playback, visualizer, recovery, and uninstall validation passed through the release-candidate cycle.
+v1.1 builds on the first stable release with persistent background playback in the Windows system tray, global hardware-media-key support, optional per-user Start with Windows integration, audio-state refinements, responsive Now Playing and visualizer improvements, and a hardened signed-update foundation.
+
+**v1.1 is distributed as a manual-install stable release. Automatic update discovery remains unpublished and disabled as a production delivery path.**
 
 Cadence Studio is separate from **Cadence Classic**, the original PowerShell/WinForms application. Both projects retain independent codebases, settings, release histories, and development paths.
 
@@ -64,15 +66,20 @@ Cadence Studio is separate from **Cadence Classic**, the original PowerShell/Win
 - Local music-library indexing with real folder hierarchy and fast cached startup.
 - NAudio playback with seek, volume, shuffle, repeat, queue management, and clean shutdown.
 - Persistent queue, playlists, playback position, workspace, window state, and appearance settings.
+- Background playback through the Windows system tray with Open, Exit, Previous, Play/Pause, and Next controls.
+- Global hardware-media-key support while Cadence Studio is visible, minimized, or hidden in the tray.
+- Optional per-user **Start Cadence with Windows** integration.
 - M3U and M3U8 playlist import and export.
 - Global Library search across artists, albums, tracks, and genres.
 
 ### Audio and visualization
 
 - Real-time 10-band equalizer with presets, preamp, custom profiles, and headroom protection.
+- Player-volume isolation and filter-state improvements introduced during the v1.1 cycle.
 - Full-spectrum FFT visualizers with multiple densities, palettes, response controls, and reduced-motion support.
-- Compact and expanded Now Playing workspaces.
+- Compact and expanded Now Playing workspaces with responsive layout behavior.
 - Detached Window Visualizer with **Celestial Resonance**, **Aurora Cascade**, **Glass Horizon**, and **Infinite Windows** presets.
+- Corrected mirrored waveform direction and horizon baseline behavior.
 - Song-change notifications with artwork, progress, and playback controls.
 
 ### Metadata and enrichment
@@ -95,6 +102,8 @@ Cadence Studio is separate from **Cadence Classic**, the original PowerShell/Win
 ### Download a release
 
 Prebuilt installers and portable packages are published through [**GitHub Releases**](https://github.com/MikereDD/Cadence-Studio/releases). Release binaries are intentionally kept out of the source repository.
+
+v1.1 uses manual installation. The signed updater foundation remains in the codebase, but no stable online discovery manifest is published for automatic updates.
 
 ### Windows installer
 
@@ -180,12 +189,11 @@ Online enrichment is optional. Playback, local indexing, playlists, local metada
 
 Cadence Studio aims for **controlled spectacle rather than clutter**: layered depth, tactile controls, expressive visualizers, strong typography, and clear hierarchy without sacrificing reliability, performance, or accessibility.
 
-Stable v1.0 is a quality gate, not a schedule target. The application reached stable status only after fresh-install, upgrade, persistence, recovery, performance, long-playback, portable-package, installer, and uninstall validation passed.
+Stable releases are quality gates, not schedule targets. v1.1 was promoted only after Release-build qualification, manifest/replay security checks, updater transaction regression tests, signed integration tests, and manual packaged-application validation of the preceding development build.
 
 ## Documentation
 
 - [GitHub Releases](https://github.com/MikereDD/Cadence-Studio/releases)
-- [v1.0 Validation Plan](RC-TEST-PLAN.md)
 - [Testing Notes](TESTING.md)
 - [Architecture](ARCHITECTURE.md)
 - [Packaging Documentation](docs/PACKAGING.md)

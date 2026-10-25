@@ -36,7 +36,7 @@ CloseApplications=yes
 RestartApplications=no
 ArchitecturesAllowed=x64compatible arm64
 ChangesAssociations=no
-VersionInfoVersion=1.0.0.0
+VersionInfoVersion=1.1.0.0
 VersionInfoProductName={#MyAppName}
 VersionInfoDescription=Cadence Studio installer
 
