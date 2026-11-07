@@ -467,7 +467,7 @@
                         <Ellipse x:Name="Outer" Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="{TemplateBinding BorderThickness}"/>
                         <Ellipse Margin="4" Stroke="#38FFFFFF" StrokeThickness="1"/>
                         <Ellipse Margin="7" Opacity="0.20"><Ellipse.Fill><RadialGradientBrush Center="0.35,0.25" GradientOrigin="0.32,0.20" RadiusX="0.8" RadiusY="0.8"><GradientStop Color="#FFFFFFFF" Offset="0"/><GradientStop Color="#00FFFFFF" Offset="1"/></RadialGradientBrush></Ellipse.Fill></Ellipse>
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,3,0,0" TextElement.FontFamily="Segoe UI Symbol" TextElement.FontSize="{TemplateBinding FontSize}" TextElement.FontWeight="SemiBold" TextElement.Foreground="{TemplateBinding Foreground}"/>
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.FontFamily="Segoe UI Symbol" TextElement.FontSize="{TemplateBinding FontSize}" TextElement.FontWeight="SemiBold" TextElement.Foreground="{TemplateBinding Foreground}"/>
                         <Ellipse x:Name="FocusHalo" Margin="-3" Stroke="{DynamicResource AccentBrush}" StrokeThickness="1.6" Opacity="0"/>
                     </Grid>
                     <ControlTemplate.Triggers>
@@ -500,7 +500,7 @@
                         <Ellipse Margin="4" Stroke="#58FFFFFF" StrokeThickness="1"/>
                         <Ellipse Margin="7" Opacity="0.24"><Ellipse.Fill><RadialGradientBrush Center="0.34,0.22" GradientOrigin="0.30,0.18" RadiusX="0.82" RadiusY="0.82"><GradientStop Color="#FFFFFFFF" Offset="0"/><GradientStop Color="#00FFFFFF" Offset="1"/></RadialGradientBrush></Ellipse.Fill></Ellipse>
                         <Grid Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <Path x:Name="PlayIcon" Data="M 4,2 L 4,30 L 29,16 Z" Fill="{TemplateBinding Foreground}" Stretch="Uniform" Margin="2,1,0,1"/>
+                            <Path x:Name="PlayIcon" Data="M 4,2 L 4,30 L 29,16 Z" Fill="{TemplateBinding Foreground}" Stretch="Uniform" Margin="1,0,0,0"/>
                             <Grid x:Name="PauseIcon" Visibility="Collapsed" Width="28" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="10"/><ColumnDefinition Width="8"/><ColumnDefinition Width="10"/></Grid.ColumnDefinitions>
                                 <Rectangle Grid.Column="0" RadiusX="2" RadiusY="2" Fill="{TemplateBinding Foreground}"/>
@@ -524,13 +524,13 @@
     <Style x:Key="HeroTransportButtonStyle" TargetType="Button" BasedOn="{StaticResource TransportButtonStyle}"><Setter Property="Width" Value="54"/><Setter Property="Height" Value="54"/><Setter Property="FontSize" Value="19"/></Style>
     <Style x:Key="HeroPlayButtonStyle" TargetType="Button" BasedOn="{StaticResource PlayButtonStyle}"><Setter Property="Width" Value="80"/><Setter Property="Height" Value="80"/><Setter Property="FontSize" Value="31"/></Style>
     <Style x:Key="TreeActionButtonStyle" TargetType="Button" BasedOn="{StaticResource PillButtonStyle}">
-        <Setter Property="Width" Value="34"/>
-        <Setter Property="Height" Value="30"/>
+        <Setter Property="Width" Value="32"/>
+        <Setter Property="Height" Value="32"/>
         <Setter Property="Padding" Value="0"/>
         <Setter Property="Margin" Value="5,0,0,0"/>
         <Setter Property="FontFamily" Value="Segoe UI Symbol"/>
-        <Setter Property="FontSize" Value="13"/>
-        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
     </Style>
     <Style x:Key="FocusModeButtonStyle" TargetType="Button" BasedOn="{StaticResource PillButtonStyle}"><Setter Property="Padding" Value="12,7"/><Setter Property="FontSize" Value="11"/></Style>
     <Style x:Key="HeroMetadataChipStyle" TargetType="Border"><Setter Property="Background" Value="{DynamicResource PremiumButtonBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/><Setter Property="BorderThickness" Value="1"/><Setter Property="CornerRadius" Value="11"/><Setter Property="Padding" Value="10,6"/><Setter Property="Margin" Value="0,0,8,8"/></Style>

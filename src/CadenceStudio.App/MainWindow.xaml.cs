@@ -457,10 +457,7 @@ public partial class MainWindow : Window
         PlayerDockControlsGrid.Margin = new Thickness(dockWidth < 1120d ? 8d : 20d, 0d,
             dockWidth < 1120d ? 8d : 20d, 0d);
         var shortDock = dockWidth < 950d;
-        DockRepeatText.Visibility = shortDock ? Visibility.Collapsed : Visibility.Visible;
-        DockShuffleText.Visibility = shortDock ? Visibility.Collapsed : Visibility.Visible;
-
-        // Expanded stage keeps artwork and title balanced at normal-window sizes.
+// Expanded stage keeps artwork and title balanced at normal-window sizes.
         var availableExpandedStageWidth = workspaceWidth - (_expandedInsightsDocked
             ? ExpandedEnrichmentPanelColumn.Width.Value + 18d : 0d) - 44d;
         // Restored windows often have nearly the same height as maximized ones,
