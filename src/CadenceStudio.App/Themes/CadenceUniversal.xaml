@@ -73,12 +73,24 @@
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             Padding="{TemplateBinding Padding}" CornerRadius="10">
-                        <ContentPresenter RecognizesAccessKey="True"
+                        <ContentPresenter x:Name="PillContent" RecognizesAccessKey="True"
                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                                          TextElement.Foreground="{TemplateBinding Foreground}">
+                            <ContentPresenter.RenderTransform>
+                                <TranslateTransform Y="-1" />
+                            </ContentPresenter.RenderTransform>
+                        </ContentPresenter>
                     </Border>
                     <ControlTemplate.Triggers>
+                        <!-- Tree action glyphs keep exact geometrical centering. -->
+                        <Trigger Property="Tag" Value="CadenceIconAction">
+                            <Setter TargetName="PillContent" Property="RenderTransform">
+                                <Setter.Value>
+                                    <TranslateTransform Y="0" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Shell" Property="Background" Value="{DynamicResource PremiumButtonHoverBrush}" />
                             <Setter TargetName="Shell" Property="BorderBrush" Value="{DynamicResource ControlActiveBrush}" />
@@ -111,7 +123,11 @@
                             BorderThickness="{TemplateBinding BorderThickness}"
                             Padding="{TemplateBinding Padding}" CornerRadius="10">
                         <ContentPresenter RecognizesAccessKey="True" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                                          TextElement.Foreground="{TemplateBinding Foreground}">
+                            <ContentPresenter.RenderTransform>
+                                <TranslateTransform Y="-1" />
+                            </ContentPresenter.RenderTransform>
+                        </ContentPresenter>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
@@ -147,6 +163,7 @@
         <Setter Property="IsHitTestVisible" Value="False" />
     </Style>
     <Style x:Key="TreeActionButtonStyle" TargetType="Button" BasedOn="{StaticResource PillButtonStyle}">
+        <Setter Property="Tag" Value="CadenceIconAction" />
         <Setter Property="Width" Value="32" />
         <Setter Property="Height" Value="32" />
         <Setter Property="Padding" Value="0" />
@@ -166,14 +183,15 @@
         </Style.Triggers>
     </Style>
 
-    <!-- v5: exact shared icon-button shell for Music Library + Queue. -->
-    <Style x:Key="MediaRowIconButtonStyle" TargetType="Button">
-        <Setter Property="Width" Value="32" />
-        <Setter Property="Height" Value="32" />
-        <Setter Property="Padding" Value="0" />
-        <Setter Property="Margin" Value="4,0,0,0" />
-        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <!-- v8: consistent, text-first utility actions; existing icon/transport shells stay unchanged. -->
+    <Style x:Key="StudioUtilityButtonBaseStyle" TargetType="Button">
+        <Setter Property="FontFamily" Value="{DynamicResource AppBodyFontFamily}" />
+        <Setter Property="FontSize" Value="{DynamicResource AppControlFontSize}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Padding" Value="12,6" />
         <Setter Property="Background" Value="{DynamicResource PremiumButtonBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Cursor" Value="Hand" />
@@ -184,28 +202,35 @@
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="Shell"
-                            Width="{TemplateBinding Width}"
-                            Height="{TemplateBinding Height}"
-                            CornerRadius="10"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}">
-                        <ContentPresenter HorizontalAlignment="Center"
-                                          VerticalAlignment="Center"
-                                          RecognizesAccessKey="False"
-                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Padding="{TemplateBinding Padding}"
+                            CornerRadius="10"
+                            SnapsToDevicePixels="True"
+                            RenderTransformOrigin="0.5,0.5">
+                        <ContentPresenter RecognizesAccessKey="True"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          TextElement.Foreground="{TemplateBinding Foreground}">
+                            <ContentPresenter.RenderTransform>
+                                <TranslateTransform Y="-1" />
+                            </ContentPresenter.RenderTransform>
+                        </ContentPresenter>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Shell" Property="Background" Value="{DynamicResource PremiumButtonHoverBrush}" />
-                            <Setter TargetName="Shell" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                            <Setter TargetName="Shell" Property="Opacity" Value="0.96" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Shell" Property="Background" Value="{DynamicResource PremiumButtonPressedBrush}" />
-                            <Setter TargetName="Shell" Property="Opacity" Value="0.86" />
+                            <Setter TargetName="Shell" Property="Opacity" Value="0.82" />
+                            <Setter TargetName="Shell" Property="RenderTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleX="0.97" ScaleY="0.97" />
+                                </Setter.Value>
+                            </Setter>
                         </Trigger>
                         <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Setter TargetName="Shell" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
                             <Setter TargetName="Shell" Property="BorderThickness" Value="2" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
@@ -217,15 +242,150 @@
         </Setter>
     </Style>
 
-    <Style x:Key="MediaRowDestructiveIconButtonStyle"
-           TargetType="Button"
-           BasedOn="{StaticResource MediaRowIconButtonStyle}">
+    <Style x:Key="StudioUtilityButtonStyle" TargetType="Button"
+           BasedOn="{StaticResource StudioUtilityButtonBaseStyle}">
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource PremiumButtonHoverBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="StudioUtilityPrimaryButtonStyle" TargetType="Button"
+           BasedOn="{StaticResource StudioUtilityButtonBaseStyle}">
+        <!-- v8.1: dark idle and disabled shells, never a light accent fill. -->
+        <Setter Property="Background" Value="{DynamicResource PremiumButtonBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource PremiumButtonHoverBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource PremiumButtonPressedBrush}" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{DynamicResource PremiumButtonBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="StudioUtilityDangerButtonStyle" TargetType="Button"
+           BasedOn="{StaticResource StudioUtilityButtonBaseStyle}">
+        <!-- Destructive actions stay calm until hovered or keyboard-focused. -->
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource PremiumButtonHoverBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource DangerBrush}" />
                 <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
             </Trigger>
             <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource DangerBrush}" />
                 <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="StudioUtilityCompactButtonStyle" TargetType="Button"
+           BasedOn="{StaticResource StudioUtilityButtonStyle}">
+        <Setter Property="MinHeight" Value="28" />
+        <Setter Property="Padding" Value="10,4" />
+        <Setter Property="FontSize" Value="11" />
+    </Style>
+    <Style x:Key="StudioUtilityCompactDangerButtonStyle" TargetType="Button"
+           BasedOn="{StaticResource StudioUtilityDangerButtonStyle}">
+        <Setter Property="MinHeight" Value="28" />
+        <Setter Property="Padding" Value="10,4" />
+        <Setter Property="FontSize" Value="11" />
+    </Style>
+
+    <!-- v5: exact shared icon-button shell for Music Library + Queue. -->
+    <!-- v8.1: miniature transport family for all library/queue row actions.
+         Retain icon vectors and command bindings from MainWindow.xaml. -->
+    <Style x:Key="MediaRowIconButtonStyle" TargetType="Button">
+        <Setter Property="Width" Value="34" />
+        <Setter Property="Height" Value="34" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="4,0,0,0" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="Background" Value="{DynamicResource PremiumButtonBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Shell"
+                            CornerRadius="12"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            SnapsToDevicePixels="True"
+                            RenderTransformOrigin="0.5,0.5">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          RecognizesAccessKey="False"
+                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Shell" Property="Background" Value="{DynamicResource PremiumButtonHoverBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Shell" Property="Background" Value="{DynamicResource PremiumButtonPressedBrush}" />
+                            <Setter TargetName="Shell" Property="RenderTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleX="0.95" ScaleY="0.95" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Shell" Property="BorderThickness" Value="2" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Shell" Property="Opacity" Value="0.40" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="MediaRowDestructiveIconButtonStyle"
+           TargetType="Button"
+           BasedOn="{StaticResource MediaRowIconButtonStyle}">
+        <!-- Shared transport shell, red emphasis only for destructive intent. -->
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource DangerBrush}" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource DangerBrush}" />
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -257,7 +417,11 @@
                             BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
                             Padding="{TemplateBinding Padding}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
-                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                                          TextElement.Foreground="{TemplateBinding Foreground}">
+                            <ContentPresenter.RenderTransform>
+                                <TranslateTransform Y="-1" />
+                            </ContentPresenter.RenderTransform>
+                        </ContentPresenter>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
@@ -305,7 +469,11 @@
                             BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
                             Padding="{TemplateBinding Padding}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
-                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                                          TextElement.Foreground="{TemplateBinding Foreground}">
+                            <ContentPresenter.RenderTransform>
+                                <TranslateTransform Y="-1" />
+                            </ContentPresenter.RenderTransform>
+                        </ContentPresenter>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">

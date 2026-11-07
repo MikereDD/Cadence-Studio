@@ -451,12 +451,12 @@
                                             <Run Text="{Binding LibraryFolderCountText, Mode=OneWay}" />
                                         </TextBlock>
                                     </StackPanel>
-                                    <Button Grid.Column="1" Style="{StaticResource PillButtonStyle}" Padding="10,7"
+                                    <Button Grid.Column="1" Style="{StaticResource StudioUtilityButtonStyle}"
                                             Content="Root" Command="{Binding AddLibraryRootCommand}" ToolTip="Add library root" />
-                                    <Button Grid.Column="3" Style="{StaticResource AccentPillButtonStyle}" Padding="11,7"
+                                    <Button Grid.Column="3" Style="{StaticResource StudioUtilityPrimaryButtonStyle}"
                                             Content="Scan" Command="{Binding ScanLibraryCommand}" ToolTip="Rescan saved roots"
                                             Visibility="{Binding IsLibraryIdle, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                    <Button Grid.Column="3" Style="{StaticResource PillButtonStyle}" Padding="11,7"
+                                    <Button Grid.Column="3" Style="{StaticResource StudioUtilityDangerButtonStyle}"
                                             Content="Cancel scan" Command="{Binding CancelLibraryScanCommand}" ToolTip="Stop the active library scan"
                                             Visibility="{Binding IsLibraryScanning, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                 </Grid>
@@ -635,7 +635,7 @@
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="{Binding LibraryLastScanText}" Style="{StaticResource CaptionStyle}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                                    <Button Grid.Column="1" Style="{StaticResource PillButtonStyle}" Padding="10,6" Content="Remove root" Command="{Binding RemoveLibraryRootCommand}" />
+                                    <Button Grid.Column="1" Style="{StaticResource StudioUtilityCompactDangerButtonStyle}" Content="Remove root" Command="{Binding RemoveLibraryRootCommand}" ToolTip="Remove the selected library root" />
                                 </Grid>
                             </Grid>
                         </Border>
@@ -1185,7 +1185,7 @@
                                                             <TextBlock Text="Up next" FontSize="15" FontWeight="SemiBold" />
                                                             <TextBlock Text="{Binding QueueCountText}" Style="{StaticResource CaptionStyle}" Margin="10,2,0,0" />
                                                         </StackPanel>
-                                                        <Button Grid.Column="1" Style="{StaticResource UtilityPillButtonStyle}" Content="Clear" Command="{Binding ClearQueueCommand}" Padding="11,5" />
+                                                        <Button Grid.Column="1" Style="{StaticResource StudioUtilityCompactDangerButtonStyle}" Content="Clear" Command="{Binding ClearQueueCommand}" ToolTip="Clear the queue" />
                                                     </Grid>
 
                                                     <Grid Grid.Row="2">
@@ -1332,7 +1332,7 @@
                                         <TextBlock Text="Queue" Style="{StaticResource PanelTitleStyle}" />
                                         <TextBlock Text="{Binding QueueVisibleCountText}" Style="{StaticResource CaptionStyle}" Margin="0,4,0,0" />
                                     </StackPanel>
-                                    <Button Grid.Column="1" Style="{StaticResource UtilityPillButtonStyle}" Content="Clear" Command="{Binding ClearQueueCommand}" />
+                                    <Button Grid.Column="1" Style="{StaticResource StudioUtilityCompactDangerButtonStyle}" Content="Clear" Command="{Binding ClearQueueCommand}" ToolTip="Clear the queue" />
                                 </Grid>
 
                                 <Border Grid.Row="1" Style="{StaticResource SearchBoxStyle}" Margin="0,16,0,10">
@@ -1372,11 +1372,11 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Text="{Binding QueueArtworkProgressText}" Style="{StaticResource CaptionStyle}"
                                                    TextTrimming="CharacterEllipsis" ToolTip="{Binding QueueArtworkStatus}" VerticalAlignment="Center" />
-                                        <Button Grid.Column="1" Padding="8,4" Margin="8,0,0,0"
+                                        <Button Grid.Column="1" Margin="8,0,0,0"
                                                 Content="Fetch art" Command="{Binding FetchQueueArtworkCommand}"
                                                 ToolTip="Fetch missing artwork for the current queue">
                                             <Button.Style>
-                                                <Style TargetType="Button" BasedOn="{StaticResource PillButtonStyle}">
+                                                <Style TargetType="Button" BasedOn="{StaticResource StudioUtilityCompactButtonStyle}">
                                                     <Setter Property="Visibility" Value="Visible" />
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding IsQueueArtworkLoading}" Value="True">
@@ -1386,7 +1386,7 @@
                                                 </Style>
                                             </Button.Style>
                                         </Button>
-                                        <Button Grid.Column="1" Style="{StaticResource PillButtonStyle}" Padding="8,4" Margin="8,0,0,0"
+                                        <Button Grid.Column="1" Style="{StaticResource StudioUtilityCompactDangerButtonStyle}" Margin="8,0,0,0"
                                                 Content="Cancel" Command="{Binding CancelQueueArtworkCommand}"
                                                 ToolTip="Cancel queue artwork lookup"
                                                 Visibility="{Binding IsQueueArtworkLoading, Converter={StaticResource BooleanToVisibilityConverter}}" />
@@ -1485,8 +1485,8 @@
                                         <ColumnDefinition Width="10" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <Button Style="{StaticResource AccentPillButtonStyle}" Content="Open music" Command="{Binding OpenAudioFilesCommand}" />
-                                    <Button Grid.Column="2" Style="{StaticResource PrimaryPillButtonStyle}" Content="Play selected" Command="{Binding PlaySelectedCommand}" />
+                                    <Button Style="{StaticResource StudioUtilityPrimaryButtonStyle}" Content="Open music" Command="{Binding OpenAudioFilesCommand}" />
+                                    <Button Grid.Column="2" Style="{StaticResource StudioUtilityButtonStyle}" Content="Play selected" Command="{Binding PlaySelectedCommand}" />
                                 </Grid>
                             </Grid>
                         </Border>
@@ -1738,15 +1738,15 @@
                                     <TextBlock Text="{Binding QueueVisibleCountText}" Style="{StaticResource CaptionStyle}" Margin="0,4,0,0" />
                                 </StackPanel>
                                 <WrapPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                                    <Button Style="{StaticResource PrimaryPillButtonStyle}" Content="Open music" Command="{Binding OpenAudioFilesCommand}" />
-                                    <Button Style="{StaticResource UtilityPillButtonStyle}" Content="Import M3U" Command="{Binding ImportPlaylistCommand}" Margin="8,0,0,0" />
-                                    <Button Style="{StaticResource UtilityPillButtonStyle}" Content="Save playlist" Command="{Binding SaveQueueAsPlaylistCommand}" Margin="8,0,0,0" />
-                                    <Button Style="{StaticResource UtilityPillButtonStyle}" Content="Export queue" Command="{Binding ExportQueueCommand}" Margin="8,0,0,0" />
-                                    <Button Style="{StaticResource UtilityPillButtonStyle}" Content="Fetch artwork" Command="{Binding FetchQueueArtworkCommand}" Margin="8,0,0,0"
+                                    <Button Style="{StaticResource StudioUtilityPrimaryButtonStyle}" Content="Open music" Command="{Binding OpenAudioFilesCommand}" />
+                                    <Button Style="{StaticResource StudioUtilityButtonStyle}" Content="Import M3U" Command="{Binding ImportPlaylistCommand}" Margin="8,0,0,0" />
+                                    <Button Style="{StaticResource StudioUtilityButtonStyle}" Content="Save playlist" Command="{Binding SaveQueueAsPlaylistCommand}" Margin="8,0,0,0" />
+                                    <Button Style="{StaticResource StudioUtilityButtonStyle}" Content="Export queue" Command="{Binding ExportQueueCommand}" Margin="8,0,0,0" />
+                                    <Button Style="{StaticResource StudioUtilityButtonStyle}" Content="Fetch artwork" Command="{Binding FetchQueueArtworkCommand}" Margin="8,0,0,0"
                                             ToolTip="Fetch missing MusicBrainz and Cover Art Archive artwork for the queue" />
-                                    <Button Style="{StaticResource UtilityPillButtonStyle}" Content="Cancel artwork" Command="{Binding CancelQueueArtworkCommand}" Margin="8,0,0,0"
+                                    <Button Style="{StaticResource StudioUtilityDangerButtonStyle}" Content="Cancel artwork" Command="{Binding CancelQueueArtworkCommand}" Margin="8,0,0,0"
                                             Visibility="{Binding IsQueueArtworkLoading, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                    <Button Style="{StaticResource UtilityPillButtonStyle}" Content="Clear" Command="{Binding ClearQueueCommand}" Margin="8,0,0,0" />
+                                    <Button Style="{StaticResource StudioUtilityDangerButtonStyle}" Content="Clear" Command="{Binding ClearQueueCommand}" Margin="8,0,0,0" ToolTip="Clear the queue" />
                                 </WrapPanel>
                             </Grid>
 
@@ -1886,7 +1886,7 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Drag rows to reorder, or use the arrow controls. Search only filters the view and never changes playback order."
                                            Style="{StaticResource CaptionStyle}" VerticalAlignment="Center" />
-                                <Button Grid.Column="1" Style="{StaticResource PrimaryPillButtonStyle}" Content="Play selected" Command="{Binding PlaySelectedCommand}" />
+                                <Button Grid.Column="1" Style="{StaticResource StudioUtilityPrimaryButtonStyle}" Content="Play selected" Command="{Binding PlaySelectedCommand}" />
                             </Grid>
                         </Grid>
                     </Border>
