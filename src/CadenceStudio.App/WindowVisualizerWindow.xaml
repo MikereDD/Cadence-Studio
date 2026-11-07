@@ -158,69 +158,22 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <!-- Previous/next are quiet, touchable glyphs; only play/pause is a colored disk. -->
-        <Style x:Key="VisualizerTransportButtonStyle" TargetType="Button">
-            <Setter Property="Width" Value="34"/>
-            <Setter Property="Height" Value="40"/>
-            <Setter Property="Margin" Value="2,0"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderBrush" Value="Transparent"/>
-            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Grid SnapsToDevicePixels="True">
-                            <Border x:Name="Shell" CornerRadius="11" Background="{TemplateBinding Background}"
-                                    BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1"/>
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <Border x:Name="FocusOutline" CornerRadius="11" BorderBrush="{DynamicResource AccentBrush}"
-                                    BorderThickness="2" Opacity="0" IsHitTestVisible="False"/>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Shell" Property="Background" Value="{DynamicResource SurfaceHoverBrush}"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Shell" Property="Background" Value="{DynamicResource PremiumButtonPressedBrush}"/>
-                            </Trigger>
-                            <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="FocusOutline" Property="Opacity" Value="1"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.45"/></Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+        <!-- v10: same theme and interaction as main transport; slightly smaller to fit the dock. -->
+        <Style x:Key="VisualizerTransportButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource TransportButtonStyle}">
+            <Setter Property="Width" Value="40" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Margin" Value="2,0" />
         </Style>
-        <Style x:Key="VisualizerHeroPlayButtonStyle" TargetType="Button">
-            <Setter Property="Width" Value="46"/>
-            <Setter Property="Height" Value="46"/>
-            <Setter Property="Margin" Value="4,0"/>
-            <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Grid SnapsToDevicePixels="True">
-                            <Ellipse x:Name="Disk" Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="1"/>
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <Ellipse x:Name="FocusOutline" Stroke="{DynamicResource TextPrimaryBrush}"
-                                     StrokeThickness="2" Margin="2" Opacity="0" IsHitTestVisible="False"/>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Disk" Property="Stroke" Value="{DynamicResource TextPrimaryBrush}"/></Trigger>
-                            <Trigger Property="IsPressed" Value="True"><Setter TargetName="Disk" Property="Opacity" Value="0.82"/></Trigger>
-                            <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="FocusOutline" Property="Opacity" Value="1"/></Trigger>
-                            <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.45"/></Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+        <Style x:Key="VisualizerHeroPlayButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource ReactivePlayTransportButtonStyle}">
+            <Setter Property="Width" Value="40" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Margin" Value="2,0" />
         </Style>
+
     </Window.Resources>
 
     <!-- Edge-to-edge presentation; NO full-width title or transport bars. -->
@@ -471,51 +424,57 @@
                     </StackPanel>
                 </Grid>
 
-                <!-- No nested black capsule: the three controls share the same glass dock. -->
+                <!-- v10: detached visualizer uses the same existing main-player transport glyphs. -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"
                             HorizontalAlignment="Center">
                     <Button Style="{StaticResource VisualizerTransportButtonStyle}" Command="{Binding PreviousCommand}"
                             ToolTip="Previous track" AutomationProperties.Name="Previous track">
-                        <Path Width="16" Height="16" Stretch="Uniform" Fill="{DynamicResource TextPrimaryBrush}"
-                              Data="M 3,3 L 6,3 L 6,21 L 3,21 Z M 19,3 L 8,12 L 19,21 Z"/>
+                        <TextBlock Text="&#xE892;" FontFamily="Segoe Fluent Icons" FontSize="15"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Button>
                     <Button Style="{StaticResource VisualizerHeroPlayButtonStyle}" Command="{Binding TogglePlaybackCommand}"
                             ToolTip="Play or pause (Space)" AutomationProperties.Name="Play or pause">
-                        <Grid Width="20" Height="20">
-                            <Path Fill="{DynamicResource CadenceOnAccentBrush}" Data="M 6,2 L 23,12 L 6,22 Z">
+                        <Grid Width="18" Height="18" IsHitTestVisible="False">
+                            <Path Data="M 4,2 L 4,16 L 16,9 Z"
+                                  Fill="Transparent"
+                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                  StrokeThickness="1.8"
+                                  StrokeLineJoin="Round">
                                 <Path.Style>
                                     <Style TargetType="Path">
-                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Setter Property="Visibility" Value="Visible" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsPlaybackPlaying}" Value="True">
-                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Setter Property="Visibility" Value="Collapsed" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </Path.Style>
                             </Path>
-                            <Grid Width="16" Height="19" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Grid>
                                 <Grid.Style>
                                     <Style TargetType="Grid">
-                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Setter Property="Visibility" Value="Collapsed" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsPlaybackPlaying}" Value="True">
-                                                <Setter Property="Visibility" Value="Visible"/>
+                                                <Setter Property="Visibility" Value="Visible" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </Grid.Style>
-                                <Rectangle Width="5" RadiusX="1" RadiusY="1" Fill="{DynamicResource CadenceOnAccentBrush}"
-                                           HorizontalAlignment="Left"/>
-                                <Rectangle Width="5" RadiusX="1" RadiusY="1" Fill="{DynamicResource CadenceOnAccentBrush}"
-                                           HorizontalAlignment="Right"/>
+                                <Rectangle Width="4" Height="14" HorizontalAlignment="Left"
+                                           Margin="3,0,0,0" RadiusX="1" RadiusY="1"
+                                           Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                                <Rectangle Width="4" Height="14" HorizontalAlignment="Right"
+                                           Margin="0,0,3,0" RadiusX="1" RadiusY="1"
+                                           Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
                             </Grid>
                         </Grid>
                     </Button>
                     <Button Style="{StaticResource VisualizerTransportButtonStyle}" Command="{Binding NextCommand}"
                             ToolTip="Next track" AutomationProperties.Name="Next track">
-                        <Path Width="16" Height="16" Stretch="Uniform" Fill="{DynamicResource TextPrimaryBrush}"
-                              Data="M 16,3 L 19,3 L 19,21 L 16,21 Z M 5,3 L 16,12 L 5,21 Z"/>
+                        <TextBlock Text="&#xE893;" FontFamily="Segoe Fluent Icons" FontSize="15"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Button>
                 </StackPanel>
 
