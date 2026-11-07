@@ -38,7 +38,7 @@ Cadence Studio is a modern Windows music player focused on dependable local play
 
 v1.2 refines the interface with unified themed buttons, corrected Music Library and Queue layouts, and improved song-change notifications with Cadence artwork fallback and matching transport controls.
 
-**v1.2 is being prepared for release. The last published stable release is v1.1; automatic update discovery remains unpublished.**
+**v1.2 is a manual-install stable release. Automatic update discovery remains unpublished.**
 
 Cadence Studio is separate from **Cadence Classic**, the original PowerShell/WinForms application. Both projects retain independent codebases, settings, release histories, and development paths.
 
@@ -106,7 +106,7 @@ Cadence Studio is separate from **Cadence Classic**, the original PowerShell/Win
 
 Prebuilt installers and portable packages are published through [**GitHub Releases**](https://github.com/MikereDD/Cadence-Studio/releases). Release binaries are intentionally kept out of the source repository.
 
-v1.1 uses manual installation. The signed updater foundation remains in the codebase, but no stable online discovery manifest is published for automatic updates.
+v1.2 uses manual installation. The signed updater foundation remains in the codebase, but no stable online discovery manifest is published for automatic updates.
 
 ### Windows installer
 

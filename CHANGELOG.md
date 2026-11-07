@@ -2,7 +2,7 @@
 
 All notable Cadence Studio changes are recorded here in reverse chronological order. Repeated micro-build entries from the development cycle are consolidated under their final milestone versions for clarity.
 
-## v1.2 — Release preparation
+## v1.2 — Stable release
 
 - Unified transport, Library, Queue, utility, playlist and dialog button styling.
 - Improved theme-aware hover, pressed, focused and playback-active states.

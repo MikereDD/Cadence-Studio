@@ -1,4 +1,4 @@
-# Cadence Studio v1.2 — Release Preparation
+# Cadence Studio v1.2 — Stable Release
 
 This release focuses on interface consistency, button behavior, layout corrections and improved song-change notifications.
 
@@ -9,10 +9,10 @@ This release focuses on interface consistency, button behavior, layout correctio
 - Cadence Studio icon fallback when album artwork is unavailable.
 - Song-change notification controls matching the main player.
 
-## Release status
+## Release qualification
 
-Release build verified with zero compilation errors.
-Final regression tests, packaging and publication remain pending.
+Release build verified with zero compilation errors. Audio regression: 7 passed, 0 failures. Manifest security: 18 passed. Updater transactions: 56 passed. Signed integration: 101 passed. Top-level checks: 57 passed.
+v1.2 is distributed through manual installer and portable packages. No stable automatic-update discovery manifest is published.
 
 ---
 
