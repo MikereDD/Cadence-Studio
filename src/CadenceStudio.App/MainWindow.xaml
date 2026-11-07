@@ -1430,8 +1430,8 @@
                                                         <ColumnDefinition Width="34" />
                                                         <ColumnDefinition Width="*" MinWidth="54" />
                                                         <ColumnDefinition Width="34" />
-                                                        <ColumnDefinition Width="32" />
-                                                        <ColumnDefinition Width="30" />
+                                                        <ColumnDefinition Width="38" />
+                                                        <ColumnDefinition Width="38" />
                                                     </Grid.ColumnDefinitions>
                                                     <TextBlock Text="⋮⋮" Foreground="{DynamicResource TextMutedBrush}"
                                                                VerticalAlignment="Center" HorizontalAlignment="Center"
