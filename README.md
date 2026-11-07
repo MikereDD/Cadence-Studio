@@ -9,12 +9,13 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.1-b8872c" alt="Version 1.1">
+  <img src="https://img.shields.io/badge/version-1.2-b8872c" alt="Version 1.2">
   <img src="https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-555b66" alt="Windows 10 and 11">
   <img src="https://img.shields.io/badge/.NET-8-555b66" alt=".NET 8">
   <img src="https://img.shields.io/badge/audio-NAudio%202.3.0-555b66" alt="NAudio 2.3.0">
   <img src="https://img.shields.io/badge/metadata-TagLibSharp%202.3.0-555b66" alt="TagLibSharp 2.3.0">
   <img src="https://img.shields.io/badge/UI-WPF%20%2B%20XAML-2d2d2d" alt="WPF and XAML">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-b8872c" alt="License: Apache-2.0"></a>
 </p>
 
 <p align="center">
@@ -25,17 +26,19 @@
   <a href="CHANGELOG.md">Changelog</a>
   ·
   <a href="ROADMAP.md">Roadmap</a>
+  ·
+  <a href="LICENSE">Apache-2.0 License</a>
 </p>
 
 ---
 
-## Cadence Studio v1.1
+## Cadence Studio v1.2
 
 Cadence Studio is a modern Windows music player focused on dependable local playback, expressive visuals, strong metadata tools, and a carefully designed desktop experience.
 
-v1.1 builds on the first stable release with persistent background playback in the Windows system tray, global hardware-media-key support, optional per-user Start with Windows integration, audio-state refinements, responsive Now Playing and visualizer improvements, and a hardened signed-update foundation.
+v1.2 refines the interface with unified themed buttons, corrected Music Library and Queue layouts, and improved song-change notifications with Cadence artwork fallback and matching transport controls.
 
-**v1.1 is distributed as a manual-install stable release. Automatic update discovery remains unpublished and disabled as a production delivery path.**
+**v1.2 is being prepared for release. The last published stable release is v1.1; automatic update discovery remains unpublished.**
 
 Cadence Studio is separate from **Cadence Classic**, the original PowerShell/WinForms application. Both projects retain independent codebases, settings, release histories, and development paths.
 
@@ -185,6 +188,11 @@ Cadence Studio is local-first. It requires no account, subscription, telemetry, 
 
 Online enrichment is optional. Playback, local indexing, playlists, local metadata, and cached content remain available offline.
 
+## License
+
+Cadence Studio is licensed under the [Apache License 2.0](LICENSE).
+
+Third-party components and services retain their own licenses and terms. See [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) for details.
 ## Design principles
 
 Cadence Studio aims for **controlled spectacle rather than clutter**: layered depth, tactile controls, expressive visualizers, strong typography, and clear hierarchy without sacrificing reliability, performance, or accessibility.
@@ -201,6 +209,7 @@ Stable releases are quality gates, not schedule targets. v1.1 was promoted only 
 - [Changelog](CHANGELOG.md)
 - [Release Notes](RELEASE-NOTES.md)
 - [Third-Party Notices](THIRD-PARTY-NOTICES.md)
+- [Apache-2.0 License](LICENSE)
 
 ---
 

@@ -64,10 +64,40 @@
                     </StackPanel>
 
                     <StackPanel Grid.Column="1" Orientation="Horizontal" shell:WindowChrome.IsHitTestVisibleInChrome="True">
-                        <Button Style="{StaticResource WindowButtonStyle}" Content="?" Click="Shortcuts_Click" ToolTip="Keyboard shortcuts (F1 or Ctrl+/)" />
-                        <Button Style="{StaticResource WindowButtonStyle}" Content="—" Click="Minimize_Click" />
-                        <Button Style="{StaticResource WindowButtonStyle}" Content="□" Click="Maximize_Click" />
-                        <Button Style="{StaticResource CloseWindowButtonStyle}" Content="×" Click="Close_Click" />
+                        <Button Style="{StaticResource WindowButtonStyle}" Click="Shortcuts_Click" ToolTip="Keyboard shortcuts (F1 or Ctrl+/)">
+                            <Viewbox Width="14" Height="14" Stretch="Uniform" IsHitTestVisible="False">
+                                <Canvas Width="16" Height="16">
+                                    <Path Data="M 4,5.2 C 4,3 5.7,1.7 8,1.7 C 10.4,1.7 12,3 12,5.1 C 12,6.7 11.1,7.7 9.5,8.7 C 8.4,9.4 8,10.1 8,11.1"
+                                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.5"
+                                          StrokeStartLineCap="Round" Fill="Transparent" />
+                                    <Ellipse Width="1.8" Height="1.8" Canvas.Left="7.1" Canvas.Top="13"
+                                             Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                                </Canvas>
+                            </Viewbox>
+                        </Button>
+                        <Button Style="{StaticResource WindowButtonStyle}" Click="Minimize_Click" ToolTip="Minimize">
+                            <Viewbox Width="13" Height="13" Stretch="Uniform" IsHitTestVisible="False">
+                                <Canvas Width="16" Height="16">
+                                    <Line X1="3" Y1="11.5" X2="13" Y2="11.5"
+                                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.4"
+                                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                                </Canvas>
+                            </Viewbox>
+                        </Button>
+                        <Button Style="{StaticResource WindowButtonStyle}" Click="Maximize_Click" ToolTip="Maximize or restore">
+                            <Viewbox Width="13" Height="13" Stretch="Uniform" IsHitTestVisible="False">
+                                <Rectangle Width="10" Height="10"
+                                           Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.35"
+                                           Fill="Transparent" />
+                            </Viewbox>
+                        </Button>
+                        <Button Style="{StaticResource CloseWindowButtonStyle}" Click="Close_Click" ToolTip="Close">
+                            <Viewbox Width="12" Height="12" Stretch="Uniform" IsHitTestVisible="False">
+                                <Path Data="M 3,3 L 13,13 M 13,3 L 3,13"
+                                      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.5"
+                                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                            </Viewbox>
+                        </Button>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -322,7 +352,7 @@
                             </Popup>
                             <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
                                 <!-- Universal v1.5: unobtrusive, fully functional quick theme switcher. -->
-                                <Button x:Name="QuickThemeButton" Style="{StaticResource QuickThemeButtonStyle}"
+                                <Button x:Name="QuickThemeButton" Style="{StaticResource TreeActionButtonStyle}"
                                         Click="QuickThemeButton_Click" AutomationProperties.Name="Quick theme switcher"
                                         ToolTip="{Binding ThemeName, StringFormat='Current theme: {0}'}">
                                     <Button.ContextMenu>
@@ -421,12 +451,12 @@
                                             <Run Text="{Binding LibraryFolderCountText, Mode=OneWay}" />
                                         </TextBlock>
                                     </StackPanel>
-                                    <Button Grid.Column="1" Style="{StaticResource PillButtonStyle}" Padding="10,7"
+                                    <Button Grid.Column="1" Style="{StaticResource StudioUtilityButtonStyle}"
                                             Content="Root" Command="{Binding AddLibraryRootCommand}" ToolTip="Add library root" />
-                                    <Button Grid.Column="3" Style="{StaticResource AccentPillButtonStyle}" Padding="11,7"
+                                    <Button Grid.Column="3" Style="{StaticResource StudioUtilityPrimaryButtonStyle}"
                                             Content="Scan" Command="{Binding ScanLibraryCommand}" ToolTip="Rescan saved roots"
                                             Visibility="{Binding IsLibraryIdle, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                    <Button Grid.Column="3" Style="{StaticResource PillButtonStyle}" Padding="11,7"
+                                    <Button Grid.Column="3" Style="{StaticResource StudioUtilityDangerButtonStyle}"
                                             Content="Cancel scan" Command="{Binding CancelLibraryScanCommand}" ToolTip="Stop the active library scan"
                                             Visibility="{Binding IsLibraryScanning, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                 </Grid>
@@ -499,7 +529,7 @@
                                             <Style TargetType="TreeViewItem" BasedOn="{StaticResource DarkTreeViewItemStyle}" />
                                             <HierarchicalDataTemplate DataType="{x:Type vm:LibraryFolderNode}" ItemsSource="{Binding Children}">
                                                 <Grid Margin="0,2,6,2" HorizontalAlignment="Left"
-                                                      Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=TreeView}, Converter={StaticResource LibraryRowWidthConverter}, ConverterParameter=34}">
+                                                      Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=TreeView}, Converter={StaticResource LibraryRowWidthConverter}, ConverterParameter=64}">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*" />
                                                         <ColumnDefinition Width="Auto" />
@@ -510,15 +540,35 @@
                                                         <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip="{Binding FullPath}" />
                                                         <TextBlock Text="{Binding Summary}" Style="{StaticResource CaptionStyle}" Margin="0,2,0,0" />
                                                     </StackPanel>
-                                                    <Button Grid.Column="1" Style="{StaticResource TreeActionButtonStyle}" Content="＋"
+                                                    <Button Grid.Column="1" Style="{StaticResource MediaRowIconButtonStyle}"
                                                             Command="{Binding DataContext.AddLibraryFolderCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
-                                                            CommandParameter="{Binding}" ToolTip="Add this folder and all subfolders to the queue" />
-                                                    <Button Grid.Column="2" Style="{StaticResource TreeActionButtonStyle}" Content="▶"
+                                                            CommandParameter="{Binding}" ToolTip="Add this folder and all subfolders to the queue"
+                                                            AutomationProperties.Name="Add folder branch to queue">
+                                                        <Path Width="14" Height="14"
+                                                               Data="M 7,2.5 L 7,11.5 M 2.5,7 L 11.5,7"
+                                                               Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                               StrokeThickness="1.55" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stretch="None" />
+                                                    </Button>
+                                                    <Button Grid.Column="2" Style="{StaticResource MediaRowIconButtonStyle}"
                                                             Command="{Binding DataContext.PlayLibraryFolderCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
-                                                            CommandParameter="{Binding}" ToolTip="Play this folder and all subfolders" />
-                                                    <Button Grid.Column="3" Style="{StaticResource TreeActionButtonStyle}" Content="P"
+                                                            CommandParameter="{Binding}" ToolTip="Play this folder and all subfolders"
+                                                            AutomationProperties.Name="Play folder branch">
+                                                        <Path Width="14" Height="14"
+                                                               Data="M 3,2 L 3,12 L 12,7 Z"
+                                                               Fill="Transparent"
+                                                               Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                               StrokeThickness="1.55" StrokeLineJoin="Round"
+                                                               Stretch="Uniform" Margin="1,0,0,0" />
+                                                    </Button>
+                                                    <Button Grid.Column="3" Style="{StaticResource MediaRowIconButtonStyle}"
                                                             Command="{Binding DataContext.AddLibraryFolderToPlaylistCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
-                                                            CommandParameter="{Binding}" ToolTip="Add this folder and all subfolders to the selected playlist" />
+                                                            CommandParameter="{Binding}" ToolTip="Add this folder and all subfolders to the selected playlist"
+                                                            AutomationProperties.Name="Add folder branch to selected playlist">
+                                                        <Path Width="16" Height="14"
+                                                               Data="M 1.5,3 L 8.5,3 M 1.5,7 L 8.5,7 M 1.5,11 L 6,11 M 11,7.2 L 11,12.8 M 8.2,10 L 13.8,10"
+                                                               Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                               StrokeThickness="1.55" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stretch="None" />
+                                                    </Button>
                                                 </Grid>
                                             </HierarchicalDataTemplate>
 
@@ -538,15 +588,35 @@
                                                         <TextBlock Text="{Binding FormatDescription}" Style="{StaticResource CaptionStyle}" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" />
                                                     </StackPanel>
                                                     <TextBlock Grid.Column="2" Text="{Binding DurationText}" Style="{StaticResource CaptionStyle}" VerticalAlignment="Center" Margin="6,0" />
-                                                    <Button Grid.Column="3" Style="{StaticResource TreeActionButtonStyle}" Content="＋"
+                                                    <Button Grid.Column="3" Style="{StaticResource MediaRowIconButtonStyle}"
                                                             Command="{Binding DataContext.AddLibraryTrackCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
-                                                            CommandParameter="{Binding}" ToolTip="Add track to queue" />
-                                                    <Button Grid.Column="4" Style="{StaticResource TreeActionButtonStyle}" Content="▶"
+                                                            CommandParameter="{Binding}" ToolTip="Add track to queue"
+                                                            AutomationProperties.Name="Add track to queue">
+                                                        <Path Width="14" Height="14"
+                                                               Data="M 7,2.5 L 7,11.5 M 2.5,7 L 11.5,7"
+                                                               Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                               StrokeThickness="1.55" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stretch="None" />
+                                                    </Button>
+                                                    <Button Grid.Column="4" Style="{StaticResource MediaRowIconButtonStyle}"
                                                             Command="{Binding DataContext.PlayLibraryTrackCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
-                                                            CommandParameter="{Binding}" ToolTip="Play track" />
-                                                    <Button Grid.Column="5" Style="{StaticResource TreeActionButtonStyle}" Content="P"
+                                                            CommandParameter="{Binding}" ToolTip="Play track"
+                                                            AutomationProperties.Name="Play track">
+                                                        <Path Width="14" Height="14"
+                                                               Data="M 3,2 L 3,12 L 12,7 Z"
+                                                               Fill="Transparent"
+                                                               Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                               StrokeThickness="1.55" StrokeLineJoin="Round"
+                                                               Stretch="Uniform" Margin="1,0,0,0" />
+                                                    </Button>
+                                                    <Button Grid.Column="5" Style="{StaticResource MediaRowIconButtonStyle}"
                                                             Command="{Binding DataContext.AddLibraryTrackToPlaylistCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
-                                                            CommandParameter="{Binding}" ToolTip="Add track to selected playlist" />
+                                                            CommandParameter="{Binding}" ToolTip="Add track to selected playlist"
+                                                            AutomationProperties.Name="Add track to selected playlist">
+                                                        <Path Width="16" Height="14"
+                                                               Data="M 1.5,3 L 8.5,3 M 1.5,7 L 8.5,7 M 1.5,11 L 6,11 M 11,7.2 L 11,12.8 M 8.2,10 L 13.8,10"
+                                                               Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                               StrokeThickness="1.55" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stretch="None" />
+                                                    </Button>
                                                 </Grid>
                                             </DataTemplate>
                                         </TreeView.Resources>
@@ -575,7 +645,7 @@
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="{Binding LibraryLastScanText}" Style="{StaticResource CaptionStyle}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                                    <Button Grid.Column="1" Style="{StaticResource PillButtonStyle}" Padding="10,6" Content="Remove root" Command="{Binding RemoveLibraryRootCommand}" />
+                                    <Button Grid.Column="1" Style="{StaticResource StudioUtilityCompactDangerButtonStyle}" Content="Remove root" Command="{Binding RemoveLibraryRootCommand}" ToolTip="Remove the selected library root" />
                                 </Grid>
                             </Grid>
                         </Border>
@@ -607,8 +677,8 @@
                                     <!-- Universal v1.6: single icon instead of release badge and split text button.
                                          Existing visualizer modes and Compact/Expand command remain accessible. -->
                                     <Button x:Name="WindowVisualizerMenuButton" Grid.Column="1"
-                                            Style="{StaticResource UtilityPillButtonStyle}"
-                                            Width="38" Height="34" Padding="7,5"
+                                            Style="{StaticResource TreeActionButtonStyle}"
+                                            Width="32" Height="32" Padding="0"
                                             Click="WindowVisualizerMenu_Click"
                                             ToolTip="Window Visualizer" AutomationProperties.Name="Window Visualizer"
                                             AutomationProperties.HelpText="Choose window visualizer mode">
@@ -1125,7 +1195,7 @@
                                                             <TextBlock Text="Up next" FontSize="15" FontWeight="SemiBold" />
                                                             <TextBlock Text="{Binding QueueCountText}" Style="{StaticResource CaptionStyle}" Margin="10,2,0,0" />
                                                         </StackPanel>
-                                                        <Button Grid.Column="1" Style="{StaticResource UtilityPillButtonStyle}" Content="Clear" Command="{Binding ClearQueueCommand}" Padding="11,5" />
+                                                        <Button Grid.Column="1" Style="{StaticResource StudioUtilityCompactDangerButtonStyle}" Content="Clear" Command="{Binding ClearQueueCommand}" ToolTip="Clear the queue" />
                                                     </Grid>
 
                                                     <Grid Grid.Row="2">
@@ -1169,8 +1239,19 @@
                                                                             <TextBlock Text="{Binding DurationText}" Style="{StaticResource CaptionStyle}" Margin="0,4,0,0" />
                                                                         </StackPanel>
                                                                         <StackPanel Grid.Column="3" VerticalAlignment="Center">
-                                                                            <Button Style="{StaticResource TreeActionButtonStyle}" Content="▶" Command="{Binding DataContext.PlayTrackCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" ToolTip="Play track" />
-                                                                            <Button Style="{StaticResource TreeActionButtonStyle}" Content="×" Margin="0,8,0,0" Command="{Binding DataContext.RemoveTrackCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" ToolTip="Remove from queue" />
+                                                                            <Button Style="{StaticResource MediaRowIconButtonStyle}" Command="{Binding DataContext.PlayTrackCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" ToolTip="Play track" AutomationProperties.Name="Play track">
+                                                                                <Path Width="14" Height="14"
+                                                               Data="M 3,2 L 3,12 L 12,7 Z"
+                                                               Fill="Transparent"
+                                                               Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                               StrokeThickness="1.55" StrokeLineJoin="Round"
+                                                               Stretch="Uniform" Margin="1,0,0,0" />
+                                                                            </Button>
+                                                                            <Button Style="{StaticResource MediaRowDestructiveIconButtonStyle}" Margin="4,8,0,0" Command="{Binding DataContext.RemoveTrackCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" ToolTip="Remove from queue" AutomationProperties.Name="Remove track from queue">
+                                                                                <Path Width="14" Height="14" Data="M 3,3 L 11,11 M 11,3 L 3,11"
+                                                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                                  StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stretch="None" />
+                                                                            </Button>
                                                                         </StackPanel>
                                                                     </Grid>
                                                                 </DataTemplate>
@@ -1264,7 +1345,7 @@
                                         <TextBlock Text="Queue" Style="{StaticResource PanelTitleStyle}" />
                                         <TextBlock Text="{Binding QueueVisibleCountText}" Style="{StaticResource CaptionStyle}" Margin="0,4,0,0" />
                                     </StackPanel>
-                                    <Button Grid.Column="1" Style="{StaticResource UtilityPillButtonStyle}" Content="Clear" Command="{Binding ClearQueueCommand}" />
+                                    <Button Grid.Column="1" Style="{StaticResource StudioUtilityCompactDangerButtonStyle}" Content="Clear" Command="{Binding ClearQueueCommand}" ToolTip="Clear the queue" />
                                 </Grid>
 
                                 <Border Grid.Row="1" Style="{StaticResource SearchBoxStyle}" Margin="0,16,0,10">
@@ -1304,11 +1385,11 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Text="{Binding QueueArtworkProgressText}" Style="{StaticResource CaptionStyle}"
                                                    TextTrimming="CharacterEllipsis" ToolTip="{Binding QueueArtworkStatus}" VerticalAlignment="Center" />
-                                        <Button Grid.Column="1" Padding="8,4" Margin="8,0,0,0"
+                                        <Button Grid.Column="1" Margin="8,0,0,0"
                                                 Content="Fetch art" Command="{Binding FetchQueueArtworkCommand}"
                                                 ToolTip="Fetch missing artwork for the current queue">
                                             <Button.Style>
-                                                <Style TargetType="Button" BasedOn="{StaticResource PillButtonStyle}">
+                                                <Style TargetType="Button" BasedOn="{StaticResource StudioUtilityCompactButtonStyle}">
                                                     <Setter Property="Visibility" Value="Visible" />
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding IsQueueArtworkLoading}" Value="True">
@@ -1318,7 +1399,7 @@
                                                 </Style>
                                             </Button.Style>
                                         </Button>
-                                        <Button Grid.Column="1" Style="{StaticResource PillButtonStyle}" Padding="8,4" Margin="8,0,0,0"
+                                        <Button Grid.Column="1" Style="{StaticResource StudioUtilityCompactDangerButtonStyle}" Margin="8,0,0,0"
                                                 Content="Cancel" Command="{Binding CancelQueueArtworkCommand}"
                                                 ToolTip="Cancel queue artwork lookup"
                                                 Visibility="{Binding IsQueueArtworkLoading, Converter={StaticResource BooleanToVisibilityConverter}}" />
@@ -1349,8 +1430,8 @@
                                                         <ColumnDefinition Width="34" />
                                                         <ColumnDefinition Width="*" MinWidth="54" />
                                                         <ColumnDefinition Width="34" />
-                                                        <ColumnDefinition Width="32" />
-                                                        <ColumnDefinition Width="30" />
+                                                        <ColumnDefinition Width="38" />
+                                                        <ColumnDefinition Width="38" />
                                                     </Grid.ColumnDefinitions>
                                                     <TextBlock Text="⋮⋮" Foreground="{DynamicResource TextMutedBrush}"
                                                                VerticalAlignment="Center" HorizontalAlignment="Center"
@@ -1372,12 +1453,23 @@
                                                                    TextTrimming="CharacterEllipsis" ToolTip="{Binding Artist}" />
                                                     </StackPanel>
                                                     <TextBlock Grid.Column="3" Text="{Binding DurationText}" Style="{StaticResource CaptionStyle}" VerticalAlignment="Center" HorizontalAlignment="Center" />
-                                                    <Button Grid.Column="4" Style="{StaticResource PillButtonStyle}" Padding="6,4" MinWidth="30" Content="▶"
+                                                    <Button Grid.Column="4" Style="{StaticResource MediaRowIconButtonStyle}"
                                                             Command="{Binding DataContext.PlayTrackCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                                            CommandParameter="{Binding}" ToolTip="Play track" />
-                                                    <Button Grid.Column="5" Style="{StaticResource TreeActionButtonStyle}" Content="×" Margin="2,0,0,0" MinWidth="28"
+                                                            CommandParameter="{Binding}" ToolTip="Play track" AutomationProperties.Name="Play track">
+                                                        <Path Width="14" Height="14"
+                                                               Data="M 3,2 L 3,12 L 12,7 Z"
+                                                               Fill="Transparent"
+                                                               Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                               StrokeThickness="1.55" StrokeLineJoin="Round"
+                                                               Stretch="Uniform" Margin="1,0,0,0" />
+                                                    </Button>
+                                                    <Button Grid.Column="5" Style="{StaticResource MediaRowDestructiveIconButtonStyle}"
                                                             Command="{Binding DataContext.RemoveTrackCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                                            CommandParameter="{Binding}" ToolTip="Remove track from queue" />
+                                                            CommandParameter="{Binding}" ToolTip="Remove track from queue" AutomationProperties.Name="Remove track from queue">
+                                                        <Path Width="14" Height="14" Data="M 3,3 L 11,11 M 11,3 L 3,11"
+                                                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                                  StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stretch="None" />
+                                                    </Button>
                                                 </Grid>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
@@ -1409,8 +1501,8 @@
                                         <ColumnDefinition Width="10" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <Button Style="{StaticResource AccentPillButtonStyle}" Content="Open music" Command="{Binding OpenAudioFilesCommand}" />
-                                    <Button Grid.Column="2" Style="{StaticResource PrimaryPillButtonStyle}" Content="Play selected" Command="{Binding PlaySelectedCommand}" />
+                                    <Button Style="{StaticResource StudioUtilityPrimaryButtonStyle}" Content="Open music" Command="{Binding OpenAudioFilesCommand}" />
+                                    <Button Grid.Column="2" Style="{StaticResource StudioUtilityButtonStyle}" Content="Play selected" Command="{Binding PlaySelectedCommand}" />
                                 </Grid>
                             </Grid>
                         </Border>
@@ -1537,7 +1629,7 @@
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
                                     <Button Style="{StaticResource UtilityPillButtonStyle}" Content="Duplicate" Command="{Binding DuplicatePlaylistCommand}" />
-                                    <Button Grid.Column="2" Style="{StaticResource UtilityPillButtonStyle}" Content="Delete" Command="{Binding DeletePlaylistCommand}" />
+                                    <Button Grid.Column="2" Style="{StaticResource StudioUtilityDangerButtonStyle}" Content="Delete" Command="{Binding DeletePlaylistCommand}" ToolTip="Delete the selected playlist" />
                                 </Grid>
                             </Grid>
                         </Border>
@@ -1603,12 +1695,24 @@
                                                         </TextBlock>
                                                     </StackPanel>
                                                     <TextBlock Grid.Column="2" Text="{Binding DurationText}" Style="{StaticResource CaptionStyle}" VerticalAlignment="Center" Margin="10,0" />
-                                                    <Button Grid.Column="3" Style="{StaticResource TreeActionButtonStyle}" Content="↑"
-                                                            Command="{Binding DataContext.MovePlaylistTrackUpCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" ToolTip="Move up" />
-                                                    <Button Grid.Column="4" Style="{StaticResource TreeActionButtonStyle}" Content="↓"
-                                                            Command="{Binding DataContext.MovePlaylistTrackDownCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" ToolTip="Move down" />
-                                                    <Button Grid.Column="5" Style="{StaticResource TreeActionButtonStyle}" Content="×"
-                                                            Command="{Binding DataContext.RemovePlaylistTrackCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" ToolTip="Remove from playlist" />
+                                                    <Button Grid.Column="3" Style="{StaticResource TreeActionButtonStyle}"
+                                                            Command="{Binding DataContext.MovePlaylistTrackUpCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" ToolTip="Move up" AutomationProperties.Name="Move track up">
+                                                        <Path Width="14" Height="14" Data="M 3,9 L 7,5 L 11,9"
+                                                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                                  StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Stretch="None" />
+                                                    </Button>
+                                                    <Button Grid.Column="4" Style="{StaticResource TreeActionButtonStyle}"
+                                                            Command="{Binding DataContext.MovePlaylistTrackDownCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" ToolTip="Move down" AutomationProperties.Name="Move track down">
+                                                        <Path Width="14" Height="14" Data="M 3,5 L 7,9 L 11,5"
+                                                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                                  StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Stretch="None" />
+                                                    </Button>
+                                                    <Button Grid.Column="5" Style="{StaticResource TreeDestructiveActionButtonStyle}"
+                                                            Command="{Binding DataContext.RemovePlaylistTrackCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" ToolTip="Remove from playlist" AutomationProperties.Name="Remove track from playlist">
+                                                        <Path Width="14" Height="14" Data="M 3,3 L 11,11 M 11,3 L 3,11"
+                                                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                                  StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stretch="None" />
+                                                    </Button>
                                                 </Grid>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
@@ -1620,7 +1724,7 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Use the P action in Library to add a track or complete folder branch to the selected playlist."
+                                    <TextBlock Text="Use the playlist-add action in Library to add a track or complete folder branch to the selected playlist."
                                                Style="{StaticResource CaptionStyle}" VerticalAlignment="Center" />
                                     <Button Grid.Column="1" Style="{StaticResource UtilityPillButtonStyle}" Content="Add current queue" Command="{Binding AddQueueToPlaylistCommand}" />
                                 </Grid>
@@ -1650,15 +1754,15 @@
                                     <TextBlock Text="{Binding QueueVisibleCountText}" Style="{StaticResource CaptionStyle}" Margin="0,4,0,0" />
                                 </StackPanel>
                                 <WrapPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                                    <Button Style="{StaticResource PrimaryPillButtonStyle}" Content="Open music" Command="{Binding OpenAudioFilesCommand}" />
-                                    <Button Style="{StaticResource UtilityPillButtonStyle}" Content="Import M3U" Command="{Binding ImportPlaylistCommand}" Margin="8,0,0,0" />
-                                    <Button Style="{StaticResource UtilityPillButtonStyle}" Content="Save playlist" Command="{Binding SaveQueueAsPlaylistCommand}" Margin="8,0,0,0" />
-                                    <Button Style="{StaticResource UtilityPillButtonStyle}" Content="Export queue" Command="{Binding ExportQueueCommand}" Margin="8,0,0,0" />
-                                    <Button Style="{StaticResource UtilityPillButtonStyle}" Content="Fetch artwork" Command="{Binding FetchQueueArtworkCommand}" Margin="8,0,0,0"
+                                    <Button Style="{StaticResource StudioUtilityPrimaryButtonStyle}" Content="Open music" Command="{Binding OpenAudioFilesCommand}" />
+                                    <Button Style="{StaticResource StudioUtilityButtonStyle}" Content="Import M3U" Command="{Binding ImportPlaylistCommand}" Margin="8,0,0,0" />
+                                    <Button Style="{StaticResource StudioUtilityButtonStyle}" Content="Save playlist" Command="{Binding SaveQueueAsPlaylistCommand}" Margin="8,0,0,0" />
+                                    <Button Style="{StaticResource StudioUtilityButtonStyle}" Content="Export queue" Command="{Binding ExportQueueCommand}" Margin="8,0,0,0" />
+                                    <Button Style="{StaticResource StudioUtilityButtonStyle}" Content="Fetch artwork" Command="{Binding FetchQueueArtworkCommand}" Margin="8,0,0,0"
                                             ToolTip="Fetch missing MusicBrainz and Cover Art Archive artwork for the queue" />
-                                    <Button Style="{StaticResource UtilityPillButtonStyle}" Content="Cancel artwork" Command="{Binding CancelQueueArtworkCommand}" Margin="8,0,0,0"
+                                    <Button Style="{StaticResource StudioUtilityDangerButtonStyle}" Content="Cancel artwork" Command="{Binding CancelQueueArtworkCommand}" Margin="8,0,0,0"
                                             Visibility="{Binding IsQueueArtworkLoading, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                    <Button Style="{StaticResource UtilityPillButtonStyle}" Content="Clear" Command="{Binding ClearQueueCommand}" Margin="8,0,0,0" />
+                                    <Button Style="{StaticResource StudioUtilityDangerButtonStyle}" Content="Clear" Command="{Binding ClearQueueCommand}" Margin="8,0,0,0" ToolTip="Clear the queue" />
                                 </WrapPanel>
                             </Grid>
 
@@ -1745,14 +1849,33 @@
                                                     </TextBlock>
                                                 </StackPanel>
                                                 <TextBlock Grid.Column="3" Text="{Binding DurationText}" Style="{StaticResource CaptionStyle}" VerticalAlignment="Center" Margin="12,0" />
-                                                <Button Grid.Column="4" Style="{StaticResource TreeActionButtonStyle}" Content="↑"
-                                                        Command="{Binding DataContext.MoveQueueTrackUpCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" ToolTip="Move up" />
-                                                <Button Grid.Column="5" Style="{StaticResource TreeActionButtonStyle}" Content="↓"
-                                                        Command="{Binding DataContext.MoveQueueTrackDownCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" ToolTip="Move down" />
-                                                <Button Grid.Column="6" Style="{StaticResource TreeActionButtonStyle}" Content="▶"
-                                                        Command="{Binding DataContext.PlayTrackCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" ToolTip="Play track" />
-                                                <Button Grid.Column="7" Style="{StaticResource TreeActionButtonStyle}" Content="×"
-                                                        Command="{Binding DataContext.RemoveTrackCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" ToolTip="Remove from queue" />
+                                                <Button Grid.Column="4" Style="{StaticResource MediaRowIconButtonStyle}"
+                                                        Command="{Binding DataContext.MoveQueueTrackUpCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" ToolTip="Move up" AutomationProperties.Name="Move track up">
+                                                    <Path Width="14" Height="14" Data="M 3,9 L 7,5 L 11,9"
+                                                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                                  StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Stretch="None" />
+                                                </Button>
+                                                <Button Grid.Column="5" Style="{StaticResource MediaRowIconButtonStyle}"
+                                                        Command="{Binding DataContext.MoveQueueTrackDownCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" ToolTip="Move down" AutomationProperties.Name="Move track down">
+                                                    <Path Width="14" Height="14" Data="M 3,5 L 7,9 L 11,5"
+                                                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                                  StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Stretch="None" />
+                                                </Button>
+                                                <Button Grid.Column="6" Style="{StaticResource MediaRowIconButtonStyle}"
+                                                        Command="{Binding DataContext.PlayTrackCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" ToolTip="Play track" AutomationProperties.Name="Play track">
+                                                    <Path Width="14" Height="14"
+                                                               Data="M 3,2 L 3,12 L 12,7 Z"
+                                                               Fill="Transparent"
+                                                               Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                               StrokeThickness="1.55" StrokeLineJoin="Round"
+                                                               Stretch="Uniform" Margin="1,0,0,0" />
+                                                </Button>
+                                                <Button Grid.Column="7" Style="{StaticResource MediaRowDestructiveIconButtonStyle}"
+                                                        Command="{Binding DataContext.RemoveTrackCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" ToolTip="Remove from queue" AutomationProperties.Name="Remove track from queue">
+                                                    <Path Width="14" Height="14" Data="M 3,3 L 11,11 M 11,3 L 3,11"
+                                                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                                  StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stretch="None" />
+                                                </Button>
                                             </Grid>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
@@ -1782,7 +1905,7 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Drag rows to reorder, or use the arrow controls. Search only filters the view and never changes playback order."
                                            Style="{StaticResource CaptionStyle}" VerticalAlignment="Center" />
-                                <Button Grid.Column="1" Style="{StaticResource PrimaryPillButtonStyle}" Content="Play selected" Command="{Binding PlaySelectedCommand}" />
+                                <Button Grid.Column="1" Style="{StaticResource StudioUtilityPrimaryButtonStyle}" Content="Play selected" Command="{Binding PlaySelectedCommand}" />
                             </Grid>
                         </Grid>
                     </Border>
@@ -2625,28 +2748,117 @@
                                     <RowDefinition Height="32" />
                                 </Grid.RowDefinitions>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <Button Style="{StaticResource TransportButtonStyle}" Content="|◀" Command="{Binding PreviousCommand}" ToolTip="Previous" />
-                                    <Button Style="{StaticResource TransportButtonStyle}" Content="■" Command="{Binding StopPlaybackCommand}" Margin="12,0,0,0" ToolTip="Stop" />
-                                    <Button Content="{Binding PlayPauseGlyph}" Command="{Binding TogglePlaybackCommand}" Margin="14,0" ToolTip="Play or pause">
-                                        <Button.Style>
-                                            <Style TargetType="Button" BasedOn="{StaticResource PlayButtonStyle}">
-                                                <Setter Property="Width" Value="66" />
-                                                <Setter Property="Height" Value="66" />
-                                            </Style>
-                                        </Button.Style>
+                                    <Button Style="{StaticResource TransportButtonStyle}" Command="{Binding PreviousCommand}" ToolTip="Previous">
+                                        <TextBlock Text="&#xE892;" FontFamily="Segoe Fluent Icons" FontSize="15"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
                                     </Button>
-                                    <Button Style="{StaticResource TransportButtonStyle}" Content="▶|" Click="Next_Click" ToolTip="Next" />
-                                    <Button Style="{StaticResource TransportModeButtonStyle}" Command="{Binding CycleRepeatCommand}" Margin="16,0,0,0" ToolTip="Cycle repeat mode">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="↻" FontFamily="Segoe UI Symbol" FontSize="17" FontWeight="Bold" Margin="0,0,9,0" VerticalAlignment="Center" />
-                                            <TextBlock x:Name="DockRepeatText" Text="{Binding RepeatLabel}" VerticalAlignment="Center" />
-                                        </StackPanel>
+                                    <Button Style="{StaticResource TransportButtonStyle}" Command="{Binding StopPlaybackCommand}" Margin="12,0,0,0" ToolTip="Stop">
+                                        <TextBlock Text="&#xE15B;" FontFamily="Segoe Fluent Icons" FontSize="14"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
                                     </Button>
-                                    <ToggleButton Style="{StaticResource TransportModeToggleStyle}" IsChecked="{Binding IsShuffleEnabled, Mode=OneWay}" Command="{Binding ToggleShuffleCommand}" Margin="10,0,0,0" ToolTip="Toggle shuffle">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="⤨" FontFamily="Segoe UI Symbol" FontSize="17" FontWeight="Bold" Margin="0,0,9,0" VerticalAlignment="Center" />
-                                            <TextBlock x:Name="DockShuffleText" Text="{Binding ShuffleLabel}" VerticalAlignment="Center" />
-                                        </StackPanel>
+                                    <Button Style="{StaticResource ReactivePlayTransportButtonStyle}"
+                                            Command="{Binding TogglePlaybackCommand}"
+                                            Margin="12,0"
+                                            ToolTip="Play or pause"
+                                            AutomationProperties.Name="Play or pause">
+                                        <Grid Width="18" Height="18" IsHitTestVisible="False">
+                                            <Path Data="M 4,2 L 4,16 L 16,9 Z"
+                                                  Fill="Transparent"
+                                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                  StrokeThickness="1.8"
+                                                  StrokeLineJoin="Round">
+                                                <Path.Style>
+                                                    <Style TargetType="Path">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsPlaybackPlaying}" Value="True">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Path.Style>
+                                            </Path>
+                                            <Grid>
+                                                <Grid.Style>
+                                                    <Style TargetType="Grid">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsPlaybackPlaying}" Value="True">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Grid.Style>
+                                                <Rectangle Width="4" Height="14" HorizontalAlignment="Left"
+                                                           Margin="3,0,0,0" RadiusX="1" RadiusY="1"
+                                                           Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                                                <Rectangle Width="4" Height="14" HorizontalAlignment="Right"
+                                                           Margin="0,0,3,0" RadiusX="1" RadiusY="1"
+                                                           Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                                            </Grid>
+                                        </Grid>
+                                    </Button>
+                                    <Button Style="{StaticResource TransportButtonStyle}" Click="Next_Click" ToolTip="Next">
+                                        <TextBlock Text="&#xE893;" FontFamily="Segoe Fluent Icons" FontSize="15"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Button>
+                                    <Button Style="{StaticResource ReactiveRepeatModeButtonStyle}"
+                                            Command="{Binding CycleRepeatCommand}"
+                                            Margin="16,0,0,0"
+                                            ToolTip="{Binding RepeatLabel}"
+                                            AutomationProperties.Name="{Binding RepeatLabel}">
+                                        <Grid Width="20" Height="20" IsHitTestVisible="False">
+                                            <Path Data="M 5,5 H 14 C 16.2,5 18,6.8 18,9 V 10
+                                                        M 15.5,7.5 L 18,10 L 20.5,7.5
+                                                        M 15,15 H 6 C 3.8,15 2,13.2 2,11 V 10
+                                                        M 4.5,12.5 L 2,10 L -0.5,12.5"
+                                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                  StrokeThickness="1.6"
+                                                  StrokeStartLineCap="Round"
+                                                  StrokeEndLineCap="Round"
+                                                  StrokeLineJoin="Round"
+                                                  Fill="Transparent"
+                                                  Stretch="Uniform" />
+                                            <TextBlock Text="1"
+                                                       FontSize="8"
+                                                       FontWeight="Bold"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"
+                                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding RepeatLabel}" Value="Repeat one">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Grid>
+                                    </Button>
+                                    <ToggleButton Style="{StaticResource ReactiveShuffleModeToggleStyle}"
+                                                  IsChecked="{Binding IsShuffleEnabled, Mode=OneWay}"
+                                                  Command="{Binding ToggleShuffleCommand}"
+                                                  Margin="10,0,0,0"
+                                                  ToolTip="{Binding ShuffleLabel}"
+                                                  AutomationProperties.Name="{Binding ShuffleLabel}">
+                                        <Viewbox Width="19" Height="19" Stretch="Uniform" IsHitTestVisible="False">
+                                            <Canvas Width="20" Height="20">
+                                                <Path Data="M 2,5 H 5.5 C 8,5 9.2,7.2 10.5,9.4 C 11.8,11.6 13,14 15.5,14 H 17.5
+                                                            M 15,11.5 L 17.5,14 L 15,16.5
+                                                            M 2,15 H 5.5 C 7.2,15 8.3,13.9 9.2,12.5
+                                                            M 11,7.4 C 12,5.9 13.2,5 15.5,5 H 17.5
+                                                            M 15,2.5 L 17.5,5 L 15,7.5"
+                                                      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ToggleButton}}"
+                                                      StrokeThickness="1.6"
+                                                      StrokeStartLineCap="Round"
+                                                      StrokeEndLineCap="Round"
+                                                      StrokeLineJoin="Round"
+                                                      Fill="Transparent" />
+                                            </Canvas>
+                                        </Viewbox>
                                     </ToggleButton>
                                 </StackPanel>
                                 <Grid Grid.Row="1" Margin="0,4,0,0" VerticalAlignment="Center">
@@ -2671,8 +2883,46 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="44" />
                                 </Grid.ColumnDefinitions>
-                                <Button Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="15"
-                                        Content="{Binding VolumeGlyph}" Command="{Binding ToggleMuteCommand}" Cursor="Hand" ToolTip="Mute or unmute" />
+                                <Button Style="{StaticResource TreeActionButtonStyle}"
+                                        Width="32" Height="32" Margin="0"
+                                        Command="{Binding ToggleMuteCommand}" ToolTip="Mute or unmute"
+                                        AutomationProperties.Name="Mute or unmute">
+                                    <Viewbox Width="16" Height="16" Stretch="Uniform" IsHitTestVisible="False">
+                                        <Canvas Width="18" Height="18">
+                                            <Path Data="M 2,7 L 6,7 L 10,3 L 10,15 L 6,11 L 2,11 Z"
+                                                  Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                                            <Path Data="M 12,6 C 14,7.2 14,10.8 12,12"
+                                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                  StrokeThickness="1.5" StrokeStartLineCap="Round"
+                                                  Fill="Transparent">
+                                                <Path.Style>
+                                                    <Style TargetType="Path">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsMuted}" Value="True">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Path.Style>
+                                            </Path>
+                                            <Path Data="M 12,6 L 16,12 M 16,6 L 12,12"
+                                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                  StrokeThickness="1.5" StrokeStartLineCap="Round">
+                                                <Path.Style>
+                                                    <Style TargetType="Path">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsMuted}" Value="True">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Path.Style>
+                                            </Path>
+                                        </Canvas>
+                                    </Viewbox>
+                                </Button>
                                 <Slider Grid.Column="1" Minimum="0" Maximum="1" Value="{Binding Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                         ToolTip="Player volume: 100% preserves the EQ output level. Windows Volume mixer is a separate control."
                                         IsMoveToPointEnabled="True" SmallChange="0.01" LargeChange="0.05"

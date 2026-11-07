@@ -11,5 +11,6 @@
     <Company>Typezer∅ Studio</Company>
     <Product>Cadence Studio</Product>
     <Copyright>Copyright © Typezer∅</Copyright>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
 </Project>

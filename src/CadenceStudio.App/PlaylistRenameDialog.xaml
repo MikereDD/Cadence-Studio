@@ -43,7 +43,7 @@
                                FontWeight="SemiBold" />
                     <Button Grid.Column="1"
                             Style="{StaticResource CloseWindowButtonStyle}"
-                            Content="✕"
+                            Content="Cancel" ContentTemplate="{StaticResource CadenceDialogCloseIconTemplate}" AutomationProperties.Name="Cancel rename"
                             Click="Cancel_Click"
                             ToolTip="Cancel" />
                 </Grid>
@@ -94,13 +94,13 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <Button Grid.Column="1"
-                            Style="{StaticResource PillButtonStyle}"
+                            Style="{StaticResource StudioUtilityButtonStyle}"
                             Content="Cancel"
                             MinWidth="92"
                             IsCancel="True"
                             Click="Cancel_Click" />
                     <Button Grid.Column="3"
-                            Style="{StaticResource PillButtonStyle}"
+                            Style="{StaticResource StudioUtilityPrimaryButtonStyle}"
                             Content="Rename"
                             MinWidth="92"
                             IsDefault="True"

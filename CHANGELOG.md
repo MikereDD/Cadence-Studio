@@ -2,6 +2,15 @@
 
 All notable Cadence Studio changes are recorded here in reverse chronological order. Repeated micro-build entries from the development cycle are consolidated under their final milestone versions for clarity.
 
+## v1.2 — Release preparation
+
+- Unified transport, Library, Queue, utility, playlist and dialog button styling.
+- Improved theme-aware hover, pressed, focused and playback-active states.
+- Corrected collapsed Music Library row overflow and compact Queue action-button clipping.
+- Added Cadence Studio icon fallback for song-change notifications without valid artwork.
+- Matched notification popup transport controls to the main player.
+- Updated application, updater and installer version metadata to v1.2.
+
 ## v1.1 — Stable release
 
 - Promoted the validated v1.1 development line to the second stable Cadence Studio release.

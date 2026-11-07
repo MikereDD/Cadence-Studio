@@ -36,7 +36,7 @@
                     CornerRadius="18,18,0,0" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
                 <Grid>
                     <TextBlock Text="About Cadence Studio" Style="{StaticResource SecondaryDialogTitleStyle}" Margin="18,0" />
-                    <Button HorizontalAlignment="Right" shell:WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource CloseWindowButtonStyle}" Content="×" Click="Close_Click" />
+                    <Button HorizontalAlignment="Right" shell:WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource CloseWindowButtonStyle}" Content="Close" ContentTemplate="{StaticResource CadenceDialogCloseIconTemplate}" ToolTip="Close" AutomationProperties.Name="Close dialog" Click="Close_Click" />
                 </Grid>
             </Border>
 

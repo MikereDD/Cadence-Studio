@@ -5,36 +5,18 @@
         AllowsTransparency="True" Background="Transparent" ShowInTaskbar="False" Topmost="True"
         Opacity="0" MouseLeftButtonUp="Window_MouseLeftButtonUp">
     <Window.Resources>
-        <Style x:Key="PopupTransportButtonStyle" TargetType="Button">
+        <!-- Use the exact shared transport family used by the main player. -->
+        <Style x:Key="PopupTransportButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource TransportButtonStyle}">
             <Setter Property="Width" Value="38"/>
             <Setter Property="Height" Value="38"/>
-            <Setter Property="Background" Value="{DynamicResource PremiumButtonBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
-            <Setter Property="BorderThickness" Value="1.2"/>
-            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Grid RenderTransformOrigin="0.5,0.5">
-                            <Grid.RenderTransform><ScaleTransform ScaleX="1" ScaleY="1"/></Grid.RenderTransform>
-                            <Ellipse x:Name="Face" Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="{TemplateBinding BorderThickness}"/>
-                            <Ellipse Margin="4" Stroke="#32FFFFFF" StrokeThickness="1"/>
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Face" Property="Fill" Value="{DynamicResource PremiumButtonHoverBrush}"/>
-                                <Setter TargetName="Face" Property="Stroke" Value="{DynamicResource AccentBrush}"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Face" Property="Fill" Value="{DynamicResource PremiumButtonPressedBrush}"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+        </Style>
+        <Style x:Key="PopupReactivePlayButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource ReactivePlayTransportButtonStyle}">
+            <Setter Property="Width" Value="38"/>
+            <Setter Property="Height" Value="38"/>
         </Style>
 
         <Style x:Key="PopupProgressStyle" TargetType="ProgressBar">
@@ -75,10 +57,21 @@
                 <ColumnDefinition Width="142"/>
             </Grid.ColumnDefinitions>
 
-            <Border Width="66" Height="66" CornerRadius="11" ClipToBounds="True" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
-                <Border.Background>
-                    <ImageBrush ImageSource="{Binding NowPlayingArtwork, Converter={StaticResource AlbumArtConverter}}" Stretch="UniformToFill"/>
-                </Border.Background>
+            <Border Width="66" Height="66" CornerRadius="11" ClipToBounds="True"
+                    Background="{DynamicResource AlbumArtPlaceholderBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+                <Grid>
+                    <Image Source="Assets/cadence-studio-icon-256.png"
+                           Width="44" Height="44" Stretch="Uniform"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           IsHitTestVisible="False" />
+                    <Border>
+                        <Border.Background>
+                            <ImageBrush ImageSource="{Binding NowPlayingArtwork, Converter={StaticResource AlbumArtConverter}}"
+                                        Stretch="UniformToFill"/>
+                        </Border.Background>
+                    </Border>
+                </Grid>
             </Border>
 
             <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,14,0">
@@ -92,18 +85,28 @@
             </StackPanel>
 
             <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                <Button Style="{StaticResource PopupTransportButtonStyle}" Command="{Binding PreviousCommand}" ToolTip="Previous">
-                    <Path Data="M 15,7 L 15,25 M 14,16 L 25,8 L 25,24 Z" Stroke="{DynamicResource TextPrimaryBrush}" Fill="{DynamicResource TextPrimaryBrush}" StrokeThickness="2" Stretch="Uniform" Width="15" Height="17"/>
+                <Button Style="{StaticResource PopupTransportButtonStyle}"
+                        Command="{Binding PreviousCommand}" ToolTip="Previous"
+                        AutomationProperties.Name="Previous track">
+                    <TextBlock Text="&#xE892;" FontFamily="Segoe Fluent Icons" FontSize="15"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Button>
-                <Button Style="{StaticResource PopupTransportButtonStyle}" Command="{Binding TogglePlaybackCommand}" ToolTip="Play or pause" Margin="9,0">
-                    <Grid Width="18" Height="18">
-                        <Path Data="M 4,2 L 16,9 L 4,16 Z" Fill="{DynamicResource TextPrimaryBrush}">
+                <Button Style="{StaticResource PopupReactivePlayButtonStyle}"
+                        Command="{Binding TogglePlaybackCommand}" ToolTip="Play or pause"
+                        AutomationProperties.Name="Play or pause" Margin="9,0">
+                    <Grid Width="18" Height="18" IsHitTestVisible="False">
+                        <Path Data="M 4,2 L 4,16 L 16,9 Z"
+                              Fill="Transparent"
+                              Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                              StrokeThickness="1.8"
+                              StrokeLineJoin="Round">
                             <Path.Style>
                                 <Style TargetType="Path">
                                     <Setter Property="Visibility" Value="Visible"/>
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding PlayPauseGlyph}" Value="⏸"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger>
-                                        <DataTrigger Binding="{Binding PlayPauseGlyph}" Value="Ⅱ"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger>
+                                        <DataTrigger Binding="{Binding IsPlaybackPlaying}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </Path.Style>
@@ -113,18 +116,26 @@
                                 <Style TargetType="Grid">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding PlayPauseGlyph}" Value="⏸"><Setter Property="Visibility" Value="Visible"/></DataTrigger>
-                                        <DataTrigger Binding="{Binding PlayPauseGlyph}" Value="Ⅱ"><Setter Property="Visibility" Value="Visible"/></DataTrigger>
+                                        <DataTrigger Binding="{Binding IsPlaybackPlaying}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </Grid.Style>
-                            <Rectangle Width="5" Height="16" RadiusX="1" RadiusY="1" Fill="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Left"/>
-                            <Rectangle Width="5" Height="16" RadiusX="1" RadiusY="1" Fill="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Right"/>
+                            <Rectangle Width="4" Height="14" HorizontalAlignment="Left"
+                                       Margin="3,0,0,0" RadiusX="1" RadiusY="1"
+                                       Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                            <Rectangle Width="4" Height="14" HorizontalAlignment="Right"
+                                       Margin="0,0,3,0" RadiusX="1" RadiusY="1"
+                                       Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
                         </Grid>
                     </Grid>
                 </Button>
-                <Button Style="{StaticResource PopupTransportButtonStyle}" Command="{Binding NextCommand}" ToolTip="Next">
-                    <Path Data="M 11,8 L 22,16 L 11,24 Z M 23,7 L 23,25" Stroke="{DynamicResource TextPrimaryBrush}" Fill="{DynamicResource TextPrimaryBrush}" StrokeThickness="2" Stretch="Uniform" Width="15" Height="17"/>
+                <Button Style="{StaticResource PopupTransportButtonStyle}"
+                        Command="{Binding NextCommand}" ToolTip="Next"
+                        AutomationProperties.Name="Next track">
+                    <TextBlock Text="&#xE893;" FontFamily="Segoe Fluent Icons" FontSize="15"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Button>
             </StackPanel>
 
