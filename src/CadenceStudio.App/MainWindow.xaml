@@ -529,7 +529,7 @@
                                             <Style TargetType="TreeViewItem" BasedOn="{StaticResource DarkTreeViewItemStyle}" />
                                             <HierarchicalDataTemplate DataType="{x:Type vm:LibraryFolderNode}" ItemsSource="{Binding Children}">
                                                 <Grid Margin="0,2,6,2" HorizontalAlignment="Left"
-                                                      Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=TreeView}, Converter={StaticResource LibraryRowWidthConverter}, ConverterParameter=34}">
+                                                      Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=TreeView}, Converter={StaticResource LibraryRowWidthConverter}, ConverterParameter=64}">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*" />
                                                         <ColumnDefinition Width="Auto" />
