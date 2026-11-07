@@ -15,6 +15,7 @@
   <img src="https://img.shields.io/badge/audio-NAudio%202.3.0-555b66" alt="NAudio 2.3.0">
   <img src="https://img.shields.io/badge/metadata-TagLibSharp%202.3.0-555b66" alt="TagLibSharp 2.3.0">
   <img src="https://img.shields.io/badge/UI-WPF%20%2B%20XAML-2d2d2d" alt="WPF and XAML">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-b8872c" alt="License: Apache-2.0"></a>
 </p>
 
 <p align="center">
@@ -25,6 +26,8 @@
   <a href="CHANGELOG.md">Changelog</a>
   ·
   <a href="ROADMAP.md">Roadmap</a>
+  ·
+  <a href="LICENSE">Apache-2.0 License</a>
 </p>
 
 ---
@@ -185,6 +188,11 @@ Cadence Studio is local-first. It requires no account, subscription, telemetry, 
 
 Online enrichment is optional. Playback, local indexing, playlists, local metadata, and cached content remain available offline.
 
+## License
+
+Cadence Studio is licensed under the [Apache License 2.0](LICENSE).
+
+Third-party components and services retain their own licenses and terms. See [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) for details.
 ## Design principles
 
 Cadence Studio aims for **controlled spectacle rather than clutter**: layered depth, tactile controls, expressive visualizers, strong typography, and clear hierarchy without sacrificing reliability, performance, or accessibility.
@@ -201,6 +209,7 @@ Stable releases are quality gates, not schedule targets. v1.1 was promoted only 
 - [Changelog](CHANGELOG.md)
 - [Release Notes](RELEASE-NOTES.md)
 - [Third-Party Notices](THIRD-PARTY-NOTICES.md)
+- [Apache-2.0 License](LICENSE)
 
 ---
 
