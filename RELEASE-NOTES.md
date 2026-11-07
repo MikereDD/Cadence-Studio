@@ -1,3 +1,21 @@
+# Cadence Studio v1.2 — Release Preparation
+
+This release focuses on interface consistency, button behavior, layout corrections and improved song-change notifications.
+
+## Highlights
+
+- Unified themed transport, Library, Queue, playlist and dialog controls.
+- Improved responsive Music Library and compact Queue layouts.
+- Cadence Studio icon fallback when album artwork is unavailable.
+- Song-change notification controls matching the main player.
+
+## Release status
+
+Release build verified with zero compilation errors.
+Final regression tests, packaging and publication remain pending.
+
+---
+
 # Cadence Studio v1.1 — Stable Release
 
 Cadence Studio v1.1 is the second stable release of the Windows music player. It keeps the local-first playback and library workflow of v1.0 while adding a stronger Windows background-player experience, refined audio and visual behavior, and a hardened signed-update foundation.

@@ -1,5 +1,5 @@
 #ifndef MyAppVersion
-  #define MyAppVersion "1.0"
+  #error MyAppVersion must be supplied by New-Installer.ps1
 #endif
 #ifndef PublishDir
   #error PublishDir must be supplied by New-Installer.ps1
@@ -36,7 +36,7 @@ CloseApplications=yes
 RestartApplications=no
 ArchitecturesAllowed=x64compatible arm64
 ChangesAssociations=no
-VersionInfoVersion=1.1.0.0
+VersionInfoVersion=1.2.0.0
 VersionInfoProductName={#MyAppName}
 VersionInfoDescription=Cadence Studio installer
 
