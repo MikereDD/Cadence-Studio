@@ -926,4 +926,16 @@
         <Setter Property="Width" Value="80" />
         <Setter Property="Height" Value="80" />
     </Style>
+
+    <!-- v9: identical vector Close icon for all secondary dialogs.
+         Content remains a screen-reader-friendly label; only its visual rendering changes. -->
+    <DataTemplate x:Key="CadenceDialogCloseIconTemplate">
+        <Viewbox Width="12" Height="12" Stretch="Uniform" IsHitTestVisible="False">
+            <Path Data="M 3,3 L 13,13 M 13,3 L 3,13"
+                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                  StrokeThickness="1.5"
+                  StrokeStartLineCap="Round"
+                  StrokeEndLineCap="Round" />
+        </Viewbox>
+    </DataTemplate>
 </ResourceDictionary>

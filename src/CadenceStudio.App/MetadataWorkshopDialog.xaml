@@ -175,7 +175,7 @@
                         <TextBlock Text="Metadata Workshop" FontSize="14" FontWeight="Bold"/>
                         <Border Background="{DynamicResource AccentSoftBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="8,3" Margin="12,0,0,0"><TextBlock Text="SAFE REVIEW" FontSize="9" FontWeight="Bold"/></Border>
                     </StackPanel>
-                    <Button HorizontalAlignment="Right" shell:WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource CloseWindowButtonStyle}" Content="×" Click="Close_Click"/>
+                    <Button HorizontalAlignment="Right" shell:WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource CloseWindowButtonStyle}" Content="Close" ContentTemplate="{StaticResource CadenceDialogCloseIconTemplate}" ToolTip="Close" AutomationProperties.Name="Close dialog" Click="Close_Click"/>
                 </Grid>
             </Border>
             <Grid Grid.Row="1" Margin="24">
