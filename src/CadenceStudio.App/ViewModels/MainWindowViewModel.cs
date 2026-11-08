@@ -524,11 +524,11 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
     }
     public string PlaybackStatusText => _playbackService.Snapshot.State switch
     {
-        PlaybackState.Playing => "NAudio playback active",
-        PlaybackState.Paused => "Playback paused",
-        PlaybackState.Faulted => "Playback needs attention",
-        _ when _playbackService.Snapshot.CurrentTrack is not null => "Track ready",
-        _ => "NAudio playback online"
+        PlaybackState.Playing => "Playing",
+        PlaybackState.Paused => "Paused",
+        PlaybackState.Faulted => "Playback error",
+        _ when _playbackService.Snapshot.CurrentTrack is not null => "Ready",
+        _ => "Ready"
     };
 
     public bool IsPlaybackPlaying => _playbackService.Snapshot.State == PlaybackState.Playing;
@@ -709,7 +709,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
                 ApplyLibrarySnapshot(snapshot, preparedFolders);
                 LibraryScanStatus = snapshot.Tracks.Count == 0
                     ? "No indexed tracks yet"
-                    : $"Loaded {IndexedTrackCountText}";
+                    : string.Empty;
                 StatusText = snapshot.Tracks.Count == 0
                     ? "Library ready • Scan a saved root to begin"
                     : $"Library ready • {IndexedTrackCountText}";

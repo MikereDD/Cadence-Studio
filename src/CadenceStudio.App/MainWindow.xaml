@@ -402,7 +402,7 @@
                                     </Viewbox>
                                 </Button>
                                 <Border Background="{DynamicResource WindowBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="12" Padding="12,7">
-                                    <StackPanel Orientation="Horizontal"><Ellipse Width="7" Height="7" Fill="{DynamicResource SuccessBrush}" Margin="0,0,8,0"/><TextBlock Text="Playback online" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/></StackPanel>
+                                    <StackPanel Orientation="Horizontal"><Ellipse Width="7" Height="7" Fill="{DynamicResource SuccessBrush}" Margin="0,0,8,0"/><TextBlock Text="{Binding PlaybackStatusText}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/></StackPanel>
                                 </Border>
                             </StackPanel>
                         </Grid>
@@ -506,6 +506,15 @@
                                 </Border>
 
                                 <Grid Grid.Row="3" Margin="0,10,0,8">
+                                    <Grid.Style>
+                                        <Style TargetType="Grid">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding LibraryScanStatus}" Value="">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Grid.Style>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
@@ -895,7 +904,7 @@
                                                     <ScrollViewer.Style><Style TargetType="ScrollViewer"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding IsLyricsTabActive}" Value="True"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></ScrollViewer.Style>
                                                     <Border Style="{StaticResource LyricsPanelStyle}">
                                                         <StackPanel>
-                                                            <Grid Margin="0,0,0,9"><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions><TextBlock Text="LYRICS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" /><Border Grid.Column="1" Background="{DynamicResource SurfaceRaisedBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="7,2"><TextBlock Text="{Binding LyricsSourceText}" Style="{StaticResource CaptionStyle}" /></Border></Grid>
+                                                            <Grid Margin="0,0,0,9"><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions><TextBlock Text="LYRICS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" /><Border Grid.Column="1" Background="{DynamicResource SurfaceRaisedBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="7,2"><Border.Style><Style TargetType="Border"><Style.Triggers><DataTrigger Binding="{Binding LyricsSourceText}" Value=""><Setter Property="Visibility" Value="Collapsed" /></DataTrigger></Style.Triggers></Style></Border.Style><TextBlock Text="{Binding LyricsSourceText}" Style="{StaticResource CaptionStyle}" /></Border></Grid>
                                                             <TextBlock Text="{Binding LyricsText}" TextWrapping="Wrap" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="{DynamicResource AppBodyFontSize}" FontWeight="Medium" LineHeight="24" />
                                                         </StackPanel>
                                                     </Border>
@@ -919,7 +928,7 @@
                                                         <Style TargetType="TextBlock" BasedOn="{StaticResource CaptionStyle}">
                                                             <Setter Property="Text" Value="{Binding MusicBrainzStatus}" />
                                                             <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding IsLyricsTabActive}" Value="True"><Setter Property="Text" Value="{Binding LyricsSourceText}" /></DataTrigger>
+                                                                <DataTrigger Binding="{Binding IsLyricsTabActive}" Value="True"><Setter Property="Visibility" Value="Collapsed" /></DataTrigger>
                                                                 <DataTrigger Binding="{Binding IsBioTabActive}" Value="True"><Setter Property="Text" Value="{Binding BioSourceText}" /></DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
@@ -1293,7 +1302,7 @@
                                                     <Border Style="{StaticResource LyricsPanelStyle}" Padding="16,14">
                                                         <StackPanel>
                                                             <Border Height="2" Margin="0,0,0,12" CornerRadius="1" Background="{DynamicResource AccentBrush}" Opacity="0.70" />
-                                                            <Grid Margin="0,0,0,12"><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions><TextBlock Text="LYRICS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" /><Border Grid.Column="1" Background="{DynamicResource SurfaceRaisedBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="8,3"><TextBlock Text="{Binding LyricsSourceText}" Style="{StaticResource CaptionStyle}" /></Border></Grid>
+                                                            <Grid Margin="0,0,0,12"><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions><TextBlock Text="LYRICS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" /><Border Grid.Column="1" Background="{DynamicResource SurfaceRaisedBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="8,3"><Border.Style><Style TargetType="Border"><Style.Triggers><DataTrigger Binding="{Binding LyricsSourceText}" Value=""><Setter Property="Visibility" Value="Collapsed" /></DataTrigger></Style.Triggers></Style></Border.Style><TextBlock Text="{Binding LyricsSourceText}" Style="{StaticResource CaptionStyle}" /></Border></Grid>
                                                             <TextBlock Text="{Binding LyricsText}" TextWrapping="Wrap" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="{DynamicResource AppLyricsFontSize}" FontWeight="Medium" LineHeight="{DynamicResource AppLyricsLineHeight}" TextAlignment="Center" Padding="8,4" />
                                                         </StackPanel>
                                                     </Border>
@@ -1313,7 +1322,7 @@
                                             <Grid Grid.Row="3">
                                                 <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
                                                 <TextBlock TextTrimming="CharacterEllipsis">
-                                                    <TextBlock.Style><Style TargetType="TextBlock" BasedOn="{StaticResource CaptionStyle}"><Setter Property="Text" Value="{Binding MusicBrainzStatus}" /><Style.Triggers><DataTrigger Binding="{Binding IsLyricsTabActive}" Value="True"><Setter Property="Text" Value="{Binding LyricsSourceText}" /></DataTrigger><DataTrigger Binding="{Binding IsBioTabActive}" Value="True"><Setter Property="Text" Value="{Binding BioSourceText}" /></DataTrigger></Style.Triggers></Style></TextBlock.Style>
+                                                    <TextBlock.Style><Style TargetType="TextBlock" BasedOn="{StaticResource CaptionStyle}"><Setter Property="Text" Value="{Binding MusicBrainzStatus}" /><Style.Triggers><DataTrigger Binding="{Binding IsLyricsTabActive}" Value="True"><Setter Property="Visibility" Value="Collapsed" /></DataTrigger><DataTrigger Binding="{Binding IsBioTabActive}" Value="True"><Setter Property="Text" Value="{Binding BioSourceText}" /></DataTrigger></Style.Triggers></Style></TextBlock.Style>
                                                 </TextBlock>
                                                 <Grid Grid.Row="1" Margin="0,9,0,0"><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions><TextBlock Text="{Binding EnrichmentStatus}" Style="{StaticResource CaptionStyle}" TextTrimming="CharacterEllipsis" /><Button Grid.Column="1" Style="{StaticResource PillButtonStyle}" Padding="9,5" Content="Refresh" Command="{Binding RefreshEnrichmentCommand}" Margin="9,0,0,0" /></Grid>
                                             </Grid>
@@ -2316,8 +2325,6 @@
                                                     <TextBlock Text="Version, credits, paths, logs, and diagnostics." Style="{StaticResource CaptionStyle}" Margin="0,4,0,0" />
                                                 </StackPanel>
                                             </Grid>
-                                            <TextBlock Grid.Row="1" Text="Separate from Cadence Classic. Reliable, functional, polished, and built for Eye Candy."
-                                                       Style="{StaticResource CaptionStyle}" TextWrapping="Wrap" Margin="0,13,0,0" />
                                             <Button Grid.Row="2" Style="{StaticResource PillButtonStyle}" Content="Open About" Click="About_Click"
                                                     HorizontalAlignment="Left" Margin="0,14,0,0" />
                                         </Grid>
@@ -2945,7 +2952,7 @@
                         <Ellipse Width="6" Height="6" Fill="{DynamicResource SuccessBrush}" Margin="0,0,8,0" />
                         <TextBlock Text="{Binding StatusText}" Style="{StaticResource CaptionStyle}" />
                     </StackPanel>
-                    <TextBlock Grid.Column="1" Text="Separate from Cadence Classic" Style="{StaticResource CaptionStyle}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="Cadence Studio" Style="{StaticResource CaptionStyle}" VerticalAlignment="Center" />
                 </Grid>
             </Border>
         </Grid>

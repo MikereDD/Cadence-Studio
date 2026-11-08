@@ -16,7 +16,7 @@ public sealed partial class MainWindowViewModel
     private string _musicBrainzStatus = "Not matched";
     private string _nowPlayingDetailsText = "Audio and metadata details appear here.";
     private string _lyricsText = "No lyrics loaded.";
-    private string _lyricsSourceText = "Local lyrics are checked before online lookup.";
+    private string _lyricsSourceText = string.Empty;
     private string _artistBioText = "No artist biography loaded.";
     private string _bioSourceText = "MusicBrainz and Wikipedia attribution appears here.";
     private string? _onlineArtworkTrackPath;
@@ -170,7 +170,7 @@ public sealed partial class MainWindowViewModel
             MusicBrainzStatus = "Looking up MusicBrainz…";
             NowPlayingDetailsText = BuildLocalDetails(track);
             LyricsText = "Looking for embedded, local, and online lyrics…";
-            LyricsSourceText = "Lyrics lookup in progress";
+            LyricsSourceText = string.Empty;
             ArtistBioText = "Looking up artist information…";
             BioSourceText = "Artist lookup in progress";
         });
@@ -200,7 +200,7 @@ public sealed partial class MainWindowViewModel
                 MusicBrainzStatus = "MusicBrainz unavailable";
                 NowPlayingDetailsText = BuildLocalDetails(track);
                 LyricsText = "Lyrics could not be loaded.";
-                LyricsSourceText = "Check the Cadence Studio log for details";
+                LyricsSourceText = string.Empty;
                 ArtistBioText = "Artist biography could not be loaded.";
                 BioSourceText = "Check the Cadence Studio log for details";
             });
@@ -218,7 +218,7 @@ public sealed partial class MainWindowViewModel
             : "Enrichment lookup complete and cached locally";
         NowPlayingDetailsText = BuildEnrichedDetails(track, enrichment);
         LyricsText = enrichment.HasLyrics ? enrichment.LyricsText : "No lyrics were found for this track.";
-        LyricsSourceText = enrichment.LyricsSource;
+        LyricsSourceText = enrichment.HasLyrics ? enrichment.LyricsSource : string.Empty;
         ArtistBioText = enrichment.HasBio ? enrichment.ArtistBio : "No artist biography was found.";
         BioSourceText = enrichment.BioSource;
         ApplyOnlineArtwork(track, enrichment);
@@ -233,7 +233,7 @@ public sealed partial class MainWindowViewModel
         MusicBrainzStatus = "Not matched";
         NowPlayingDetailsText = "Audio and metadata details appear here.";
         LyricsText = "No lyrics loaded.";
-        LyricsSourceText = "Local lyrics are checked before online lookup.";
+        LyricsSourceText = string.Empty;
         ArtistBioText = "No artist biography loaded.";
         BioSourceText = "MusicBrainz and Wikipedia attribution appears here.";
     }

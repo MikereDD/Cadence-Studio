@@ -40,7 +40,6 @@ v1.3 adds monitor-aware fullscreen and configurable Current Display, All Display
 
 **v1.3 is a manual-install stable release. Automatic update discovery remains unpublished.**
 
-Cadence Studio is separate from **Cadence Classic**, the original PowerShell/WinForms application. Both projects retain independent codebases, settings, release histories, and development paths.
 
 ## Screenshots
 
