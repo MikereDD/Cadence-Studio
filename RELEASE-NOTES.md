@@ -1,3 +1,24 @@
+# Cadence Studio v1.3 — Stable Release
+
+Cadence Studio v1.3 brings flexible multi-monitor fullscreen rendering to the detached Window Visualizer, preserving the interface and transport refinements from the v1.2 cycle.
+
+## Highlights
+
+- **Current Display** (default): fullscreen on the monitor hosting the visualizer.
+- **All Displays**: one independently sized visualizer per connected screen, using the same audio-driven view model.
+- **Selected Display**: target an explicitly chosen Windows monitor.
+- Better framing on mixed resolutions and aspect ratios, including 16:9 and 16:10 layouts.
+- Fullscreen monitor navigation and window restoration controls.
+
+## Distribution
+
+Manual-install stable release: self-contained and framework-dependent portable ZIPs plus per-user Windows installer, each with a SHA-256 sidecar. The signed-updater foundation remains present; the stable online automatic-update discovery manifest is intentionally not published.
+
+## Verification
+
+Build, audio, manifest security, updater regression, signed integration, and release artifact checks are required before publication. Install/launch and multi-monitor fullscreen behavior are manually smoke-tested before publishing.
+
+---
 # Cadence Studio v1.2 — Stable Release
 
 This release focuses on interface consistency, button behavior, layout corrections and improved song-change notifications.

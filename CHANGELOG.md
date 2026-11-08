@@ -2,6 +2,15 @@
 
 All notable Cadence Studio changes are recorded here in reverse chronological order. Repeated micro-build entries from the development cycle are consolidated under their final milestone versions for clarity.
 
+## v1.3 — Stable release
+
+- Added fullscreen scope controls: Current Display (default), All Displays, and Selected Display.
+- Fullscreen now uses the target monitor bounds rather than the combined virtual desktop.
+- Added independent monitor-sized render surfaces for mixed display dimensions and aspect ratios.
+- Added keyboard monitor navigation and more reliable fullscreen restoration.
+- Incorporated the prior transport/theme unification refinements.
+- Updated app, updater, installer and release metadata to v1.3.
+- Kept stable auto-update discovery unpublished; release is manual installer/portable delivery.
 ## v1.2 — Stable release
 
 - Unified transport, Library, Queue, utility, playlist and dialog button styling.

@@ -4,8 +4,8 @@ public static class ProductInfo
 {
     public const string Name = "Cadence Studio";
     public const string AppId = "cadence-studio";
-    public const string DisplayVersion = "v1.2";
-    public const string InformationalVersion = "1.2";
+    public const string DisplayVersion = "v1.3";
+    public const string InformationalVersion = "1.3";
     public const string UpdateChannel = "stable";
     public const int ReleaseManifestSchemaVersion = 3;
     public const int UpdaterProtocolVersion = 3;

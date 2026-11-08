@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.2-b8872c" alt="Version 1.2">
+  <img src="https://img.shields.io/badge/version-1.3-b8872c" alt="Version 1.3">
   <img src="https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-555b66" alt="Windows 10 and 11">
   <img src="https://img.shields.io/badge/.NET-8-555b66" alt=".NET 8">
   <img src="https://img.shields.io/badge/audio-NAudio%202.3.0-555b66" alt="NAudio 2.3.0">
@@ -32,13 +32,13 @@
 
 ---
 
-## Cadence Studio v1.2
+## Cadence Studio v1.3
 
 Cadence Studio is a modern Windows music player focused on dependable local playback, expressive visuals, strong metadata tools, and a carefully designed desktop experience.
 
-v1.2 refines the interface with unified themed buttons, corrected Music Library and Queue layouts, and improved song-change notifications with Cadence artwork fallback and matching transport controls.
+v1.3 adds monitor-aware fullscreen and configurable Current Display, All Displays, and Selected Display modes, rendering independently at each screen resolution. It retains the v1.2 interface and transport polish.
 
-**v1.2 is a manual-install stable release. Automatic update discovery remains unpublished.**
+**v1.3 is a manual-install stable release. Automatic update discovery remains unpublished.**
 
 Cadence Studio is separate from **Cadence Classic**, the original PowerShell/WinForms application. Both projects retain independent codebases, settings, release histories, and development paths.
 
@@ -82,6 +82,7 @@ Cadence Studio is separate from **Cadence Classic**, the original PowerShell/Win
 - Full-spectrum FFT visualizers with multiple densities, palettes, response controls, and reduced-motion support.
 - Compact and expanded Now Playing workspaces with responsive layout behavior.
 - Detached Window Visualizer with **Celestial Resonance**, **Aurora Cascade**, **Glass Horizon**, and **Infinite Windows** presets.
+- Configurable fullscreen on the current, all, or a selected display, independently adapted to each monitor.
 - Corrected mirrored waveform direction and horizon baseline behavior.
 - Song-change notifications with artwork, progress, and playback controls.
 
@@ -106,7 +107,7 @@ Cadence Studio is separate from **Cadence Classic**, the original PowerShell/Win
 
 Prebuilt installers and portable packages are published through [**GitHub Releases**](https://github.com/MikereDD/Cadence-Studio/releases). Release binaries are intentionally kept out of the source repository.
 
-v1.2 uses manual installation. The signed updater foundation remains in the codebase, but no stable online discovery manifest is published for automatic updates.
+v1.3 uses manual installation. The signed updater foundation remains in the codebase, but no stable online discovery manifest is published for automatic updates.
 
 ### Windows installer
 
