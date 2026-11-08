@@ -41,6 +41,8 @@ public sealed class VisualizerExperienceSettings
     public double WindowWidth { get; set; } = 1180;
     public double WindowHeight { get; set; } = 720;
     public string? WindowMonitorDeviceName { get; set; }
+    // Current, All, or Selected; selected device uses WindowMonitorDeviceName.
+    public string FullscreenDisplayScope { get; set; } = "Current";
 
     public void Normalize()
     {
@@ -62,6 +64,8 @@ public sealed class VisualizerExperienceSettings
         WindowHeight = Normalize(WindowHeight, 320, 4320, 720);
         WindowLeft = NormalizeCoordinate(WindowLeft);
         WindowTop = NormalizeCoordinate(WindowTop);
+        FullscreenDisplayScope = FullscreenDisplayScope is "Current" or "All" or "Selected"
+            ? FullscreenDisplayScope : "Current";
         WindowMonitorDeviceName = string.IsNullOrWhiteSpace(WindowMonitorDeviceName)
             ? null
             : WindowMonitorDeviceName.Trim();
