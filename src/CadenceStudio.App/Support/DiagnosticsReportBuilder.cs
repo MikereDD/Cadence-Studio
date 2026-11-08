@@ -57,7 +57,6 @@ public static class DiagnosticsReportBuilder
         AppendPath(builder, "Playlists", paths.PlaylistsFile, isDirectory: false);
         AppendPath(builder, "Log file", paths.LogFile, isDirectory: false);
         builder.AppendLine();
-        builder.AppendLine("Cadence Studio is a separate modern desktop application from Cadence Classic.");
         return builder.ToString();
     }
 

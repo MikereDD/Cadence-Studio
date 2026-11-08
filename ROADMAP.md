@@ -1,8 +1,8 @@
 # Cadence Studio roadmap
 
-Cadence Studio is a separate C#/WPF/XAML/MVVM application. Cadence Classic remains the stable PowerShell/WinForms project.
+Cadence Studio is a local-first Windows music player built with C#, WPF, XAML, and MVVM.
 
-Stable v1.0 is gated by quality, not schedule. The app will not be called stable until it is reliable, visually cohesive, accessible, performant, and properly packaged.
+The v1.3 stable milestone is complete; subsequent work focuses on usability, reliability, performance, and presentation.
 
 ## Completed foundation
 

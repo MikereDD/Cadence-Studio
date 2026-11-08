@@ -65,9 +65,7 @@
                         <StackPanel>
                             <TextBlock Text="Reliable. Functional. Polished. Eye Candy." Style="{StaticResource PanelTitleStyle}" />
                             <TextBlock Margin="0,8,0,0" TextWrapping="Wrap" LineHeight="20"
-                                       Text="Cadence Studio combines a direct, practical music-library workflow with a polished modern Windows experience built using C#, WPF, XAML, and MVVM." />
-                            <TextBlock Margin="0,10,0,0" Style="{StaticResource CaptionStyle}" TextWrapping="Wrap"
-                                       Text="Cadence Studio is a separate application that preserves Cadence Classic while providing its own modern architecture, visual system, and release path." />
+                                       Text="A local-first Windows music player with library browsing, playlists, metadata tools, artwork, and customizable visualizers." />
                         </StackPanel>
                     </Border>
 

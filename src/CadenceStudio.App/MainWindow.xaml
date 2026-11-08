@@ -402,7 +402,7 @@
                                     </Viewbox>
                                 </Button>
                                 <Border Background="{DynamicResource WindowBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="12" Padding="12,7">
-                                    <StackPanel Orientation="Horizontal"><Ellipse Width="7" Height="7" Fill="{DynamicResource SuccessBrush}" Margin="0,0,8,0"/><TextBlock Text="Playback online" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/></StackPanel>
+                                    <StackPanel Orientation="Horizontal"><Ellipse Width="7" Height="7" Fill="{DynamicResource SuccessBrush}" Margin="0,0,8,0"/><TextBlock Text="{Binding PlaybackStatusText}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/></StackPanel>
                                 </Border>
                             </StackPanel>
                         </Grid>
@@ -2316,8 +2316,6 @@
                                                     <TextBlock Text="Version, credits, paths, logs, and diagnostics." Style="{StaticResource CaptionStyle}" Margin="0,4,0,0" />
                                                 </StackPanel>
                                             </Grid>
-                                            <TextBlock Grid.Row="1" Text="Separate from Cadence Classic. Reliable, functional, polished, and built for Eye Candy."
-                                                       Style="{StaticResource CaptionStyle}" TextWrapping="Wrap" Margin="0,13,0,0" />
                                             <Button Grid.Row="2" Style="{StaticResource PillButtonStyle}" Content="Open About" Click="About_Click"
                                                     HorizontalAlignment="Left" Margin="0,14,0,0" />
                                         </Grid>
@@ -2945,7 +2943,7 @@
                         <Ellipse Width="6" Height="6" Fill="{DynamicResource SuccessBrush}" Margin="0,0,8,0" />
                         <TextBlock Text="{Binding StatusText}" Style="{StaticResource CaptionStyle}" />
                     </StackPanel>
-                    <TextBlock Grid.Column="1" Text="Separate from Cadence Classic" Style="{StaticResource CaptionStyle}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="Cadence Studio" Style="{StaticResource CaptionStyle}" VerticalAlignment="Center" />
                 </Grid>
             </Border>
         </Grid>

@@ -524,11 +524,11 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
     }
     public string PlaybackStatusText => _playbackService.Snapshot.State switch
     {
-        PlaybackState.Playing => "NAudio playback active",
-        PlaybackState.Paused => "Playback paused",
-        PlaybackState.Faulted => "Playback needs attention",
-        _ when _playbackService.Snapshot.CurrentTrack is not null => "Track ready",
-        _ => "NAudio playback online"
+        PlaybackState.Playing => "Playing",
+        PlaybackState.Paused => "Paused",
+        PlaybackState.Faulted => "Playback error",
+        _ when _playbackService.Snapshot.CurrentTrack is not null => "Ready",
+        _ => "Ready"
     };
 
     public bool IsPlaybackPlaying => _playbackService.Snapshot.State == PlaybackState.Playing;
