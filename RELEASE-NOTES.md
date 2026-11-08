@@ -1,3 +1,24 @@
+# Cadence Studio v1.3.1 — Stable Maintenance Release
+
+Cadence Studio v1.3.1 is a focused interface-copy and usability refinement of v1.3. It retains the monitor-aware fullscreen visualizer, playback engine, library, and settings compatibility.
+
+## Highlights
+
+- Removed Cadence Classic messaging from the app and current-facing documentation.
+- Simplified playback status labels and reduced duplicated library count text.
+- Cleaned up lyrics empty states and repeated source attribution; credits remain visible when lyrics exist.
+- Made the About dialog's Updates section more compact, with updater test controls under developer diagnostics.
+- Show the update-install action only when a valid, eligible update is identified.
+
+## Distribution
+
+Manual-install stable release: per-user Windows installer and both portable ZIP variants, each accompanied by a SHA-256 checksum. The signed-updater foundation remains in place, but no stable online automatic-update discovery manifest is being published.
+
+## Verification
+
+Release build, audio/security/updater tests, package checksum verification, and a manual packaged application/installer smoke test are required before publication.
+
+---
 # Cadence Studio v1.3 — Stable Release
 
 Cadence Studio v1.3 brings flexible multi-monitor fullscreen rendering to the detached Window Visualizer, preserving the interface and transport refinements from the v1.2 cycle.

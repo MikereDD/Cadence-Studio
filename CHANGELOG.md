@@ -2,6 +2,14 @@
 
 All notable Cadence Studio changes are recorded here in reverse chronological order. Repeated micro-build entries from the development cycle are consolidated under their final milestone versions for clarity.
 
+## v1.3.1 — Stable maintenance release
+
+- Removed obsolete Cadence Classic references from the main window, About dialog, diagnostics, and current-facing docs.
+- Replaced developer-facing NAudio playback labels with concise user-facing status text.
+- Simplified the About dialog's Updates section while retaining checks, verified installation, and optional developer diagnostics.
+- Removed repeated lyrics attribution and unavailable-lyrics messaging, preserving source credit when lyrics are present.
+- Reduced repeated library track-count status text while retaining scan progress and errors.
+- Kept all v1.3 multi-monitor visualizer and playback behavior; no data migration or auto-update manifest.
 ## v1.3 — Stable release
 
 - Added fullscreen scope controls: Current Display (default), All Displays, and Selected Display.
