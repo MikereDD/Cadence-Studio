@@ -33,9 +33,7 @@ public partial class AboutDialog : Window
             : "STABLE RELEASE";
 
         UpdatePolicyText.Text =
-            $"{Capitalize(ProductInfo.UpdateChannel)} channel • " +
-            $"manifest schema {ProductInfo.ReleaseManifestSchemaVersion} • " +
-            $"updater protocol {ProductInfo.UpdaterProtocolVersion}";
+            $"{ProductInfo.DisplayVersion} • {Capitalize(ProductInfo.UpdateChannel)}";
     }
 
     protected override void OnClosed(EventArgs e)
@@ -69,8 +67,8 @@ public partial class AboutDialog : Window
         DryRunButton.IsEnabled = false;
         _eligibleUpdate = null;
         InstallButton.IsEnabled = false;
-        UpdateStatusText.Text =
-            $"Checking the approved {ProductInfo.UpdateChannel} manifest endpoint...";
+        InstallButton.Visibility = Visibility.Collapsed;
+        UpdateStatusText.Text = "Checking for updates...";
 
         try
         {
@@ -81,7 +79,9 @@ public partial class AboutDialog : Window
             {
                 UpdateStatusText.Text = result.Message;
                 _eligibleUpdate = result;
-                InstallButton.IsEnabled = result.State == CadenceStudio.Core.Updates.UpdateCheckState.UpdateAvailable;
+                var updateAvailable = result.State == CadenceStudio.Core.Updates.UpdateCheckState.UpdateAvailable;
+                InstallButton.IsEnabled = updateAvailable;
+                InstallButton.Visibility = updateAvailable ? Visibility.Visible : Visibility.Collapsed;
             }
         }
         catch (OperationCanceledException)

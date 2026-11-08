@@ -709,7 +709,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
                 ApplyLibrarySnapshot(snapshot, preparedFolders);
                 LibraryScanStatus = snapshot.Tracks.Count == 0
                     ? "No indexed tracks yet"
-                    : $"Loaded {IndexedTrackCountText}";
+                    : string.Empty;
                 StatusText = snapshot.Tracks.Count == 0
                     ? "Library ready • Scan a saved root to begin"
                     : $"Library ready • {IndexedTrackCountText}";

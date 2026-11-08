@@ -74,7 +74,6 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
                             <Grid>
@@ -85,7 +84,7 @@
                                 <StackPanel>
                                     <TextBlock Text="Updates" Style="{StaticResource PanelTitleStyle}" />
                                     <TextBlock x:Name="UpdatePolicyText"
-                                               Text="Development channel • manifest schema 2 • updater protocol 2"
+                                               Text="v1.3 • Stable"
                                                Style="{StaticResource CaptionStyle}"
                                                TextWrapping="Wrap"
                                                Margin="0,6,16,0" />
@@ -98,18 +97,14 @@
                                         VerticalAlignment="Top" />
                             </Grid>
 
-                            <TextBlock Grid.Row="1"
-                                       Text="Test the separate updater safely. Cadence stays open and no update is installed. Without an eligible update, this runs a clearly labeled synthetic test."
-                                       Style="{StaticResource CaptionStyle}"
-                                       TextWrapping="Wrap"
-                                       LineHeight="19"
-                                       Margin="0,13,0,0" />
 
-                            <StackPanel Grid.Row="2"><Button x:Name="InstallButton" Content="Install update and restart" IsEnabled="False" Click="Install_Click" Style="{StaticResource PillButtonStyle}" HorizontalAlignment="Left" Margin="0,12,0,0" /><Button x:Name="DryRunButton" Content="Test updater (no installation)" Click="DryRun_Click" Style="{StaticResource PillButtonStyle}" HorizontalAlignment="Left" Margin="0,12,0,0" /><TextBlock x:Name="UpdateStatusText"
-                                       Grid.Row="2"
-                                       Text="Not checked yet."
-                                       TextWrapping="Wrap"
-                                       Margin="0,13,0,0" /></StackPanel>
+                            <StackPanel Grid.Row="1" Margin="0,12,0,0">
+                                <Button x:Name="InstallButton" Content="Install update and restart"
+                                        IsEnabled="False" Visibility="Collapsed" Click="Install_Click"
+                                        Style="{StaticResource PillButtonStyle}" HorizontalAlignment="Left" Margin="0,0,0,9" />
+                                <TextBlock x:Name="UpdateStatusText" Text="Not checked yet." TextWrapping="Wrap"
+                                           Style="{StaticResource CaptionStyle}" />
+                            </StackPanel>
                         </Grid>
                     </Border>
 
@@ -129,6 +124,16 @@
                                     <Button Style="{StaticResource PillButtonStyle}" Content="Open data" Click="OpenData_Click" Margin="0,0,8,8" />
                                     <Button Style="{StaticResource AccentPillButtonStyle}" Content="Copy diagnostics" Click="CopyDiagnostics_Click" Margin="0,0,8,8" />
                                 </WrapPanel>
+                                <ToggleButton x:Name="UpdaterToolsToggle" Content="Updater diagnostics"
+                                              Style="{StaticResource ChipToggleStyle}" HorizontalAlignment="Left" Margin="0,4,0,0" />
+                                <StackPanel Margin="0,8,0,0"
+                                            Visibility="{Binding IsChecked, ElementName=UpdaterToolsToggle, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <TextBlock Text="Test updater handoff without installing an update."
+                                               Style="{StaticResource CaptionStyle}" TextWrapping="Wrap" />
+                                    <Button x:Name="DryRunButton" Content="Test updater (no installation)"
+                                            Click="DryRun_Click" Style="{StaticResource PillButtonStyle}"
+                                            HorizontalAlignment="Left" Margin="0,8,0,0" />
+                                </StackPanel>
                                 <TextBlock x:Name="DiagnosticsStatusText" Text="Ready" Style="{StaticResource CaptionStyle}" Margin="0,4,0,0" />
                             </StackPanel>
                         </Border>
