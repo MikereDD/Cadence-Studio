@@ -186,6 +186,19 @@ public sealed partial class MainWindowViewModel
     public double? WindowVisualizerSavedTop => Experience.WindowTop;
     public bool ShouldRememberWindowVisualizerPlacement => Experience.RememberWindowPlacement;
     public VisualizerWindowMode WindowVisualizerWindowMode => Experience.DefaultWindowMode;
+
+    public string WindowFullscreenDisplayScope => Experience.FullscreenDisplayScope;
+    public string? WindowFullscreenTargetDisplay => Experience.WindowMonitorDeviceName;
+
+    public void ConfigureWindowFullscreenDisplayScope(string scope, string? monitorDeviceName)
+    {
+        if (scope is not ("Current" or "All" or "Selected")) return;
+        Experience.FullscreenDisplayScope = scope;
+        if (scope == "Selected" && !string.IsNullOrWhiteSpace(monitorDeviceName))
+            Experience.WindowMonitorDeviceName = monitorDeviceName;
+        OnPropertyChanged(nameof(WindowFullscreenDisplayScope));
+        OnPropertyChanged(nameof(WindowFullscreenTargetDisplay));
+    }
     public VisualizerPreset WindowVisualizerPreset => Experience.WindowPreset;
     public string WindowVisualizerPresetLabel => Experience.WindowPreset switch
     {

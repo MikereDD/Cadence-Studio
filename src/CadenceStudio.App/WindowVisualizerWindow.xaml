@@ -179,7 +179,7 @@
     <!-- Edge-to-edge presentation; NO full-width title or transport bars. -->
     <Grid ClipToBounds="True" Background="{DynamicResource WindowBrush}">
         <!-- The entire scene covers the window; only its outer edges crop, never its central focal geometry. -->
-        <Viewbox Stretch="UniformToFill" StretchDirection="Both"
+        <Viewbox x:Name="VisualizerSceneViewbox" Stretch="UniformToFill" StretchDirection="Both"
                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False">
             <Grid x:Name="VisualizerRoot" Width="1180" Height="620" ClipToBounds="True" Opacity="1">
                     <Grid.Background>
@@ -312,7 +312,7 @@
         </Viewbox>
 
         <!-- Left and right are separate floating chips; uncovered caption space remains draggable. -->
-        <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="46" Margin="14,12,14,0"
+        <Grid x:Name="VisualizerTopBar" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="46" Margin="14,12,14,0"
               Panel.ZIndex="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -358,6 +358,16 @@
                         <Path Width="14" Height="14" Stretch="Uniform" Fill="Transparent" Stroke="{DynamicResource TextPrimaryBrush}"
                               StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
                               Data="M 8,3 L 16,3 L 15,8 L 18,11 L 18,13 L 6,13 L 6,11 L 9,8 Z M 12,13 L 12,21"/>
+                    </Button>
+                    <!-- v11.2: choose current, all, or a specific Windows monitor for fullscreen. -->
+                    <Button Style="{StaticResource VisualizerChromeButtonStyle}" Click="DisplayScope_Click"
+                            ToolTip="Fullscreen display scope: current, all, or selected"
+                            AutomationProperties.Name="Choose fullscreen displays"
+                            shell:WindowChrome.IsHitTestVisibleInChrome="True">
+                        <Path Width="15" Height="15" Stretch="Uniform" Fill="Transparent"
+                              Stroke="{DynamicResource TextPrimaryBrush}" StrokeThickness="1.6"
+                              StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                              Data="M 3,5 L 21,5 L 21,17 L 3,17 Z M 9,20 L 15,20 M 12,17 L 12,20"/>
                     </Button>
                     <Button Style="{StaticResource VisualizerChromeButtonStyle}" Click="Fullscreen_Click"
                             ToolTip="Fullscreen / restore (F11)" AutomationProperties.Name="Toggle fullscreen"

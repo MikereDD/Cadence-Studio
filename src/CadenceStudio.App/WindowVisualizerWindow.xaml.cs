@@ -1,4 +1,9 @@
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Windows.Interop;
+using System.Windows.Shell;
+using FormsScreen = System.Windows.Forms.Screen;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -20,9 +25,48 @@ public partial class WindowVisualizerWindow : Window
     private Rect _previousBounds;
     private VisualizerPreset _lastAppliedPreset;
     private bool _animationsStarted;
+    private ResizeMode _previousResizeMode = ResizeMode.CanResize;
+    private bool _previousTopmost;
+    private double _previousCaptionHeight = 58;
+    private string? _fullscreenDisplayName;
+    private HwndSource? _hwndSource;
+    private bool _fullscreenRefreshQueued;
+    private readonly bool _isDisplayMirror;
+    private readonly WindowVisualizerWindow? _displayMaster;
+    private readonly string? _forcedDisplayName;
+    private readonly List<WindowVisualizerWindow> _displayMirrors = new();
+    private bool _reconcilingDisplayMirrors;
 
-    public WindowVisualizerWindow(MainWindowViewModel viewModel)
+    private const int WmDpiChanged = 0x02E0;
+    private const int WmDisplayChange = 0x007E;
+    private const uint SwpNoZOrder = 0x0004;
+    private const uint SwpNoActivate = 0x0010;
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct NativeRect
     {
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
+    }
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool GetWindowRect(IntPtr window, out NativeRect bounds);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool SetWindowPos(IntPtr window, IntPtr insertAfter,
+        int x, int y, int width, int height, uint flags);
+
+    public WindowVisualizerWindow(MainWindowViewModel viewModel,
+        bool isDisplayMirror = false, string? forcedDisplayName = null,
+        WindowVisualizerWindow? displayMaster = null)
+    {
+        _isDisplayMirror = isDisplayMirror;
+        _forcedDisplayName = forcedDisplayName;
+        _displayMaster = displayMaster;
         _viewModel = viewModel;
         InitializeComponent();
         DataContext = viewModel;
@@ -47,10 +91,16 @@ public partial class WindowVisualizerWindow : Window
         _controlsTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Math.Clamp(viewModel.WindowVisualizerControlsAutoHideSeconds, 0.5, 10.0)) };
         _controlsTimer.Tick += (_, _) => HideControls();
         _viewModel.PropertyChanged += ViewModel_PropertyChanged;
+        Microsoft.Win32.SystemEvents.DisplaySettingsChanged += DisplaySettingsChanged;
 
         Loaded += (_, _) =>
         {
-            if (viewModel.WindowVisualizerWindowMode == VisualizerWindowMode.Fullscreen)
+            if (_isDisplayMirror)
+            {
+                VisualizerTopBar.Visibility = Visibility.Collapsed;
+                ControlsPanel.Visibility = Visibility.Collapsed;
+            }
+            if (_isDisplayMirror || viewModel.WindowVisualizerWindowMode == VisualizerWindowMode.Fullscreen)
                 ToggleFullscreen();
             SelectPresetInCombo();
             ApplyPresetVisuals(false);
@@ -61,15 +111,53 @@ public partial class WindowVisualizerWindow : Window
         };
     }
 
+    protected override void OnSourceInitialized(EventArgs e)
+    {
+        base.OnSourceInitialized(e);
+        _hwndSource = PresentationSource.FromVisual(this) as HwndSource;
+        _hwndSource?.AddHook(WindowMessageHook);
+    }
+
     protected override void OnClosing(CancelEventArgs e)
     {
-        if (!_fullscreen)
+        if (!_isDisplayMirror)
+            CloseDisplayMirrors();
+        if (!_isDisplayMirror && !_fullscreen)
             _viewModel.CaptureWindowVisualizerPlacement(Left, Top, ActualWidth, ActualHeight);
+        Microsoft.Win32.SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
+        _hwndSource?.RemoveHook(WindowMessageHook);
         _viewModel.PropertyChanged -= ViewModel_PropertyChanged;
         base.OnClosing(e);
     }
 
-    private void VisualizerWindow_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateDockLayout();
+    private void VisualizerWindow_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        UpdateDockLayout();
+        UpdateVisualizerSceneLayout();
+    }
+
+    // In fullscreen the 1180x620 scene grows to the monitor's aspect ratio.
+    // Uniform scaling then fills 16:9, 16:10 and ultrawide displays without
+    // clipping the center or stretching circular geometry into ellipses.
+    // The chrome and transport dock stay outside the scaled scene.
+    private void UpdateVisualizerSceneLayout()
+    {
+        if (VisualizerRoot is null || VisualizerSceneViewbox is null) return;
+        if (!_fullscreen)
+        {
+            VisualizerRoot.Width = 1180;
+            VisualizerRoot.Height = 620;
+            VisualizerSceneViewbox.Stretch = Stretch.UniformToFill;
+            return;
+        }
+
+        var viewportWidth = Math.Max(1.0, ActualWidth);
+        var viewportHeight = Math.Max(1.0, ActualHeight);
+        var aspect = viewportWidth / viewportHeight;
+        VisualizerRoot.Width = Math.Max(1180.0, 620.0 * aspect);
+        VisualizerRoot.Height = Math.Max(620.0, 1180.0 / aspect);
+        VisualizerSceneViewbox.Stretch = Stretch.Uniform;
+    }
 
     // At compact widths, remove the readout's entire column so the song title
     // gets all available room. Wide windows restore a balanced three-column dock.
@@ -85,6 +173,7 @@ public partial class WindowVisualizerWindow : Window
 
     private void ShowControls()
     {
+        if (_isDisplayMirror) return;
         _controlsTimer.Stop();
         var target = _viewModel.IsWindowPlaybackControlsEnabled ? 1.0 : 0.0;
         ControlsPanel.BeginAnimation(OpacityProperty, new DoubleAnimation(target, TimeSpan.FromMilliseconds(180))
@@ -309,16 +398,102 @@ public partial class WindowVisualizerWindow : Window
         ApplyPlaybackPresentation();
     }
 
+    private void DisplayScope_Click(object sender, RoutedEventArgs e)
+    {
+        if (_isDisplayMirror || sender is not Button button) return;
+        var menu = new ContextMenu { PlacementTarget = button };
+        var scope = _viewModel.WindowFullscreenDisplayScope;
+        var current = new MenuItem
+        {
+            Header = "Current display (default)",
+            IsCheckable = true,
+            IsChecked = scope == "Current"
+        };
+        current.Click += (_, _) => SelectFullscreenDisplays("Current", null);
+        menu.Items.Add(current);
+
+        var all = new MenuItem
+        {
+            Header = "All displays (independent visualizers)",
+            IsCheckable = true,
+            IsChecked = scope == "All"
+        };
+        all.Click += (_, _) => SelectFullscreenDisplays("All", null);
+        menu.Items.Add(all);
+        menu.Items.Add(new Separator());
+
+        var targets = new MenuItem { Header = "Selected display" };
+        foreach (var screen in FormsScreen.AllScreens
+                     .OrderBy(item => item.Bounds.Left).ThenBy(item => item.Bounds.Top))
+        {
+            var name = screen.DeviceName;
+            var label = name.Replace(@"\\.\", "", StringComparison.OrdinalIgnoreCase);
+            var targetItem = new MenuItem
+            {
+                Header = $"{label} — {screen.Bounds.Width} × {screen.Bounds.Height}" +
+                         (screen.Primary ? " (Primary)" : string.Empty),
+                IsCheckable = true,
+                IsChecked = scope == "Selected" &&
+                    string.Equals(name, _viewModel.WindowFullscreenTargetDisplay,
+                                  StringComparison.OrdinalIgnoreCase)
+            };
+            targetItem.Click += (_, _) => SelectFullscreenDisplays("Selected", name);
+            targets.Items.Add(targetItem);
+        }
+        targets.IsEnabled = targets.Items.Count > 0;
+        menu.Items.Add(targets);
+        button.ContextMenu = menu;
+        menu.IsOpen = true;
+    }
+
+    private void SelectFullscreenDisplays(string scope, string? deviceName)
+    {
+        if (_isDisplayMirror) return;
+        _viewModel.ConfigureWindowFullscreenDisplayScope(scope, deviceName);
+        if (!_fullscreen) return;
+
+        if (scope == "Selected" && !string.IsNullOrWhiteSpace(deviceName))
+            _fullscreenDisplayName = deviceName;
+        ApplyFullscreenBounds();
+        ReconcileDisplayMirrors();
+        QueueFullscreenBoundsRefresh();
+        ShowControls();
+    }
+
     private void Pin_Click(object sender, RoutedEventArgs e) => Topmost = !Topmost;
     private void Close_Click(object sender, RoutedEventArgs e) => Close();
     private void Fullscreen_Click(object sender, RoutedEventArgs e) => ToggleFullscreen();
 
     private void Window_KeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Escape && _fullscreen)
+        if (_isDisplayMirror)
+        {
+            // Escape/F11 on ANY monitor restores the controlling visualizer window.
+            if (e.Key == Key.Escape || e.Key == Key.F11)
+            {
+                e.Handled = true;
+                _ = Dispatcher.BeginInvoke(new Action(() => _displayMaster?.ExitFullscreenFromMirror()),
+                    DispatcherPriority.Input);
+            }
+            return;
+        }
+        // The monitor cycle shortcut is distinct from Left/Right preset cycling.
+        if (_fullscreen && Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift) &&
+            e.Key is Key.Left or Key.Right)
+        {
+            CycleFullscreenMonitor(e.Key == Key.Right ? 1 : -1);
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Escape && _fullscreen)
+        {
             ToggleFullscreen();
+            e.Handled = true;
+        }
         else if (e.Key == Key.F11)
+        {
             ToggleFullscreen();
+            e.Handled = true;
+        }
         else if (e.Key == Key.Space)
             _viewModel.TogglePlaybackCommand.Execute(null);
         else if (e.Key is Key.Left or Key.PageUp)
@@ -343,32 +518,200 @@ public partial class WindowVisualizerWindow : Window
         ShowControls();
     }
 
+    // Fullscreen is one monitor, never SystemParameters.VirtualScreen (which
+    // combines every display, including negative coordinates).
     private void ToggleFullscreen()
     {
         if (!_fullscreen)
         {
-            _previousBounds = new Rect(Left, Top, ActualWidth, ActualHeight);
+            var handle = new WindowInteropHelper(this).Handle;
+            if (handle == IntPtr.Zero) return;
+
+            var target = FormsScreen.FromHandle(handle);
+            var configuredDevice = _isDisplayMirror ? _forcedDisplayName :
+                _viewModel.WindowFullscreenDisplayScope == "Selected"
+                    ? _viewModel.WindowFullscreenTargetDisplay : null;
+            _fullscreenDisplayName = configuredDevice ?? target.DeviceName;
+            _previousBounds = WindowState == WindowState.Normal
+                ? new Rect(Left, Top, ActualWidth, ActualHeight)
+                : RestoreBounds;
             _previousState = WindowState;
             _previousStyle = WindowStyle;
+            _previousResizeMode = ResizeMode;
+            _previousTopmost = Topmost;
+
+            var chrome = WindowChrome.GetWindowChrome(this);
+            if (chrome is not null)
+            {
+                _previousCaptionHeight = chrome.CaptionHeight;
+                chrome.CaptionHeight = 0;
+            }
+
             WindowState = WindowState.Normal;
             WindowStyle = WindowStyle.None;
             ResizeMode = ResizeMode.NoResize;
-            Left = SystemParameters.VirtualScreenLeft;
-            Top = SystemParameters.VirtualScreenTop;
-            Width = SystemParameters.VirtualScreenWidth;
-            Height = SystemParameters.VirtualScreenHeight;
+            Topmost = true;
             _fullscreen = true;
+            ApplyFullscreenBounds();
+            QueueFullscreenBoundsRefresh();
+            if (!_isDisplayMirror) ReconcileDisplayMirrors();
         }
         else
         {
-            ResizeMode = ResizeMode.CanResize;
+            if (!_isDisplayMirror) CloseDisplayMirrors();
+            _fullscreen = false;
+            _fullscreenDisplayName = null;
+            var chrome = WindowChrome.GetWindowChrome(this);
+            if (chrome is not null)
+                chrome.CaptionHeight = _previousCaptionHeight;
+
+            WindowState = WindowState.Normal;
             WindowStyle = _previousStyle;
-            WindowState = _previousState;
+            ResizeMode = _previousResizeMode;
             Left = _previousBounds.Left;
             Top = _previousBounds.Top;
             Width = _previousBounds.Width;
             Height = _previousBounds.Height;
-            _fullscreen = false;
+            WindowState = _previousState;
+            Topmost = _previousTopmost;
+            UpdateVisualizerSceneLayout();
         }
+    }
+
+    // DeviceName remains stable across DPI or layout changes while present.
+    // AllScreens supports one, two, three or more monitors without any hardcoded
+    // monitor numbering, origin or common resolution assumption.
+    private void ApplyFullscreenBounds()
+    {
+        if (!_fullscreen) return;
+        var handle = new WindowInteropHelper(this).Handle;
+        if (handle == IntPtr.Zero) return;
+
+        var screens = FormsScreen.AllScreens;
+        if (screens.Length == 0) return;
+        var target = screens.FirstOrDefault(screen =>
+            string.Equals(screen.DeviceName, _fullscreenDisplayName, StringComparison.OrdinalIgnoreCase));
+        if (target is null)
+        {
+            target = FormsScreen.FromHandle(handle);
+            _fullscreenDisplayName = target.DeviceName;
+        }
+
+        var bounds = target.Bounds;
+        if (bounds.Width <= 0 || bounds.Height <= 0) return;
+
+        // Avoid redundant SetWindowPos during WM_DPICHANGED / WM_DISPLAYCHANGE.
+        if (GetWindowRect(handle, out var current) &&
+            current.Left == bounds.Left && current.Top == bounds.Top &&
+            current.Right == bounds.Right && current.Bottom == bounds.Bottom)
+        {
+            UpdateVisualizerSceneLayout();
+            return;
+        }
+
+        if (!SetWindowPos(handle, IntPtr.Zero, bounds.Left, bounds.Top,
+                bounds.Width, bounds.Height, SwpNoZOrder | SwpNoActivate))
+            Debug.WriteLine($"Cadence visualizer: SetWindowPos failed: {Marshal.GetLastWin32Error()}");
+
+        UpdateVisualizerSceneLayout();
+    }
+
+    private void CycleFullscreenMonitor(int direction)
+    {
+        if (!_fullscreen) return;
+        var screens = FormsScreen.AllScreens
+            .OrderBy(screen => screen.Bounds.Left)
+            .ThenBy(screen => screen.Bounds.Top)
+            .ToArray();
+        if (screens.Length < 2) return;
+
+        var index = Array.FindIndex(screens, screen =>
+            string.Equals(screen.DeviceName, _fullscreenDisplayName, StringComparison.OrdinalIgnoreCase));
+        if (index < 0) index = 0;
+        _fullscreenDisplayName = screens[(index + direction + screens.Length) % screens.Length].DeviceName;
+        ApplyFullscreenBounds();
+        QueueFullscreenBoundsRefresh();
+        if (_viewModel.WindowFullscreenDisplayScope == "Selected")
+            _viewModel.ConfigureWindowFullscreenDisplayScope("Selected", _fullscreenDisplayName);
+        ReconcileDisplayMirrors();
+        ShowControls();
+    }
+
+    private void DisplaySettingsChanged(object? sender, EventArgs e) => QueueFullscreenBoundsRefresh();
+
+    private IntPtr WindowMessageHook(IntPtr hwnd, int message, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        if (_fullscreen && (message is WmDpiChanged or WmDisplayChange))
+            QueueFullscreenBoundsRefresh();
+        return IntPtr.Zero;
+    }
+
+    // Mirrors have independent WPF visual trees and device-specific fullscreen
+    // bounds, but bind to the SAME ViewModel and live FFT data as the master.
+    private void ReconcileDisplayMirrors()
+    {
+        if (_isDisplayMirror || _reconcilingDisplayMirrors) return;
+        _reconcilingDisplayMirrors = true;
+        try
+        {
+            if (!_fullscreen || _viewModel.WindowFullscreenDisplayScope != "All")
+            {
+                CloseDisplayMirrors();
+                return;
+            }
+            var desired = FormsScreen.AllScreens
+                .Select(screen => screen.DeviceName)
+                .Where(device => !string.Equals(device, _fullscreenDisplayName,
+                    StringComparison.OrdinalIgnoreCase))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var mirror in _displayMirrors.ToArray())
+            {
+                if (mirror._forcedDisplayName is null || !desired.Contains(mirror._forcedDisplayName))
+                {
+                    _displayMirrors.Remove(mirror);
+                    mirror.Close();
+                }
+            }
+            foreach (var display in desired)
+            {
+                if (_displayMirrors.Any(mirror => string.Equals(mirror._forcedDisplayName, display,
+                        StringComparison.OrdinalIgnoreCase))) continue;
+                var mirror = new WindowVisualizerWindow(_viewModel, true, display, this);
+                _displayMirrors.Add(mirror);
+                mirror.Closed += (_, _) => _displayMirrors.Remove(mirror);
+                mirror.Show();
+            }
+        }
+        finally { _reconcilingDisplayMirrors = false; }
+    }
+
+    private void CloseDisplayMirrors()
+    {
+        foreach (var mirror in _displayMirrors.ToArray())
+        {
+            _displayMirrors.Remove(mirror);
+            mirror.Close();
+        }
+    }
+
+    private void ExitFullscreenFromMirror()
+    {
+        if (_fullscreen && !_isDisplayMirror) ToggleFullscreen();
+    }
+
+    private void QueueFullscreenBoundsRefresh()
+    {
+        if (!_fullscreen || _fullscreenRefreshQueued || Dispatcher.HasShutdownStarted) return;
+        _fullscreenRefreshQueued = true;
+        _ = Dispatcher.BeginInvoke(new Action(() =>
+        {
+            _fullscreenRefreshQueued = false;
+            if (_fullscreen)
+            {
+                ApplyFullscreenBounds();
+                if (!_isDisplayMirror) ReconcileDisplayMirrors();
+            }
+        }), DispatcherPriority.Background);
     }
 }
